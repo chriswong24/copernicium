@@ -7,8 +7,7 @@
 # October 15, 2015
 ############################################################
 
-require 'minitest/spec'
-require 'minitest/autorun'
+require 'test_helper'
 
 class TestUI < Minitest::Test
 

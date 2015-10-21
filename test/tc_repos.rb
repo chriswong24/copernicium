@@ -2,7 +2,6 @@
 
 require 'minitest/spec'
 require 'minitest/autorun'
-require 'repos'
 
 # A preliminary outline for Repos Module unit testing
 class TestCnReposModule < Minitest::Test

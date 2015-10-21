@@ -1,6 +1,4 @@
-require 'minitest/spec'
-require 'minitest/autorun'
-require_relative 'RevLog'
+require 'test_helper'
 
 class TestMyRevLogModule < Minitest::Test
 
@@ -21,7 +19,7 @@ class TestMyRevLogModule < Minitest::Test
     # alterFile(fileObject, fileReferenceString, versionReferenceString)
     # -> True if succeed, otherwise False
     it "can alter a file" do
-      @db.alterFile(RevLog.dummyFileObject, 
+      @db.alterFile(RevLog.dummyFileObject,
                     @fileRef[0],
                     @fileRef[1]).wont_be nil
     end
@@ -46,7 +44,7 @@ class TestMyRevLogModule < Minitest::Test
     it "can view the log of a file" do
       @db.viewFileHistory(@fileRef[0]).is_a?(Hash).must_equal true
     end
-    
+
     # diffFile(fileReferenceString1, fileReferenceString2,
     #          versionReferenceString1, versionReferenceString2)
     # -> Text describing the difference of two files
@@ -61,7 +59,7 @@ class TestMyRevLogModule < Minitest::Test
 
     # getFile(fileReferenceString, versionReferenceString)
     # -> fileObject
-    
+
 
     it "can get a file" do
       @db.getFile(@fileRef[0],
