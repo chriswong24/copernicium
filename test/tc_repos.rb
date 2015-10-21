@@ -1,7 +1,6 @@
 # Logan Gittelson
 
-require 'minitest/spec'
-require 'minitest/autorun'
+require_relative 'test_helper'
 
 # A preliminary outline for Repos Module unit testing
 class TestCnReposModule < Minitest::Test

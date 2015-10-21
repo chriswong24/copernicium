@@ -7,7 +7,9 @@
 # October 15, 2015
 ############################################################
 
-require 'test_helper'
+
+require_relative 'test_helper'
+
 
 class TestUI < Minitest::Test
 

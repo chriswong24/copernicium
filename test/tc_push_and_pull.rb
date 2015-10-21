@@ -3,7 +3,7 @@
 # Unit Tests for Push and Pull
 # October 15, 2015
 
-require 'test_helper'
+require_relative 'test_helper'
 
 class TestPushPullModule < Minitest::Test
   @inst	  # The instance to be used for the testing
