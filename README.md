@@ -2,6 +2,9 @@
 ===================
 
 
+[![Build Status](https://travis-ci.org/jeremywrnr/copernicium.svg)](https://travis-ci.org/jeremywrnr/copernicium)
+
+
 Repository for Team Copernicium's DVCS.
 
 
