@@ -12,7 +12,7 @@ Repository for Team Copernicium's DVCS.
 
 To run the entire test suite, run `rake`. Else run a specific test suite, eg:
 
-    $ rake 'test[push_and_pull]'
+    $ rake 'test[pushpull]'
 
 
 ### Relevant links:
