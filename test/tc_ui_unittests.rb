@@ -14,7 +14,7 @@ require_relative 'test_helper'
 class TestUI < Minitest::Test
 
   describe "UIModule" do
-    
+
     it "supports 'init' command" do
       comm = parse_command "init"
       comm.must_be_instance_of UICommandCommunicator
@@ -32,7 +32,7 @@ class TestUI < Minitest::Test
       comm.rev.must_be_nil
       comm.commit_message.must_be_nil
     end
-    
+
     it "supports 'addremove' command" do
       comm = parse_command "addremove"
       comm.must_be_instance_of UICommandCommunicator
@@ -219,11 +219,11 @@ class TestUI < Minitest::Test
       # a UI command like "git remote" - rather, the remote would be set automatically when
       # cloning, and a user could change remotes by editing the config file directly if needed
       # (which, frankly, is often what people end up doing for Git and Mercurial).
-      
+
       # Just fail the test for now
       nil.must_equal "Test not yet implemented"
     end
-      
+
   end
 end
 
@@ -231,7 +231,7 @@ end
 class UICommandCommunicator
 
   attr_reader :command
-  
+
   # Types of arguments - different fields will be set depending on the command
   attr_reader :files # An array of one or more file paths
   attr_reader :rev # A single revision indicator (commit #, branch name, HEAD, tip, etc.)
