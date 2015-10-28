@@ -8,3 +8,6 @@ task :test, [:module] do |r, m| # run module
     Rake::TestTask.new {|t| t.pattern = "test/tc_#{m[:module]}.rb"}
   end
 end
+task :info do # parse how many exist/work
+  puts `rake test 2>/dev/null | sed -ne '/.*tests.*skips/p'`
+end
