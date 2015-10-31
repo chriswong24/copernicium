@@ -5,27 +5,33 @@ module RevLog
     def initialize()
     end
  
-    def addFile(fileObject, fileReferenceString)
+    def add_file(fileObject, fileReferenceString)
     end
 
-    def alterFile(fileObject, fileReferenceString, versionReferenceString)
+    def delete_file(fileReferenceString)
+    end
+    
+    def diff_files(fileReferenceString1, fileReferenceString2,
+                   versionReferenceString1, versionReferenceString2)
     end
 
-    def deleteFileVersion(fileReferenceString, versionReferenceString)
+    def get_file(fileReferenceString, versionReferenceString)
     end
 
-    def deleteFile(fileReferenceString)
+    def hash_file(fileObject)
     end
 
-    def viewFileHistory(fileReferenceString)
+    def merge(fileObject1, fileObject2)
     end
 
-    def diffFile(fileReferenceString1, fileReferenceString2,
-                 versionReferenceString1, versionReferenceString2)
-    end
+    # def alterFile(fileObject, fileReferenceString, versionReferenceString)
+    # end
 
-    def getFile(fileReferenceString, versionReferenceString)
-    end
+    # def deleteFileVersion(fileReferenceString, versionReferenceString)
+    # end
+
+    # def viewFileHistory(fileReferenceString)
+    # end
   end
   
 end
