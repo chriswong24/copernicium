@@ -14,7 +14,10 @@ end
 
 # parse how many tests exist/work
 task :info do
-  puts `rake test 2>/dev/null | sed -ne '/.*tests.*skips/p'`
+  puts "All: \t" + `rake test 2>/dev/null | sed -ne '/.*tests.*skips/p'`
+  for mod in %w[repos revlog ui workspace pushpull]
+    puts "#{mod}:\t" + `rake test[#{mod}] 2>/dev/null | sed -ne '/.*tests.*skips/p'`
+  end
 end
 
 # adding documentation cmds
