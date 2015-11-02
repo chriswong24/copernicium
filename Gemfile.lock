@@ -10,6 +10,7 @@ GEM
       minitest (>= 5.0)
       ruby-progressbar
     rake (10.3.2)
+    rdoc (4.2.0)
     ruby-progressbar (1.7.5)
 
 PLATFORMS
@@ -19,3 +20,7 @@ DEPENDENCIES
   minitest
   minitest-reporters
   rake
+  rdoc
+
+BUNDLED WITH
+   1.10.6
