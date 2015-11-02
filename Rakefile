@@ -30,7 +30,7 @@ task :info do
       curbr = br
       curnext = false
     elsif br != '*'
-      system "git checkout #{curbr}"
+      system "git checkout #{br}"
       puts "#{br} commits:\t" + `git --no-pager log --oneline | wc -l`
     else
       curnext = true
