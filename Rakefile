@@ -28,10 +28,12 @@ task :info do
   `git branch`.split.each do |br|
     if curnext
       curbr = br
+      `git checkout #{br}`
+      puts "#{br} commits: " + `git --no-pager log --oneline | wc -l`
       curnext = false
     elsif br != '*'
       `git checkout #{br}`
-      puts "#{br} commits:\t" + `git --no-pager log --oneline | wc -l`
+      puts "#{br} commits: " + `git --no-pager log --oneline | wc -l`
     else
       curnext = true
     end
