@@ -2,7 +2,7 @@ require 'rake'
 require 'rake/testtask'
 require 'rdoc/task'
 
- # run all/module tests
+# run all/module tests
 task :default  => :test
 task :test, [:module] do |r, m|
   if m[:module].nil?
@@ -12,12 +12,33 @@ task :test, [:module] do |r, m|
   end
 end
 
-# parse how many tests exist/work
+# show info about the repo
 task :info do
+  # parse how many tests exist/work
+  puts "Test info...\n\n"
   puts "All: \t" + `rake test 2>/dev/null | sed -ne '/.*tests.*skips/p'`
-  for mod in %w[repos revlog ui workspace pushpull]
+  %w[repos revlog ui workspace pushpull].each do |mod|
     puts "#{mod}:\t" + `rake test[#{mod}] 2>/dev/null | sed -ne '/.*tests.*skips/p'`
   end
+
+  # list how many commits per branch
+  puts "\nCommit info...\n\n"
+  curbr = '---'
+  curnext = false
+  `git branch`.split.each do |br|
+    if curnext
+      curbr = br
+      curnext = false
+    elsif br != '*'
+      system "git checkout #{curbr}"
+      puts "#{br} commits:\t" + `git --no-pager log --oneline | wc -l`
+    else
+      curnext = true
+    end
+  end
+
+  # checkout original branch
+  system "git checkout #{curbr}"
 end
 
 # adding documentation cmds
