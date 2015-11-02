@@ -23,24 +23,26 @@ task :info do
 
   # list how many commits per branch
   puts "\nCommit info...\n\n"
-  curbr = '---'
+  original = 'null'
   curnext = false
+  def checkout(br) `git checkout #{br} &>/dev/null` end
+  def numcommits() `git --no-pager log --oneline | wc -l` end
   `git branch`.split.each do |br|
     if curnext
-      curbr = br
-      `git checkout #{br}`
-      puts "#{br} commits: " + `git --no-pager log --oneline | wc -l`
+      original = br
+      checkout br
+      puts "#{br} commits: " + numcommits
       curnext = false
     elsif br != '*'
-      `git checkout #{br}`
-      puts "#{br} commits: " + `git --no-pager log --oneline | wc -l`
+      checkout br
+      puts "#{br} commits: " + numcommits
     else
       curnext = true
     end
   end
 
   # checkout original branch
-  `git checkout #{curbr}`
+  checkout original
 end
 
 # adding documentation cmds
