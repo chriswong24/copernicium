@@ -29,18 +29,24 @@ module RevLog
   class RevLog
     def initialize(project_path)
       @project_path = project_path
-      if file.exist?(File.join(project_path,".cop")) then
+      @cop_path = File.join(project_path, ".cop")
+      if file.exist?(@cop_path) then
         @logmap = yaml::load(File.join(project_path, ".cop/logmap.yaml"))
       else
-        @logmap = {}
-        Dir.mkdir(File.join(project_path, ".cop"))
+        @logmap = Hash.new {[]}
+        Dir.mkdir(@cop_path)
       end
     end 
     
-    def 
-    end
- 
-    def add_file(fileObject, fileReferenceString)
+    def add_file(file_name, content)
+      hash = self.hash_file(file_name, content)
+      File.open(File.join(@cop_path, hash)) { |f|
+        f.write(content)
+      }
+      @logmap[file_name] << {:time => Time.now,
+                             :hash => hash}
+      self.update_log_file()
+      return hash
     end
 
     def delete_file(fileReferenceString)
@@ -50,7 +56,15 @@ module RevLog
                    versionReferenceString1, versionReferenceString2)
     end
 
-    def get_file(fileReferenceString, versionReferenceString)
+    def get_file(file_id)
+      file_path = File.join(@cop_path, file_id)
+      if File.exist?(file_path)
+        File.open(file_path) { |f|
+          return f.read
+        }
+      else
+        raise Exception, "Invalid file_id!"
+      end
     end
 
     def hash_file(file_name, content)
@@ -71,5 +85,12 @@ module RevLog
 
 
     private
+
+    def update_log_file()
+      File.open(File.join(@project_path, ".cop", "logmap.yaml"), "w") { |f|
+        f.write(@logmap.to_yaml) 
+      }
+    end
+
   end
 end
