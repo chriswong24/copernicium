@@ -1,11 +1,11 @@
 require_relative 'test_helper'
+require_relative '../lib/RevLog'
 
 class TestMyRevLogModule < Minitest::Test
 
   describe "RevLogModule" do
     before "manipulating the log" do
-      @db = RevLog.RevLog.new
-      @fileRef = @db.addFile(RevLog.DUMMYFILEOBJECT, nil)
+      @db = RevLog.RevLog.new(Dir.pwd)
     end
     # addFile(fileObject, fileReferenceString)
     # -> (fileReferenceString, versionReferenceString)
@@ -13,8 +13,8 @@ class TestMyRevLogModule < Minitest::Test
     # the fileReferenceString is empty, then create new entry in the
     # database"
     it "can add a file" do
-      @db.addFile(RevLog.DUMMYFILEOBJECT, nil)
-      @db.length.must_equal 2
+      hash = @db.addFile("testfilename", "testfilecontent")
+      hash.must_equal "dc198016e4d7dcace98d5843a3e6fd506c1c790110091e6748a15c79fefc02ca"
     end
     # alterFile(fileObject, fileReferenceString, versionReferenceString)
     # -> True if succeed, otherwise False
