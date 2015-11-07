@@ -24,8 +24,6 @@ require 'yaml'
 
 
 module RevLog
-  DUMMYFILEOBJECT = File.new("dummyfile.test", 'w+')
-  
   class RevLog
     def initialize(project_path)
       @project_path = project_path
