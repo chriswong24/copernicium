@@ -12,6 +12,12 @@ task :test, [:module] do |r, m|
   end
 end
 
+# setup dev env with bundler
+task :setup do
+  system 'gem install bundler'
+  system 'bundler install'
+end
+
 # show info about the repo
 task :info do
   # parse how many tests exist/work
