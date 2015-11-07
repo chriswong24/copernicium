@@ -5,11 +5,11 @@ class TestMyRevLogModule < Minitest::Test
 
   describe "RevLogModule" do
     before "manipulating the log" do
-      @db = RevLog.RevLog.new(Dir.pwd)
+      @db = RevLog::RevLog.new(Dir.pwd)
     end
     
     it "can add a file" do
-      hash = @db.addFile("testfilename", "testfilecontent")
+      hash = @db.add_file("testfilename", "testfilecontent")
       hash.must_equal "dc198016e4d7dcace98d5843a3e6fd506c1c790110091e6748a15c79fefc02ca"
     end
     # alterFile(fileObject, fileReferenceString, versionReferenceString)

@@ -1,4 +1,5 @@
 require 'yaml'
+require 'digest'
 
 # Revlog Top Level Function Definitions (Xiangru)
 # add_file: add a file to the revision history
@@ -81,6 +82,10 @@ module RevLog
 
     # def viewFileHistory(fileReferenceString)
     # end
-
+    def update_log_file()
+      File.open(File.join(@project_path, ".cop", "logmap.yaml"), "w") { |f|
+        f.write(@logmap.to_yaml) 
+      }
+    end
   end
 end
