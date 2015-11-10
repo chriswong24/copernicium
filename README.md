@@ -8,6 +8,13 @@
 Repository for Team Copernicium's DVCS.
 
 
+### Setup
+
+To install all runtime and testing dependencies, run:
+
+    $ rake setup
+
+
 ### Testing
 
 To run the entire test suite, run `rake`. Else run a specific test suite, eg:

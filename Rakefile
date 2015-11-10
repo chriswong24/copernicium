@@ -12,6 +12,12 @@ task :test, [:module] do |r, m|
   end
 end
 
+# setup dev env with bundler
+task :setup do
+  system 'gem install bundler'
+  system 'bundler install'
+end
+
 # show info about the repo
 task :info do
   # parse how many tests exist/work
@@ -23,19 +29,20 @@ task :info do
 
   # list how many commits per branch
   puts "\nCommit info...\n\n"
+  def numcommits() `git --no-pager log --oneline | wc -l` end
+  def checkout(br) system "git checkout #{br} &>/dev/null" end
+  def cleanup(br) "#{br} commits \t(" + numcommits.to_i.to_s + ')' end
   original = 'null'
   curnext = false
-  def checkout(br) `git checkout #{br} &>/dev/null` end
-  def numcommits() `git --no-pager log --oneline | wc -l` end
   `git branch`.split.each do |br|
     if curnext
       original = br
       checkout br
-      puts "#{br} commits: " + numcommits
+      puts cleanup(br)
       curnext = false
     elsif br != '*'
       checkout br
-      puts "#{br} commits: " + numcommits
+      puts cleanup(br)
     else
       curnext = true
     end
