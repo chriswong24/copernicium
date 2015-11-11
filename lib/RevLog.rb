@@ -1,5 +1,6 @@
 require 'yaml'
 require 'digest'
+require 'diffy'
 
 # Revlog Top Level Function Definitions (Xiangru)
 # add_file: add a file to the revision history
@@ -32,8 +33,8 @@ module RevLog
         @logmap = default_hash.merge(YAML.load_file(@log_path))
         @hashmap = default_hash.merge(YAML.load_file(@hash_path))
       else
-        @logmap = self.default_hash_factory()
-        @hashmap = self.default_hash_factory()
+        @logmap = default_hash_factory()
+        @hashmap = default_hash_factory()
         unless File.exist?(@cop_path)
           Dir.mkdir(@cop_path)
         end
@@ -45,7 +46,7 @@ module RevLog
     end
     
     def add_file(file_name, content)
-      hash = self.hash_file(file_name, content)
+      hash = hash_file(file_name, content)
       File.open(File.join(@cop_path, hash), "w") { |f|
         f.write(content)
       }
@@ -75,9 +76,6 @@ module RevLog
       end
     end
     
-    def diff_files(file_id1, file_id2)
-      
-    end
 
     def get_file(file_id)
       file_path = File.join(@cop_path, file_id)
@@ -88,6 +86,12 @@ module RevLog
       else
         raise Exception, "Invalid file_id!"
       end
+    end
+
+
+    def diff_files(file_id1, file_id2)
+      return Diffy::Diff.new(get_file(file_id1),
+                             get_file(file_id2)).to_s()
     end
 
     def hash_file(file_name, content)
