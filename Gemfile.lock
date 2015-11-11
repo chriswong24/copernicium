@@ -4,6 +4,7 @@ GEM
     ansi (1.5.0)
     builder (3.2.2)
     diffy (3.0.7)
+    digest (0.0.1)
     minitest (5.8.1)
     minitest-reporters (1.1.4)
       ansi
@@ -19,6 +20,7 @@ PLATFORMS
 
 DEPENDENCIES
   diffy
+  digest
   minitest
   minitest-reporters
   rake
