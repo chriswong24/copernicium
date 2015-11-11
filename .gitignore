@@ -1,4 +1,5 @@
 dummyfile.test
 .DS_Store
+.cop
 *.swp
 *.swo
