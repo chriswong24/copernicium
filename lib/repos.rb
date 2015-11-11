@@ -39,6 +39,8 @@
 module Repos
   class Repos
     def initialize()
+    # Create manifest
+    # Create current
     end
     
     def make_snapshot(file_array)
@@ -71,6 +73,11 @@ module Repos
     def delete_branch(branch_name)
     # Exit status code
     end
+    
+    def clear()
+    # Just a placeholder for now
+    end
+    
   end
 end
 
