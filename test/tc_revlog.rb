@@ -1,25 +1,21 @@
 require_relative 'test_helper'
+require_relative '../lib/RevLog'
 
 class TestMyRevLogModule < Minitest::Test
 
   describe "RevLogModule" do
     before "manipulating the log" do
-      @db = RevLog.new
-      @fileRef = @db.addFile(RevLog.dummyFileObject, nil)
+      @db = RevLog::RevLog.new(Dir.pwd)
     end
-    # addFile(fileObject, fileReferenceString)
-    # -> (fileReferenceString, versionReferenceString)
-    # "add the file corresponding to the fileReferenceString to database, if
-    # the fileReferenceString is empty, then create new entry in the
-    # database"
+    
     it "can add a file" do
-      @db.addFile(RevLog.dummyFileObject, nil)
-      @db.length.must_equal 2
+      hash = @db.add_file("testfilename", "testfilecontent")
+      hash.must_equal "dc198016e4d7dcace98d5843a3e6fd506c1c790110091e6748a15c79fefc02ca"
     end
     # alterFile(fileObject, fileReferenceString, versionReferenceString)
     # -> True if succeed, otherwise False
     it "can alter a file" do
-      @db.alterFile(RevLog.dummyFileObject,
+      @db.alterFile(RevLog.DUMMYFILEOBJECT,
                     @fileRef[0],
                     @fileRef[1]).wont_be nil
     end
@@ -49,22 +45,21 @@ class TestMyRevLogModule < Minitest::Test
     #          versionReferenceString1, versionReferenceString2)
     # -> Text describing the difference of two files
     it "can view the difference" do
-      fileRef2 = @db.addFile(RevLog.dummyFileObject, nil)
+      fileRef2 = @db.addFile(RevLog.DUMMYFILEOBJECT, nil)
       @db.diffFile(@fileRef[0],
                    fileRef2[0],
                    @fileRef[1],
                    fileRef2[1]).is_a?(String).must_equal true
     end
 
-
-    # getFile(fileReferenceString, versionReferenceString)
-    # -> fileObject
-
-
     it "can get a file" do
-      @db.getFile(@fileRef[0],
-                  @fileRef[1]).is_a?(RevLog.FileObject).must_equal true
+      content = @db.get_file(@db.add_file("testfilename1", "testfilecontent1"))
+      content.must_equal "testfilecontent1"
     end
 
+    it "can hash a file" do
+      hash = @db.hash_file("testfilename", "testfilecontent")
+      hash.must_equal "dc198016e4d7dcace98d5843a3e6fd506c1c790110091e6748a15c79fefc02ca"
+    end
   end
 end

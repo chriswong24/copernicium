@@ -13,7 +13,7 @@ class TestCnReposModule < Minitest::Test
       #pass
 
     end
-    
+
     it "can create snapshot from external command" do
       # do takeSnapshot stuff - need to check docs for proper naming convention
       @my_repo.clear()
@@ -30,9 +30,9 @@ class TestCnReposModule < Minitest::Test
       @my_repo.restoreSnapshot(repo1).wont_be_nil  # returned success
       @my_repo.diffSnapshots(repo1).must_be_nil             # restored correctly
     end
-    
+
     # UpdateManifest need a test? Only internal?
-    
+
     it "can read list returned by manifest" do
       # do listManifest stuff
       @my_repo.clear()
@@ -44,7 +44,7 @@ class TestCnReposModule < Minitest::Test
       snap3 = my_repo.current
       @my_repo.listManifest.must_equal([snap1, snap2, snap3])  # Will probably have to be different than this
     end
-    
+
     it "can check if snapshot deleted from manifest" do
       # do DeleteSnapshots stuff
       @my_repo.clear()
@@ -57,7 +57,7 @@ class TestCnReposModule < Minitest::Test
       @my_repo.deleteSnapshots([snap1])
       @my_repo.listManifest.must_equal([snap2, snap3])  # Will probably have to be different than this
     end
-    
+
     it "can check if correct differences between snapshots" do
       # do diffSnapshots stuff
       # diffSnapshots will use current if no second parameter specified
