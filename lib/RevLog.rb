@@ -27,16 +27,22 @@ module RevLog
       @project_path = project_path
       @cop_path = File.join(project_path, ".cop")
       @log_path = File.join(@cop_path, "logmap.yaml")
-      default_hash = Hash.new {[]}
-      if File.exist?(@log_path) then
+      @hash_path = File.join(@cop_path, "hashmap.yaml")
+      if File.exist?(@log_path) and File.exist?(@hash_path) then
         @logmap = default_hash.merge(YAML.load_file(@log_path))
+        @hashmap = default_hash.merge(YAML.load_file(@hash_path))
       else
-        @logmap = default_hash
+        @logmap = self.default_hash_factory()
+        @hashmap = self.default_hash_factory()
         unless File.exist?(@cop_path)
           Dir.mkdir(@cop_path)
         end
       end
     end 
+
+    def default_hash_factory()
+      Hash.new {[]}
+    end
     
     def add_file(file_name, content)
       hash = self.hash_file(file_name, content)
@@ -45,11 +51,15 @@ module RevLog
       }
       @logmap[file_name] << {:time => Time.now,
                              :hash => hash}
+      @hashmap[hash] << {:time => Time.now,
+                         :filename => file_name}
       update_log_file()
       return hash
     end
 
-    def delete_file(fileReferenceString)
+    def delete_file(file_id)
+      File.delete(File.join(@cop_path, file_id))
+      # todo
     end
     
     def diff_files(fileReferenceString1, fileReferenceString2,
@@ -83,8 +93,11 @@ module RevLog
     # def viewFileHistory(fileReferenceString)
     # end
     def update_log_file()
-      File.open(File.join(@project_path, ".cop", "logmap.yaml"), "w") { |f|
+      File.open(File.join(@cop_path, "logmap.yaml"), "w") { |f|
         f.write(@logmap.to_yaml) 
+      }
+      File.open(File.join(@cop_path, "hashmap.yaml"), "w") { |f|
+        f.write(@hashmap.to_yaml) 
       }
     end
   end
