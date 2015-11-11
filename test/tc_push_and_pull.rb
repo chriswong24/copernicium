@@ -3,10 +3,8 @@
 # Unit Tests for Push and Pull
 # October 15, 2015
 
-require 'minitest/spec'
-require 'minitest/autorun'
 require 'io/console'    # Needed to hide password at console
-require_relative 'PushPull/PushPull'
+require_relative 'test_helper.rb'
 
 class TestPushPullModule < Minitest::Test	
 	describe Copernicium_PushPull::PushPull do
