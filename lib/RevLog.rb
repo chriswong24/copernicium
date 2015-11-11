@@ -98,7 +98,18 @@ module RevLog
       Digest::SHA256.hexdigest(file_name + content.to_s)
     end
 
-    def merge(fileObject1, fileObject2)
+    def merge(file_id1, file_id2)
+      diff_a = Diffy::Diff.new(get_file(file_id1),
+                               get_file(file_id2)).each_chunk.to_a()
+      if diff_a.all? { |d| d[0]!="-"}
+        return get_file(file_id2)
+      end
+      
+      if diff_a.all? { |d| d[0]!="+"}
+        return get_file(file_id1)
+      end
+
+      return diff_a
     end
 
     # def alterFile(fileObject, fileReferenceString, versionReferenceString)
