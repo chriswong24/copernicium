@@ -3,3 +3,4 @@ gem 'rake'
 gem 'rdoc'
 gem 'minitest'
 gem "minitest-reporters"
+gem 'diffy'

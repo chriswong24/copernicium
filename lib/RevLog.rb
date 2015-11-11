@@ -57,13 +57,26 @@ module RevLog
       return hash
     end
 
+    ## return 1 if succeed, otherwise 0
     def delete_file(file_id)
-      File.delete(File.join(@cop_path, file_id))
-      # todo
+      begin 
+        file_name = @hashmap[file_id][:filename]
+        @hashmap[file_id].delete_if { |e| 
+          e[:filename] == file_name
+        }
+        @logmap[file_name].delete_if { |e|
+          e[:hash] == file_id
+        }
+        update_log_file()
+        File.delete(File.join(@cop_path, file_id))
+        return 1
+      rescue Exception
+        return 0
+      end
     end
     
-    def diff_files(fileReferenceString1, fileReferenceString2,
-                   versionReferenceString1, versionReferenceString2)
+    def diff_files(file_id1, file_id2)
+      
     end
 
     def get_file(file_id)
