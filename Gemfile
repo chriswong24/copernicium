@@ -5,4 +5,3 @@ gem 'minitest'
 gem "minitest-reporters"
 gem 'digest'
 gem 'diffy'
-gem 'yaml'
