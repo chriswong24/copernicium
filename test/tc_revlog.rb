@@ -62,6 +62,8 @@ class TestMyRevLogModule < Minitest::Test
       hash.must_equal "dc198016e4d7dcace98d5843a3e6fd506c1c790110091e6748a15c79fefc02ca"
     end
 
-    
+    after "RevLogModule" do
+      FileUtils.rm_rf(File.join(Dir.pwd, ".cop"))
+    end
   end
 end
