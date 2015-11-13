@@ -50,10 +50,10 @@ module RevLog
       File.open(File.join(@cop_path, hash), "w") { |f|
         f.write(content)
       }
-      @logmap[file_name] << {:time => Time.now,
-                             :hash => hash}
-      @hashmap[hash] << {:time => Time.now,
-                         :filename => file_name}
+      @logmap[file_name] = @logmap[file_name] << {:time => Time.now,
+                                                  :hash => hash}
+      @hashmap[hash] = @hashmap[hash] << {:time => Time.now,
+                                          :filename => file_name}
       update_log_file()
       return hash
     end
@@ -61,7 +61,7 @@ module RevLog
     ## return 1 if succeed, otherwise 0
     def delete_file(file_id)
       begin 
-        file_name = @hashmap[file_id][:filename]
+        file_name = @hashmap[file_id][0][:filename]
         @hashmap[file_id].delete_if { |e| 
           e[:filename] == file_name
         }
@@ -71,7 +71,7 @@ module RevLog
         update_log_file()
         File.delete(File.join(@cop_path, file_id))
         return 1
-      rescue Exception
+      rescue Exception => e
         return 0
       end
     end
@@ -108,7 +108,6 @@ module RevLog
       if diff_a.all? { |d| d[0]!="+"}
         return get_file(file_id1)
       end
-
       return diff_a
     end
 
