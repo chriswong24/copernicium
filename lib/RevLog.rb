@@ -1,5 +1,6 @@
 require 'yaml'
 require 'digest'
+require 'diffy'
 
 # Revlog Top Level Function Definitions (Xiangru)
 # add_file: add a file to the revision history
@@ -32,8 +33,8 @@ module RevLog
         @logmap = default_hash.merge(YAML.load_file(@log_path))
         @hashmap = default_hash.merge(YAML.load_file(@hash_path))
       else
-        @logmap = self.default_hash_factory()
-        @hashmap = self.default_hash_factory()
+        @logmap = default_hash_factory()
+        @hashmap = default_hash_factory()
         unless File.exist?(@cop_path)
           Dir.mkdir(@cop_path)
         end
@@ -45,26 +46,36 @@ module RevLog
     end
     
     def add_file(file_name, content)
-      hash = self.hash_file(file_name, content)
+      hash = hash_file(file_name, content)
       File.open(File.join(@cop_path, hash), "w") { |f|
         f.write(content)
       }
-      @logmap[file_name] << {:time => Time.now,
-                             :hash => hash}
-      @hashmap[hash] << {:time => Time.now,
-                         :filename => file_name}
+      @logmap[file_name] = @logmap[file_name] << {:time => Time.now,
+                                                  :hash => hash}
+      @hashmap[hash] = @hashmap[hash] << {:time => Time.now,
+                                          :filename => file_name}
       update_log_file()
       return hash
     end
 
+    ## return 1 if succeed, otherwise 0
     def delete_file(file_id)
-      File.delete(File.join(@cop_path, file_id))
-      # todo
+      begin 
+        file_name = @hashmap[file_id][0][:filename]
+        @hashmap[file_id].delete_if { |e| 
+          e[:filename] == file_name
+        }
+        @logmap[file_name].delete_if { |e|
+          e[:hash] == file_id
+        }
+        update_log_file()
+        File.delete(File.join(@cop_path, file_id))
+        return 1
+      rescue Exception => e
+        return 0
+      end
     end
     
-    def diff_files(fileReferenceString1, fileReferenceString2,
-                   versionReferenceString1, versionReferenceString2)
-    end
 
     def get_file(file_id)
       file_path = File.join(@cop_path, file_id)
@@ -77,11 +88,27 @@ module RevLog
       end
     end
 
+
+    def diff_files(file_id1, file_id2)
+      return Diffy::Diff.new(get_file(file_id1),
+                             get_file(file_id2)).to_s()
+    end
+
     def hash_file(file_name, content)
       Digest::SHA256.hexdigest(file_name + content.to_s)
     end
 
-    def merge(fileObject1, fileObject2)
+    def merge(file_id1, file_id2)
+      diff_a = Diffy::Diff.new(get_file(file_id1),
+                               get_file(file_id2)).each_chunk.to_a()
+      if diff_a.all? { |d| d[0]!="-"}
+        return get_file(file_id2)
+      end
+      
+      if diff_a.all? { |d| d[0]!="+"}
+        return get_file(file_id1)
+      end
+      return diff_a
     end
 
     # def alterFile(fileObject, fileReferenceString, versionReferenceString)
