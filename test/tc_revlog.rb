@@ -29,7 +29,7 @@ class TestMyRevLogModule < Minitest::Test
       hash2 = @db.add_file("testfilename", "testfilecontent\n")
       @db.merge(hash2, hash1).must_equal "testfilecontent\ntestfilecontent2\n"
     end
-      
+    
     it "can get a file" do
       content = @db.get_file(@db.add_file("testfilename1", "testfilecontent1"))
       content.must_equal "testfilecontent1"
