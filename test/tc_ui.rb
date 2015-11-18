@@ -17,13 +17,17 @@ class TestUI < Minitest::Test
 
   describe "UIModule" do
 
+    def ui_test_helper(comm, cmd, files=nil, rev=nil, msg=nil)
+      comm.must_be_instance_of UICommandCommunicator
+      comm.command.must_equal cmd
+      comm.files.must_equal files
+      comm.rev.must_equal rev
+      comm.commit_message.must_equal msg
+    end
+
     it "supports 'init' command" do
       comm = parse_command "init"
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "init"
-      comm.files.must_be_nil
-      comm.rev.must_be_nil
-      comm.commit_message.must_be_nil
+      ui_test_helper('init')
     end
 
     it "supports 'add' command" do
