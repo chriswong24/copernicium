@@ -1,7 +1,11 @@
 #!/usr/bin/env ruby
 
+require_relative "../lib/ui.rb"
+require_relative "../lib/repos.rb"
+require_relative "../lib/RevLog.rb"
+require_relative "../lib/PushPull.rb"
 require_relative "../lib/workspace.rb"
 
 # copernicium -  a distributed version control
 
-UI.new(ARGV)
+UI.parse_command(ARGV.join ' ')
