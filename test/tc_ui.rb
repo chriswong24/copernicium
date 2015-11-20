@@ -10,7 +10,7 @@
 
 require_relative 'test_helper'
 
-include UI
+include Copernicium
 
 
 class TestUI < Minitest::Test

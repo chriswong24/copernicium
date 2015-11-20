@@ -1,6 +1,6 @@
 # user interface module
 
-module UI
+module Copernicium
   # Function: parse_command()
   #
   # Parameters:
