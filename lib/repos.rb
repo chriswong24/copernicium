@@ -40,29 +40,21 @@ require 'digest'
 
 module Repos
   class Snapshot
-  {
+    def initialize(in_array)
+      @files = in_array
+      # id = hash of in array?
+    end
     # contains array of file objects
     # other info? - ID
     # Initialize hash at startup
     # Possible? Or problem with self object?
-  
-  
-  }
-  class Manifest
-  {
-    # snapshots will be list of snapshots
-    # a snapshot will be a list of file objects
-    # where do we get the file object def???
-    # consider defining snapshot object
-    
-    # Just do list of snapshots instead
-
-  }
+  end
   class Repos
     def initialize()
       # Create manifest
+      # It's a list of snapshots in chronological order
       manifest = []
-      # Read in project path and make manifest file
+      # Read in project path and make manifest file?
       # Create current
     end
     
@@ -74,6 +66,13 @@ module Repos
       return new_snap.hash
     end
     
+    def get_snapshot(target_id)
+      # Return snapshot (or just contents) given id
+      # Find snapshot
+      # Return it
+    end
+    
+    # Not sure how I'm gonna do this one
     def restore_snapshot(target_id)
       # Return comm object with status
       # Need a way to change files in workspace
@@ -87,24 +86,28 @@ module Repos
     end
     
     def delete_snapshot(target_id)
-    # Return comm object with status
+      # Return comm object with status
+      # Find snapshot, delete from manifest/memory
     end
     
     def diff_snapshots(id1, id2)
     # Return list of filenames and versions
+    # Find snapshot1 and snapshot2
+    # Use revlog diff on each set of files? Look at Diffy
     end
     
     def make_branch(branch_name)
-    # Return hash ID of new branch
-    return 2
+      # Return hash ID of new branch
+      # Not sure where to store branches
+      return 2
     end
     
     def delete_branch(branch_name)
-    # Exit status code
+      # Exit status code
     end
     
     def clear()
-    # Just a placeholder for now
+      # Just a placeholder for now
     end
     
   end
