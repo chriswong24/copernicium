@@ -169,7 +169,7 @@ module Workspace
             deletes.push(x)
           end
         end
-        @files do |x|
+        @files.each do |x|
           if comm.files.index(x) == nil
             adds.push(x)
           end
