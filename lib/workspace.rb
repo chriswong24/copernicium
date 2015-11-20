@@ -95,12 +95,12 @@ module Workspace
         list_files.each do |x|
           if @files.include? x == false
             content = Workspace.read(x)
-            hash = Revlop.add_file(x, content)
+            hash = RevLog.add_file(x, content)
             fobj = FileObj.new(x, [hash,])
             @files.add(fobj)
           else
             content = Workspace.read(x)
-            hash = Revlop.add_file(x, content)
+            hash = RevLog.add_file(x, content)
             fobj = @files[@files.index(x)]
             if fobj.history_hash_ids[-1] != hash
               fobj.history_hash_ids << hash
