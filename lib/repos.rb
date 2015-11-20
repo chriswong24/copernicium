@@ -1,5 +1,7 @@
 # repos module
 
+require 'digest'
+
 # Details from this link:
 #   https://docs.google.com/document/d/1r3-NquhyRLbCncqTOQPwsznSZ-en6G6xzLbWIAmxhys/edit#heading=h.7pyingf1unu
 
@@ -34,18 +36,40 @@
 #   in - branch name
 #   out - exit status code
 
-
+# Also do a get_snapshot
 
 module Repos
+  class Snapshot
+  {
+    # contains array of file objects
+    # other info? - ID
+    # Initialize hash at startup
+    # Possible? Or problem with self object?
+  
+  
+  }
+  class Manifest
+  {
+    # snapshots will be list of snapshots
+    # a snapshot will be a list of file objects
+    # where do we get the file object def???
+    # consider defining snapshot object
+    
+    # Just do list of snapshots
+
+  }
   class Repos
     def initialize()
-    # Create manifest
-    # Create current
+      # Create manifest
+      manifest = []
+      # Create current
     end
     
     def make_snapshot(file_array)
-    # Return hash ID of snapshot
-    return 1
+      # Return hash ID of snapshot
+      Snapshot new_snap(file_array)
+      snap_hash = new_snap.hash
+      return 1
     end
     
     def restore_snapshot(target_id)
@@ -53,8 +77,10 @@ module Repos
     end
     
     def history(branch_name)
-    # Return array of snapshot IDs
-    return ['a', 'b', 'c']
+      # Return array of snapshot IDs
+      names_list = []
+      manifest.each {|x| names_list.append(x.id)}
+      return names_list
     end
     
     def delete_snapshot(target_id)
