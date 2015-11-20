@@ -113,11 +113,11 @@ module Workspace
             file_objs.add(x)
           end
         end
-        return 0
-        #return repos.make_snapshot(file_objs)
+        ###return 0
+        return repos.make_snapshot(file_objs)
       else
-        return 0
-        #return repos.make_snapshot(@files)
+        ###return 0
+        return repos.make_snapshot(@files)
       end
     end
 
