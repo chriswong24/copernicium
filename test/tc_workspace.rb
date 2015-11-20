@@ -10,14 +10,14 @@ class TestMyWorspaceModule < Minitest::Test
     describe "WorkspaceModule" do
         before "manipulating the workspace" do
             @workspace = Workspace::Workspace.new(Dir.pwd)
-            @workspcae.writefile("1.txt", "1")
-            @workspace.writefile("2.txt", "2")
+            @workspcae.writeFile("1.txt", "1")
+            @workspace.writeFile("2.txt", "2")
             @workspace.commit()
         end
 
         it "can clean the workspace to last commit" do
-            @workspace.write("1.txt","1_1")
-            @workspace.write("2.txt", "2_2")
+            @workspace.writeFile("1.txt","1_1")
+            @workspace.writeFile("2.txt", "2_2")
             @workspace.clean()
 
             content = ""
@@ -41,7 +41,7 @@ class TestMyWorspaceModule < Minitest::Test
         end
 
         it "can clean specific files in the workspace" do
-            @workspace.writefile("1.txt", "1_1")
+            @workspace.writeFile("1.txt", "1_1")
             @workspace.clean(["1.txt"])
 
             File.open("1.txt", "r") do |f|
@@ -53,8 +53,8 @@ class TestMyWorspaceModule < Minitest::Test
         end
 
         it "can commit a entire worksapce" do
-	    @workspace.write("1.txt","1_1")
-            @workspace.write("2.txt","2_2")
+	    @workspace.writeFile("1.txt","1_1")
+            @workspace.writeFile("2.txt","2_2")
             @workspace.commit()
             @workspace.clean()
             content = ""
@@ -77,7 +77,7 @@ class TestMyWorspaceModule < Minitest::Test
         end
 
         it "can commit a list of file" do
-            @workspace.write("1.txt","1_1_1")
+            @workspace.writeFile("1.txt","1_1_1")
             @workspace.commit(["1.txt"])
             @workspace.clean()
             content = ""
@@ -91,8 +91,8 @@ class TestMyWorspaceModule < Minitest::Test
         end
 
         it "can checkout a entire branch" do
-	    @workspace.write("1.txt","1_1_1_1")
-            @workspace.write("2.txt","2_2_2_2")
+	    @workspace.writeFile("1.txt","1_1_1_1")
+            @workspace.writeFile("2.txt","2_2_2_2")
             @workspace.commit()
             @workspace.checkout('master')
             content = ""
@@ -115,7 +115,7 @@ class TestMyWorspaceModule < Minitest::Test
         end
 
         it "can checkout a list of files" do
-	    @workspace.write("1.txt","none")
+	    @workspace.writeFile("1.txt","none")
 	    @workspace.checkout('1.txt')
             content = ""
             File.open("1.txt", "r") do |f|
@@ -129,8 +129,8 @@ class TestMyWorspaceModule < Minitest::Test
         
         it "can check the status of the workspace" do
 	    FileUtils.rm('2.txt')
-	    @workspace.write("1.txt","edit")
-	    @workspace.write("3.txt","3")
+	    @workspace.writeFile("1.txt","edit")
+	    @workspace.writeFile("3.txt","3")
             changedFiles = @workspace.status()
   	    changedFiles.must_equal([["3.txt"],["1.txt"],["2.txt"]])
         end
