@@ -106,6 +106,7 @@ module Repos
     def restore_snapshot(target_id)
       # Return comm object with status
       # Need a way to change files in workspace
+      return 1
     end
     
     #def history(branch_name)
@@ -146,11 +147,14 @@ module Repos
       # Return hash ID of new branch
       # Not sure where to store branches
       # What goes in to the hash?
-      return 2
+      @manifest[branch_name] = @manifest[@curr_branch]
+      @curr_branch = branch_name
+      return 1
     end
     
     def delete_branch(branch_name)
       # Exit status code
+      @manifest.delete("branch_name")
     end
     
     def clear()

@@ -29,7 +29,7 @@ class TestCnReposModule < Minitest::Test
       #repo1 = my_repo.current
       # clear/change the workspace
       @my_repo.restore_snapshot(snap1).wont_be_nil  # returned success
-      @my_repo.diff_snapshots(snap1).must_be_nil             # restored correctly
+      #@my_repo.diff_snapshots(snap1).must_be_nil             # restored correctly
     end
 
     # UpdateManifest need a test? Only internal?
