@@ -66,21 +66,26 @@ module Workspace
         # check that every file need to be reset should have been recognized by the workspace
         #workspace_files_paths = @files.each{|x| x.path}
         list_files.each do |x|
-          if @files.include? x
+          if @files.include? x == false
             return -1
           end
         end
         # the actual action, delete all of them from the workspace first
-        list_files.each{|x| File.delete(x.path)}
+        list_files.each{|x| File.delete(x)}
         list_files.each{|x| @files.delete(x)}
         # if we have had a branch, first we get the latest snapshot of it
         # and then checkout with the restored version of them
         if @branch_name != ''
           snapshot_id = repos.history(@branch_name)[-1]
           list_files_last_commit = repos.get_snapshot(snapshot_id)
-          paths = list_files.each{|x| x.path }
-          list_files_intersection = list_files_last_commit.each{|x| x if x.path in paths}
-          return checkout(list_files_intersection)
+          list_files_intersection = []
+          list_files.each do |x|
+            if list_files_last_commit.include? x
+              list_files_intersection.add(x)
+            end
+          end
+          return 0
+          ###return checkout(list_files_intersection)
         end
       end
     end
