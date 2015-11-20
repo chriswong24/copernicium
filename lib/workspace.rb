@@ -7,7 +7,25 @@ require_relative 'RevLog'
 require_relative 'repos'
 
 module Workspace
+  class FileObj
+    def initialize(path, ids)
+      @path = path
+      @history_hash_ids = ids
+    end
+    def path
+      @path
+    end
+    def history_hash_ids
+      @history_hash_ids
+    end
+  end
   class Workspace
+    def self.writeFile(path, content)
+      f = open(path, 'w')
+      f.write(content)
+      f.close
+    end
+    #private_class_method: writeFile
 
     def initialize
       @files = []
@@ -18,8 +36,10 @@ module Workspace
     # or rollback to the entire branch head pointed
     def clean(list_files)
       if list_files == nil
-        # reset @files first, and then restore it with checkout()
+        # reset first: delete them from disk and reset @files
+        @files.each{|x| File.delete(x.path)}
         @files = []
+        # and then restore it with checkout()
         # if we have had a branch name
         if @branch_name != ''
           return checkout(@branch_name)
@@ -35,9 +55,7 @@ module Workspace
           end
         end
         # the actual action, delete all of them from the workspace first
-        list_files.each do |x|
-          @files.delete(x)
-        end
+        list_files.each{ |x| @files.delete(x)}
         # if we have had a branch, first we get the latest snapshot of it
         # and then checkout with the restored version of them
         if @branch_name != ''
