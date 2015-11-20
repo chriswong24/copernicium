@@ -124,7 +124,7 @@ module Workspace
         list_files_last_commit.each do |x|
           if list_files.include? x.path
             path = x.path
-            content = RevLog.get_file(x.history_hash_ids[-1])
+            content = Revlog.get_file(x.history_hash_ids[-1])
             @files.push(x)
             Workspace.writeFile(path,content)
           end
