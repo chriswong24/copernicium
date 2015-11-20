@@ -11,8 +11,38 @@ module Copernicium
   #   executed by the respective backend module.
   #
   def parse_command(cmd)
+    # Handle no-argument commands
     if cmd == "init" or cmd == "status" or cmd == "push" or cmd == "pull"
       return UICommandCommunicator.new(command: cmd)
+    end
+
+    # Handle "commit"
+    if cmd.start_with? "commit"
+      cmd_message_split = cmd.partition(" -m ")
+
+      if cmd_message_split.count != 3 or cmd_message_split[2] == ""
+        print "Error: no commit message (or multiple messages) given for command 'commit'!\n"
+        return nil
+      end
+
+      commit_msg = cmd_message_split[2]
+
+      if commit_msg.length == 0
+        print "Error: commit message is empty"
+        # TODO: launch editor and get long commit message
+        return nil
+      end
+
+      # Filter quotes around the commit message, if present
+      # (If the quotes around the commit message do not match, we will not filter them, i.e.,
+      # they'll be considered an intentional part of the message.)
+      if (commit_msg[0] == '"' and commit_msg[commit_msg.length - 1] == '"') \
+        or (commit_msg[0] == "'" and commit_msg[commit_msg.length - 1] == "'")
+
+        commit_msg = commit_msg.slice(1, commit_msg.length - 2)
+      end
+
+      return UICommandCommunicator.new(command: "commit", commit_message: commit_msg)
     end
   end
 

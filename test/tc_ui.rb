@@ -27,27 +27,25 @@ class TestUI < Minitest::Test
 
     it "supports 'init' command" do
       comm = parse_command "init"
-      ui_test_helper('init')
+      ui_test_helper(comm, 'init')
     end
 
     it "supports 'status' command" do
       comm = parse_command "status"
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "status"
-      comm.files.must_be_nil
-      comm.rev.must_be_nil
-      comm.commit_message.must_be_nil
+      ui_test_helper(comm, "status")
     end
 
     it "supports 'commit' command" do
       # -m is optional, but if the user doesn't give it, the UI will prompt for a message in an
       # editor. Thus, the UICommandCommunicator will always include a commit message.
       comm = parse_command "commit -m 'a commit message'"
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "commit"
-      comm.files.must_be_nil
-      comm.rev.must_be_nil
-      comm.commit_message.must_equal "a commit message"
+      ui_test_helper(comm, "commit", nil, nil, "a commit message")
+
+      comm = parse_command "commit -m a commit message"
+      ui_test_helper(comm, "commit", nil, nil, "a commit message")
+
+      comm = parse_command 'commit -m "a commit message"'
+      ui_test_helper(comm, "commit", nil, nil, "a commit message")
     end
 
     it "supports 'checkout' command" do
