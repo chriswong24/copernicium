@@ -1,7 +1,7 @@
 # repos module
 
 require 'digest'
-require 'marshal'
+#require 'marshal'
 
 # Details from this link:
 #   https://docs.google.com/document/d/1r3-NquhyRLbCncqTOQPwsznSZ-en6G6xzLbWIAmxhys/edit#heading=h.7pyingf1unu
@@ -67,25 +67,29 @@ module Repos
     def initialize()
       # Create manifest
       # It's a list of snapshots in chronological order
-      manifest = []
+      @manifest = []
       # Read in project path and make manifest file?
       # Create current
     end
     
+    def manifest()
+      @manifest
+    end
+    
     def make_snapshot(file_array)
       # Return hash ID of snapshot
-      Snapshot new_snap(file_array)
+      new_snap = Snapshot.new(file_array)
       # Set ID, consider breaking up that line
       new_snap.set_id(Digest::SHA256.hexdigest(Marshal.dump(new_snap)))
-      manifest.append(new_snap)
+      @manifest.push(new_snap)
       # Update manifest file?
-      return new_snap.hash
+      return new_snap.get_id()
     end
     
     def get_snapshot(target_id)
       # Return snapshot (or just contents) given id
       # Find snapshot
-      manifest.index{ |x| x.get_id() == "target_id" }
+      @manifest.index{ |x| x.get_id() == "target_id" }
       # Return it
       #return ret_snap
     end
@@ -96,17 +100,18 @@ module Repos
       # Need a way to change files in workspace
     end
     
-    def history(branch_name)
+    #def history(branch_name)
+    def history()
       # Return array of snapshot IDs
       names_list = []
-      manifest.each {|x| names_list.append(x.get_id())}
+      @manifest.each {|x| names_list.push(x.get_id())}
       return names_list
     end
     
     def delete_snapshot(target_id)
       # Return comm object with status
       # Find snapshot, delete from manifest/memory
-      manifst.delete_if { |x| x.get_id() == target_id }
+      manifest.delete_if { |x| x.get_id() == target_id }
       # catch error
       # update manifest file?
     end
