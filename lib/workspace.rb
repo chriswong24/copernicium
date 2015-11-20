@@ -25,7 +25,14 @@ module Workspace
       f.write(content)
       f.close
     end
+    def self.readFile(path)
+      f = open(path, 'r')
+      txt = f.read
+      f.close
+      txt
+    end
     #private_class_method: writeFile
+    #private_class_method: readFile
 
     def initialize
       @files = []
@@ -49,19 +56,23 @@ module Workspace
         end
       else
         # check that every file need to be reset should have been recognized by the workspace
+        
         list_files.each do |x|
           if x not in @files
             return -1
           end
         end
         # the actual action, delete all of them from the workspace first
+        list_files.each{ |x| File.delete(x.path)}
         list_files.each{ |x| @files.delete(x)}
         # if we have had a branch, first we get the latest snapshot of it
         # and then checkout with the restored version of them
         if @branch_name != ''
           snapshot_id = repos.history(@branch_name)[-1]
-          list_files = repos.restore_file(snapshot_id, list_files)
-          return checkout(list_files)
+          list_files_last_commit = repos.get_snapshot(snapshot_id)
+          paths = list_files.each{|x| x.path }
+          list_files_intersection = list_files_last_commit.each{|x| x if x.path in paths}
+          return checkout(list_files_intersection)
         end
       end
     end
