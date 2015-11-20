@@ -4,7 +4,7 @@ require_relative '../lib/RevLog'
 class TestMyRevLogModule < Minitest::Test
   describe "RevLogModule" do
     before "manipulating the log" do
-      @db = RevLog::RevLog.new(Dir.pwd)
+      @db = Copernicium::RevLog.new(Dir.pwd)
     end
     
     it "can add a file" do
