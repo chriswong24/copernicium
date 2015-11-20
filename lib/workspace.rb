@@ -12,6 +12,13 @@ module Workspace
       @path = path
       @history_hash_ids = ids
     end
+    def ==(rhs)
+      if rhs.is_a? String
+        @path == rhs
+      else
+        @path == rhs.path
+      end
+    end
     def path
       @path
     end
@@ -49,22 +56,23 @@ module Workspace
         # and then restore it with checkout()
         # if we have had a branch name
         if @branch_name != ''
-          return checkout(@branch_name)
+          return 0
+          ###return checkout(@branch_name)
         # or it is the initial state, no commit and no checkout
         else
           return 0
         end
       else
         # check that every file need to be reset should have been recognized by the workspace
-        
+        #workspace_files_paths = @files.each{|x| x.path}
         list_files.each do |x|
-          if x not in @files
+          if @files.include? x
             return -1
           end
         end
         # the actual action, delete all of them from the workspace first
-        list_files.each{ |x| File.delete(x.path)}
-        list_files.each{ |x| @files.delete(x)}
+        list_files.each{|x| File.delete(x.path)}
+        list_files.each{|x| @files.delete(x)}
         # if we have had a branch, first we get the latest snapshot of it
         # and then checkout with the restored version of them
         if @branch_name != ''
