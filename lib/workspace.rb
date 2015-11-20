@@ -84,16 +84,6 @@ module Workspace
         # if we have had a branch, first we get the latest snapshot of it
         # and then checkout with the restored version of them
         if @branch_name != ''
-          ## wrong code 
-          ##snapshot_id = repos.history(@branch_name)[-1]
-          ##list_files_last_commit = repos.get_snapshot(snapshot_id)
-          ##list_files_intersection = []
-          ##list_files.each do |x|
-          ##  if list_files_last_commit.include? x
-          ##    list_files_intersection.add(x)
-          ##  end
-          ##end
-          ###return 0
           return checkout(list_files)
         end
       end
@@ -108,6 +98,13 @@ module Workspace
             hash = Revlop.add_file(x, content)
             fobj = FileObj.new(x, [hash,])
             @files.add(fobj)
+          else
+            content = Workspace.read(x)
+            hash = Revlop.add_file(x, content)
+            fobj = @files[@files.index(x)]
+            if fobj.history_hash_ids[-1] != hash
+              fobj.history_hash_ids << hash
+            end
           end
         end
       end
