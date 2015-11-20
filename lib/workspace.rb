@@ -66,8 +66,8 @@ module Workspace
         # and then restore it with checkout()
         # if we have had a branch name
         if @branch_name != ''
-          return 0
-          ###return checkout(@branch_name)
+          ###return 0
+          return checkout(@branch_name)
         # or it is the initial state, no commit and no checkout
         else
           return 0
@@ -93,8 +93,8 @@ module Workspace
           ##    list_files_intersection.add(x)
           ##  end
           ##end
-          return 0
-          ###return checkout(list_files)
+          ###return 0
+          return checkout(list_files)
         end
       end
     end
@@ -157,8 +157,8 @@ module Workspace
       edits = []
       if @branch_name != ''
         snapshot_id = repos.history(@branch_name)[-1]
-        comm = repos.restore_snapshot(snapshot_id)
-        comm.files do |x|
+        snapshot_obj = repos.get_snapshot(snapshot_id)
+        snapshot_obj.files do |x|
           idx = @files.index(x)
           if idx != nil
             diff = RevLog.diff_files(@files[idx].hash, x.hash)
