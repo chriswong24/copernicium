@@ -84,16 +84,17 @@ module Workspace
         # if we have had a branch, first we get the latest snapshot of it
         # and then checkout with the restored version of them
         if @branch_name != ''
-          snapshot_id = repos.history(@branch_name)[-1]
-          list_files_last_commit = repos.get_snapshot(snapshot_id)
-          list_files_intersection = []
-          list_files.each do |x|
-            if list_files_last_commit.include? x
-              list_files_intersection.add(x)
-            end
-          end
+          ## wrong code 
+          ##snapshot_id = repos.history(@branch_name)[-1]
+          ##list_files_last_commit = repos.get_snapshot(snapshot_id)
+          ##list_files_intersection = []
+          ##list_files.each do |x|
+          ##  if list_files_last_commit.include? x
+          ##    list_files_intersection.add(x)
+          ##  end
+          ##end
           return 0
-          ###return checkout(list_files_intersection)
+          ###return checkout(list_files)
         end
       end
     end
@@ -125,25 +126,27 @@ module Workspace
       if argu.is_a?(Array)
         # we add the list of files to @files regardless whether it has been in it.
         # that means there may be multiple versions of a file.
-        argu.each do |x|
-          @files.push(x)
-          #path = x.path
-          #hash = x.hash
-          #content = RevLog.get_file(hash)
-          #Workspace.writeFile(path,content)
+        list_files = argu
+        list_files_last_commit = repos.get_snapshot(snapshot_id)
+        list_files_last_commit.each do |x|
+          if list_files.include? x.path
+            path = x.path
+            content = RevLog.get_file(x.history_hash_ids[-1])
+            @files.push(x)
+            Workspace.writeFile(path,content)
+          end
         end
       # if argu is not an Array, we assume it is a String, representing the branch name
       # we first get the last snapshot id of the branch, and then get the commit object
       # and finally push all files of it to the workspace
       else
         snapshot_id = repos.history(argu)[-1]
-        comm = repos.restore_snapshot(snapshot_id)
-        comm.files do |fff|
+        snapshot_obj = repos.get_snapshot(snapshot_id)
+        snapshot_obj.files do |fff|
           @files.push(fff)
-          #path = fff.path
-          #hash = fff.hash
-          #content = RevLog.get_file(hash)
-          #Workspace.writeFile(path,content)
+          path = fff.path
+          content = RevLog.get_file(fff.history_hash_ids[-1])
+          self.class.writeFile(path,content)
         end
       end
     end
@@ -173,6 +176,7 @@ module Workspace
         end
       end
       adds, edits, deletes
+    end
   end
 end
 
