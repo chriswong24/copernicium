@@ -170,14 +170,10 @@ module Workspace
       else
         # if @branch_name is empty, it is initial state, so every file in @files is newly added
         @files.each do |x|
-          if snapshot_obj.files.index(x) == nil
-            adds.push(x)
-          end
+          adds.push(x)
         end
-        
       end # end of if @branch_name != ''
-
-      adds, edits, deletes
+      return [adds, edits, deletes]
     end
   end
 end
