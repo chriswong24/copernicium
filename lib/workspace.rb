@@ -46,6 +46,16 @@ module Workspace
       @branch_name = ''
     end
 
+    # if include all the elements in list_files
+    def include?(list_files)
+      list_files.each do |x|
+        if @files.include? x == false
+          return false
+        end
+      end
+      true
+    end
+
     # if list_files is nil, then rollback the list of files from the branch
     # or rollback to the entire branch head pointed
     def clean(list_files)
@@ -65,10 +75,8 @@ module Workspace
       else
         # check that every file need to be reset should have been recognized by the workspace
         #workspace_files_paths = @files.each{|x| x.path}
-        list_files.each do |x|
-          if @files.include? x == false
-            return -1
-          end
+        if self.include? list_files == false
+          return -1
         end
         # the actual action, delete all of them from the workspace first
         list_files.each{|x| File.delete(x)}
@@ -93,19 +101,22 @@ module Workspace
     # commit a list of files or the entire workspace to make a new snapshot
     def commit(list_files)
       if list_files != nil
-        #files = []
-        #list_files.each do |x|
-        #  files.push(x)
-        #end
-        #snapshot = repos.last_snapshot
-        #snapshot.files do |fff|
-        #  if not files.in?(fff)
-        #    files.push(fff)
-        #  end
-        #end
-        return repos.make_snapshot(list_files)
+        # check that all in list_files should be in @files
+        if self.include? list_files == false
+          return -1
+        end
+        # get the FileObj in @files which corresponds to list_files
+        file_objs = []
+        @files.each do |x|
+          if list_files.include? x.path
+            file_objs.add(x)
+          end
+        end
+        return 0
+        #return repos.make_snapshot(file_objs)
       else
-        return repos.make_snapshot(@files)
+        return 0
+        #return repos.make_snapshot(@files)
       end
     end
 
