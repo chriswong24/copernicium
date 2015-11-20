@@ -10,7 +10,7 @@ require_relative 'repos'
 require_relative 'RevLog'
 require_relative 'ui'
 
-module PushPull
+module Copernicium
   class PushPull
 
     def connect(remote, user = nil, passwd = nil, &block)
