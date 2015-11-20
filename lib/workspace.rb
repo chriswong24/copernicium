@@ -103,7 +103,7 @@ module Workspace
     def commit(list_files)
       if list_files != nil
         list_files.each do |x|
-          if @files.include? |x| == false
+          if @files.include?(x) == false
             content = Workspace.read(x)
             hash = Revlop.add_file(x, content)
             fobj = FileObj.new(x, [hash,])
