@@ -102,23 +102,16 @@ module Workspace
     # commit a list of files or the entire workspace to make a new snapshot
     def commit(list_files)
       if list_files != nil
-        # check that all in list_files should be in @files
-        if self.include? list_files == false
-          return -1
-        end
-        # get the FileObj in @files which corresponds to list_files
-        file_objs = []
-        @files.each do |x|
-          if list_files.include? x.path
-            file_objs.add(x)
+        list_files.each do |x|
+          if @files.include? |x| == false
+            content = Workspace.read(x)
+            hash = Revlop.add_file(x, content)
+            fobj = FileObj.new(x, [hash,])
+            @files.add(fobj)
           end
         end
-        ###return 0
-        return repos.make_snapshot(file_objs)
-      else
-        ###return 0
-        return repos.make_snapshot(@files)
       end
+      return repos.make_snapshot(@files)
     end
 
     def checkout(argu)
@@ -162,7 +155,7 @@ module Workspace
           idx = @files.index(x)
           if idx != nil
             diff = RevLog.diff_files(@files[idx].hash, x.hash)
-            if diff.length == 0
+            if diff.length > 0
               edits.push(x)
             end
           else
@@ -170,11 +163,20 @@ module Workspace
           end
         end
         @files.each do |x|
-          if comm.files.index(x) == nil
+          if snapshot_obj.files.index(x) == nil
             adds.push(x)
           end
         end
-      end
+      else
+        # if @branch_name is empty, it is initial state, so every file in @files is newly added
+        @files.each do |x|
+          if snapshot_obj.files.index(x) == nil
+            adds.push(x)
+          end
+        end
+        
+      end # end of if @branch_name != ''
+
       adds, edits, deletes
     end
   end
