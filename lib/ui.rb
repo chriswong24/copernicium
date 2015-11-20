@@ -44,6 +44,18 @@ module Copernicium
 
       return UICommandCommunicator.new(command: "commit", commit_message: commit_msg)
     end
+
+    # Handle "merge"
+    if cmd.start_with? "merge"
+      cmd_split = cmd.split(" ")
+
+      if cmd_split.count != 2
+        print "Error: too many/few arguments to command 'merge'! Please specify a single commit to merge into the current branch.\n"
+        return nil
+      end
+
+      return UICommandCommunicator.new(command: "merge", rev: cmd_split[1])
+    end
   end
 
   # Communication object that will pass commands to backend modules
