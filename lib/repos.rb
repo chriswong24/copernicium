@@ -55,25 +55,28 @@ module Repos
     # where do we get the file object def???
     # consider defining snapshot object
     
-    # Just do list of snapshots
+    # Just do list of snapshots instead
 
   }
   class Repos
     def initialize()
       # Create manifest
       manifest = []
+      # Read in project path and make manifest file
       # Create current
     end
     
     def make_snapshot(file_array)
       # Return hash ID of snapshot
       Snapshot new_snap(file_array)
-      snap_hash = new_snap.hash
-      return 1
+      manifest.append(new_snap)
+      # Update manifest file?
+      return new_snap.hash
     end
     
     def restore_snapshot(target_id)
-    # Return comm object with status
+      # Return comm object with status
+      # Need a way to change files in workspace
     end
     
     def history(branch_name)
