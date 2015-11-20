@@ -22,7 +22,7 @@ require 'diffy'
 #                               in - file_id_1, file_id_2
 #                               out - success and merged file name/content, or failure and conflict
 
-module RevLog
+module Copernicium
   class RevLog
     def initialize(project_path)
       @project_path = project_path
