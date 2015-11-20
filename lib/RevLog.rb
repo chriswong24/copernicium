@@ -71,7 +71,7 @@ module RevLog
         update_log_file()
         File.delete(File.join(@cop_path, file_id))
         return 1
-      rescue Exception => e
+      rescue Exception
         return 0
       end
     end
@@ -104,11 +104,27 @@ module RevLog
       if diff_a.all? { |d| d[0]!="-"}
         return get_file(file_id2)
       end
-      
-      if diff_a.all? { |d| d[0]!="+"}
-        return get_file(file_id1)
-      end
+      # if diff_a.all? { |d| d[0]!="+"}
+      #   return get_file(file_id1)
+      # end
       return diff_a
+    end
+
+    def history(file_name)
+      hashs = []
+      for m in @logmap[file_name]
+        hashs << m[:hash]
+      end
+      return hashs
+    end
+
+    def update_log_file()
+      File.open(File.join(@cop_path, "logmap.yaml"), "w") { |f|
+        f.write(@logmap.to_yaml) 
+      }
+      File.open(File.join(@cop_path, "hashmap.yaml"), "w") { |f|
+        f.write(@hashmap.to_yaml) 
+      }
     end
 
     # def alterFile(fileObject, fileReferenceString, versionReferenceString)
@@ -119,13 +135,5 @@ module RevLog
 
     # def viewFileHistory(fileReferenceString)
     # end
-    def update_log_file()
-      File.open(File.join(@cop_path, "logmap.yaml"), "w") { |f|
-        f.write(@logmap.to_yaml) 
-      }
-      File.open(File.join(@cop_path, "hashmap.yaml"), "w") { |f|
-        f.write(@hashmap.to_yaml) 
-      }
-    end
   end
 end
