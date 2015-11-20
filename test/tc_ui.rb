@@ -30,106 +30,10 @@ class TestUI < Minitest::Test
       ui_test_helper('init')
     end
 
-    it "supports 'add' command" do
-      comm = parse_command "add test.txt"
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "add"
-      comm.files.must_equal ["test.txt"]
-      comm.rev.must_be_nil
-      comm.commit_message.must_be_nil
-    end
-
-    it "supports 'addremove' command" do
-      comm = parse_command "addremove"
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "addremove"
-      comm.files.must_be_nil
-      comm.rev.must_be_nil
-      comm.commit_message.must_be_nil
-    end
-
-    it "supports 'forget' command" do
-      comm = parse_command "forget test.txt"
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "forget"
-      comm.files.must_equal ["test.txt"]
-      comm.rev.must_be_nil
-      comm.commit_message.must_be_nil
-    end
-
-    it "supports 'remove' command" do
-      comm = parse_command "remove test.txt"
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "remove"
-      comm.files.must_equal ["test.txt"]
-      comm.rev.must_be_nil
-      comm.commit_message.must_be_nil
-    end
-
-    it "supports 'update' command" do
-      # The revision indicator parameter is optional
-      comm = parse_command "update"
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "update"
-      comm.files.must_be_nil
-      comm.rev.must_be_nil
-      comm.commit_message.must_be_nil
-
-      comm = parse_command "update tip"
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "update"
-      comm.files.must_be_nil
-      comm.rev.must_equal "tip"
-      comm.commit_message.must_be_nil
-    end
-
-    it "supports 'revert' command" do
-      # The file name parameters are optional
-      comm = parse_command "revert" # Undo all uncommitted changes
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "revert"
-      comm.files.must_be_nil
-      comm.rev.must_be_nil
-      comm.commit_message.must_be_nil
-
-      comm = parse_command "revert test.txt foo.c" # Undo changes to these files
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "revert"
-      comm.files.must_equal ["test.txt", "foo.c"]
-      comm.rev.must_be_nil
-      comm.commit_message.must_be_nil
-    end
-
-    it "supports 'diff' command" do
-      # The file name parameters are optional
-      comm = parse_command "diff" # Show all changes since last commit
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "diff"
-      comm.files.must_be_nil
-      comm.rev.must_be_nil
-      comm.commit_message.must_be_nil
-
-      comm = parse_command "diff test.txt foo.c" # Show changes only in these files
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "diff"
-      comm.files.must_equal ["test.txt", "foo.c"]
-      comm.rev.must_be_nil
-      comm.commit_message.must_be_nil
-    end
-
     it "supports 'status' command" do
       comm = parse_command "status"
       comm.must_be_instance_of UICommandCommunicator
       comm.command.must_equal "status"
-      comm.files.must_be_nil
-      comm.rev.must_be_nil
-      comm.commit_message.must_be_nil
-    end
-
-    it "supports 'log' command" do
-      comm = parse_command "log"
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "log"
       comm.files.must_be_nil
       comm.rev.must_be_nil
       comm.commit_message.must_be_nil
@@ -170,15 +74,6 @@ class TestUI < Minitest::Test
       comm.command.must_equal "checkout"
       comm.files.must_equal ["file.txt"]
       comm.rev.must_equal "master"
-      comm.commit_message.must_be_nil
-    end
-
-    it "supports 'incoming' command" do
-      comm = parse_command "incoming"
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "incoming"
-      comm.files.must_be_nil
-      comm.rev.must_be_nil
       comm.commit_message.must_be_nil
     end
 
