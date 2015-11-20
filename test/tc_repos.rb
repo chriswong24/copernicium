@@ -64,13 +64,13 @@ class TestCnReposModule < Minitest::Test
       # do diffSnapshots stuff
       # diffSnapshots will use current if no second parameter specified
       @my_repo.clear()
-      @my_repo.make_snapshot("file1")
-      snap1 = @my_repo.current
+      snap1 = @my_repo.make_snapshot(["file1", "file2", "file3"])
+      #snap1 = @my_repo.current
       # Change workspace
-      @my_repo.make_snapshot()
-      snap2 = @my_repo.current
-      @my_repo.diff_snapshots(snap1, snap1).must_be_nil
-      @my_repo.diff_snapshots(snap1, snap2).wont_be_nil
+      snap2 = @my_repo.make_snapshot(["file1", "file3"])
+      #snap2 = @my_repo.current
+      @my_repo.diff_snapshots(snap1, snap1).must_equal([])
+      @my_repo.diff_snapshots(snap1, snap2).wont_be_empty
     end
     
     # Add branch tests

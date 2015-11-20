@@ -67,7 +67,9 @@ module Repos
     def initialize()
       # Create manifest
       # It's a list of snapshots in chronological order
-      @manifest = []
+      @manifest = {"default" => []}
+      @curr_branch = "default"
+      # what to do about branch IDs?
       # Read in project path and make manifest file?
       # Create current
     end
@@ -81,7 +83,7 @@ module Repos
       new_snap = Snapshot.new(file_array)
       # Set ID, consider breaking up that line
       new_snap.set_id(Digest::SHA256.hexdigest(Marshal.dump(new_snap)))
-      @manifest.push(new_snap)
+      @manifest[@curr_branch].push(new_snap)
       # Update manifest file?
       return new_snap.get_id()
     end
@@ -89,8 +91,14 @@ module Repos
     def get_snapshot(target_id)
       # Return snapshot (or just contents) given id
       # Find snapshot
-      @manifest.index{ |x| x.get_id() == "target_id" }
+      found_index = @manifest[@curr_branch].index{ |x| x.get_id() == target_id }
+      # Handle not found case
       # Return it
+      if(found_index)
+        return @manifest[@curr_branch][found_index]
+      else
+        return found_index
+      end
       #return ret_snap
     end
     
@@ -104,27 +112,40 @@ module Repos
     def history()
       # Return array of snapshot IDs
       names_list = []
-      @manifest.each {|x| names_list.push(x.get_id())}
+      @manifest[@curr_branch].each {|x| names_list.push(x.get_id())}
       return names_list
     end
     
     def delete_snapshot(target_id)
       # Return comm object with status
       # Find snapshot, delete from manifest/memory
-      manifest.delete_if { |x| x.get_id() == target_id }
+      @manifest[@curr_branch].delete_if { |x| x.get_id() == target_id }
       # catch error
       # update manifest file?
     end
     
+    # Finds the files in snap1 that aren't in snap2, change this?
+    # Consider using diffy?
     def diff_snapshots(id1, id2)
       # Return list of filenames and versions
+      diff_files = []
+      # Put in error catching
+      files1 = get_snapshot(id1).get_files()
+      files2 = get_snapshot(id2).get_files()
       # Find snapshot1 and snapshot2
+      files1.each do |x|
+        if(!files2.include?(x))
+          diff_files.push(x)
+        end
+      end
+      return diff_files
       # Use revlog diff on each set of files? Look at Diffy
     end
     
     def make_branch(branch_name)
       # Return hash ID of new branch
       # Not sure where to store branches
+      # What goes in to the hash?
       return 2
     end
     
