@@ -74,6 +74,18 @@ module Copernicium
       # Else, we should only checkout the specified file(s) from the given revision.
       return UICommandCommunicator.new(command: "checkout", rev: cmd_split[1], files: cmd_split[2..(cmd_split.count - 1)])
     end
+
+    # Handle "clone"
+    if cmd.start_with? "clone"
+      cmd_split = cmd.split(" ")
+
+      if cmd_split.count != 2
+        print "Error: wrong number of arguments to command 'clone'! Please specify a single remote repository to clone.\n"
+        return nil
+      end
+
+      return UICommandCommunicator.new(command: "clone", repo: cmd_split[1])
+    end
   end
 
   # Communication object that will pass commands to backend modules
@@ -85,12 +97,14 @@ module Copernicium
     attr_reader :files # An array of one or more file paths
     attr_reader :rev # A single revision indicator (commit #, branch name, HEAD, tip, etc.)
     attr_reader :commit_message # A commit message
+    attr_reader :repo # URL/path to a remote repository
 
-    def initialize(command: nil, files: nil, rev: nil, commit_message: nil)
+    def initialize(command: nil, files: nil, rev: nil, commit_message: nil, repo: nil)
       @command = command
       @files = files
       @rev = rev
       @commit_message = commit_message
+      @repo = repo
     end
   end
 end

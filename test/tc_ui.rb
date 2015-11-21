@@ -17,12 +17,13 @@ class TestUI < Minitest::Test
 
   describe "UIModule" do
 
-    def ui_test_helper(comm, cmd, files=nil, rev=nil, msg=nil)
+    def ui_test_helper(comm, cmd, files=nil, rev=nil, msg=nil, repo=nil)
       comm.must_be_instance_of UICommandCommunicator
       comm.command.must_equal cmd
       comm.files.must_equal files
       comm.rev.must_equal rev
       comm.commit_message.must_equal msg
+      comm.repo.must_equal repo
     end
 
     it "supports 'init' command" do
@@ -90,24 +91,10 @@ class TestUI < Minitest::Test
     end
 
     it "supports 'clone' command" do
-      # I'm thinking that "clone" might be best implemented purely in the UI: that is, it's
-      # actually just a "wrapper command" that issues a series of more granular commands to the
-      # backend. Specifically, it will need to:
-      #   1. "init" an empty repo.
-      #   2. Set the repo's remote to the place we're cloning from.
-      #   3. "pull"
-      #   4. "update"
-      # This sequence of steps should accomplish the "clone" operation.
-      #
-      # At the moment, I can't really write a good spec for this since I'm not sure how remotes
-      # will work. Since we're not trying to implement *all* the features/flexibility of Git and
-      # Mercurial (just the "basics" to get a working, functional DVCS), we may not need to expose
-      # a UI command like "git remote" - rather, the remote would be set automatically when
-      # cloning, and a user could change remotes by editing the config file directly if needed
-      # (which, frankly, is often what people end up doing for Git and Mercurial).
-
-      # Just fail the test for now
-      nil.must_equal "Test not yet implemented"
+      # Format:
+      #   cn clone path-to-remote-repository
+      comm = parse_command "clone ssh://user@some-host.com/some/repo/path"
+      ui_test_helper(comm, "clone", nil, nil, nil, "ssh://user@some-host.com/some/repo/path")
     end
 
   end
