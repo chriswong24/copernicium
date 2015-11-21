@@ -6,9 +6,9 @@ require 'io/console'    # Needed to hide password at console
 require_relative 'test_helper.rb'
 
 class TestPushPullModule < Minitest::Test	
-  describe PushPull::PushPull do
+  describe Copernicium::PushPull do
     before "initialize the PushPull Module" do
-      @inst = PushPull::PushPull.new
+      @inst = Copernicium::PushPull.new
     end
 
     it "is able to connect to a remote computer" do	# test for a good connection and a bad connection
