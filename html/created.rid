@@ -1,7 +1,7 @@
-Mon, 02 Nov 2015 11:15:46 -0500
-README.md	Mon, 02 Nov 2015 11:14:45 -0500
-lib/RevLog.rb	Mon, 02 Nov 2015 11:14:45 -0500
-lib/pushpull.rb	Fri, 23 Oct 2015 17:39:08 -0400
-lib/repos.rb	Fri, 23 Oct 2015 17:41:28 -0400
-lib/ui.rb	Fri, 23 Oct 2015 17:41:55 -0400
-lib/workspace.rb	Fri, 23 Oct 2015 17:42:00 -0400
+Fri, 20 Nov 2015 23:15:33 -0500
+README.md	Thu, 19 Nov 2015 23:44:55 -0500
+lib/RevLog.rb	Fri, 20 Nov 2015 23:13:43 -0500
+lib/pushpull.rb	Fri, 20 Nov 2015 23:13:43 -0500
+lib/repos.rb	Fri, 20 Nov 2015 23:04:16 -0500
+lib/ui.rb	Fri, 20 Nov 2015 23:13:43 -0500
+lib/workspace.rb	Fri, 20 Nov 2015 23:04:16 -0500

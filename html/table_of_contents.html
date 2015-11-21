@@ -29,6 +29,7 @@
 
     <ul>
       <li><a href="README_md.html#label-copernicium"><a href="https://en.wikipedia.org/wiki/Copernicium">copernicium</a></a>
+      <li><a href="README_md.html#label-Setup">Setup</a>
       <li><a href="README_md.html#label-Testing">Testing</a>
       <li><a href="README_md.html#label-Relevant+links-3A">Relevant links:</a>
     </ul>
@@ -39,28 +40,22 @@
 <h2 id="classes">Classes and Modules</h2>
 <ul>
   <li class="module">
-    <a href="PushPull.html">PushPull</a>
+    <a href="Copernicium.html">Copernicium</a>
   </li>
   <li class="class">
-    <a href="PushPull/PushPull.html">PushPull::PushPull</a>
+    <a href="Copernicium/PushPull.html">Copernicium::PushPull</a>
+  </li>
+  <li class="class">
+    <a href="Copernicium/RevLog.html">Copernicium::RevLog</a>
+  </li>
+  <li class="class">
+    <a href="Copernicium/UICommandCommunicator.html">Copernicium::UICommandCommunicator</a>
   </li>
   <li class="module">
     <a href="Repos.html">Repos</a>
   </li>
   <li class="class">
     <a href="Repos/Repos.html">Repos::Repos</a>
-  </li>
-  <li class="module">
-    <a href="RevLog.html">RevLog</a>
-  </li>
-  <li class="class">
-    <a href="RevLog/RevLog.html">RevLog::RevLog</a>
-  </li>
-  <li class="module">
-    <a href="UI.html">UI</a>
-  </li>
-  <li class="class">
-    <a href="UI/UI.html">UI::UI</a>
   </li>
   <li class="module">
     <a href="Workspace.html">Workspace</a>
@@ -74,14 +69,14 @@
 <ul>
 
   <li class="method">
-    <a href="RevLog/RevLog.html#method-c-new">::new</a>
+    <a href="Copernicium/RevLog.html#method-c-new">::new</a>
     &mdash;
-    <span class="container">RevLog::RevLog</span>
+    <span class="container">Copernicium::RevLog</span>
 
   <li class="method">
-    <a href="UI/UI.html#method-c-new">::new</a>
+    <a href="Copernicium/UICommandCommunicator.html#method-c-new">::new</a>
     &mdash;
-    <span class="container">UI::UI</span>
+    <span class="container">Copernicium::UICommandCommunicator</span>
 
   <li class="method">
     <a href="Repos/Repos.html#method-c-new">::new</a>
@@ -89,44 +84,104 @@
     <span class="container">Repos::Repos</span>
 
   <li class="method">
-    <a href="PushPull/PushPull.html#method-c-new">::new</a>
+    <a href="Copernicium/RevLog.html#method-i-add_file">#add_file</a>
     &mdash;
-    <span class="container">PushPull::PushPull</span>
+    <span class="container">Copernicium::RevLog</span>
 
   <li class="method">
-    <a href="Workspace/Workspace.html#method-c-new">::new</a>
+    <a href="Workspace/Workspace.html#method-i-checkout">#checkout</a>
     &mdash;
     <span class="container">Workspace::Workspace</span>
 
   <li class="method">
-    <a href="RevLog/RevLog.html#method-i-add_file">#add_file</a>
+    <a href="Workspace/Workspace.html#method-i-clean">#clean</a>
     &mdash;
-    <span class="container">RevLog::RevLog</span>
+    <span class="container">Workspace::Workspace</span>
 
   <li class="method">
-    <a href="RevLog/RevLog.html#method-i-delete_file">#delete_file</a>
+    <a href="Copernicium/PushPull.html#method-i-clone">#clone</a>
     &mdash;
-    <span class="container">RevLog::RevLog</span>
+    <span class="container">Copernicium::PushPull</span>
 
   <li class="method">
-    <a href="RevLog/RevLog.html#method-i-diff_files">#diff_files</a>
+    <a href="Workspace/Workspace.html#method-i-commit">#commit</a>
     &mdash;
-    <span class="container">RevLog::RevLog</span>
+    <span class="container">Workspace::Workspace</span>
 
   <li class="method">
-    <a href="RevLog/RevLog.html#method-i-get_file">#get_file</a>
+    <a href="Copernicium/PushPull.html#method-i-connect">#connect</a>
     &mdash;
-    <span class="container">RevLog::RevLog</span>
+    <span class="container">Copernicium::PushPull</span>
 
   <li class="method">
-    <a href="RevLog/RevLog.html#method-i-hash_file">#hash_file</a>
+    <a href="Copernicium/RevLog.html#method-i-default_hash_factory">#default_hash_factory</a>
     &mdash;
-    <span class="container">RevLog::RevLog</span>
+    <span class="container">Copernicium::RevLog</span>
 
   <li class="method">
-    <a href="RevLog/RevLog.html#method-i-merge">#merge</a>
+    <a href="Copernicium/RevLog.html#method-i-delete_file">#delete_file</a>
     &mdash;
-    <span class="container">RevLog::RevLog</span>
+    <span class="container">Copernicium::RevLog</span>
+
+  <li class="method">
+    <a href="Copernicium/RevLog.html#method-i-diff_files">#diff_files</a>
+    &mdash;
+    <span class="container">Copernicium::RevLog</span>
+
+  <li class="method">
+    <a href="Copernicium/PushPull.html#method-i-fetch">#fetch</a>
+    &mdash;
+    <span class="container">Copernicium::PushPull</span>
+
+  <li class="method">
+    <a href="Copernicium/RevLog.html#method-i-get_file">#get_file</a>
+    &mdash;
+    <span class="container">Copernicium::RevLog</span>
+
+  <li class="method">
+    <a href="Copernicium/RevLog.html#method-i-hash_file">#hash_file</a>
+    &mdash;
+    <span class="container">Copernicium::RevLog</span>
+
+  <li class="method">
+    <a href="Copernicium/RevLog.html#method-i-history">#history</a>
+    &mdash;
+    <span class="container">Copernicium::RevLog</span>
+
+  <li class="method">
+    <a href="Copernicium/RevLog.html#method-i-merge">#merge</a>
+    &mdash;
+    <span class="container">Copernicium::RevLog</span>
+
+  <li class="method">
+    <a href="Copernicium.html#method-i-parse_command">#parse_command</a>
+    &mdash;
+    <span class="container">Copernicium</span>
+
+  <li class="method">
+    <a href="Copernicium/PushPull.html#method-i-pull">#pull</a>
+    &mdash;
+    <span class="container">Copernicium::PushPull</span>
+
+  <li class="method">
+    <a href="Copernicium/PushPull.html#method-i-push">#push</a>
+    &mdash;
+    <span class="container">Copernicium::PushPull</span>
+
+  <li class="method">
+    <a href="Workspace/Workspace.html#method-i-status">#status</a>
+    &mdash;
+    <span class="container">Workspace::Workspace</span>
+
+  <li class="method">
+    <a href="Copernicium/PushPull.html#method-i-transfer">#transfer</a>
+    &mdash;
+    <span class="container">Copernicium::PushPull</span>
+
+  <li class="method">
+    <a href="Copernicium/RevLog.html#method-i-update_log_file">#update_log_file</a>
+    &mdash;
+    <span class="container">Copernicium::RevLog</span>
 </ul>
 </main>
 
