@@ -56,6 +56,24 @@ module Copernicium
 
       return UICommandCommunicator.new(command: "merge", rev: cmd_split[1])
     end
+
+    # Handle "checkout"
+    if cmd.start_with? "checkout"
+      cmd_split = cmd.split(" ")
+
+      if cmd_split.count < 2
+        print "Error: no branch or revision specified to command 'checkout'!\n"
+        return nil
+      end
+
+      if cmd_split.count == 2
+        # No file names given - check out all files at the given revision
+        return UICommandCommunicator.new(command: "checkout", rev: cmd_split[1])
+      end
+
+      # Else, we should only checkout the specified file(s) from the given revision.
+      return UICommandCommunicator.new(command: "checkout", rev: cmd_split[1], files: cmd_split[2..(cmd_split.count - 1)])
+    end
   end
 
   # Communication object that will pass commands to backend modules

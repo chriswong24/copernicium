@@ -49,30 +49,17 @@ class TestUI < Minitest::Test
     end
 
     it "supports 'checkout' command" do
-      # Three valid forms of "checkout" command:
+      # Two valid forms of "checkout" command:
       #   cn checkout revision              (checks out full repo at revision)
-      #   cn checkout file.txt foo.c        (checks out file.txt and foo.c from the currently "active" revision)
-      #   cn checkout revision file.txt     (checks out file.txt at revision)
-      comm = parse_command "checkout master"
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "checkout"
-      comm.files.must_be_nil
-      comm.rev.must_equal "master"
-      comm.commit_message.must_be_nil
+      #   cn checkout revision file.txt     (checks out only the specified files from revision)
+      comm = parse_command "checkout revID"
+      ui_test_helper(comm, "checkout", nil, "revID")
 
-      comm = parse_command "checkout file.txt"
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "checkout"
-      comm.files.must_equal ["file.txt", "foo.c"]
-      comm.rev.must_be_nil
-      comm.commit_message.must_be_nil
+      comm = parse_command "checkout revID file.txt"
+      ui_test_helper(comm, "checkout", ["file.txt"], "revID")
 
-      comm = parse_command "checkout master file.txt"
-      comm.must_be_instance_of UICommandCommunicator
-      comm.command.must_equal "checkout"
-      comm.files.must_equal ["file.txt"]
-      comm.rev.must_equal "master"
-      comm.commit_message.must_be_nil
+      comm = parse_command "checkout revID file.txt foo.c"
+      ui_test_helper(comm, "checkout", ["file.txt", "foo.c"], "revID")
     end
 
     it "supports 'pull' command" do
