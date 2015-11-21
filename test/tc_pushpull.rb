@@ -5,7 +5,7 @@
 require 'io/console'    # Needed to hide password at console
 require_relative 'test_helper.rb'
 
-class TestPushPullModule < Minitest::Test	
+class TestPushPullModule < Minitest::Test
   describe Copernicium::PushPull do
     before "initialize the PushPull Module" do
       @inst = Copernicium::PushPull.new
@@ -14,31 +14,37 @@ class TestPushPullModule < Minitest::Test
     it "is able to connect to a remote computer" do	# test for a good connection and a bad connection
       conn = @inst.connect("cycle2.csug.rochester.edu", @user, @passwd)
       conn.must_equal true
-		
+
       conn = @inst.connect("null@cif.rochester.edu", @user, @passwd)
       conn.must_equal false
     end
 
-    it "can yield a remote connection to a block" do 
+    it "can yield a remote connection to a block" do
       test = Object.new
       conn = @inst.connect("cycle3.csug.rochester.edu", @user, @passwd) do |x|
         test = (x.exec!("echo Blocks Working!")).strip;
       end
       test.must_equal "Blocks Working!"
     end
-	
+
     it "can move files to remote servers for push" do
       tfile = File.new("comm_t.copernicium", 'w')
       tfile.close
-      test = @inst.transfer("cycle3.csug.rochester.edu", "./comm_t.copernicium", "/localdisk/comm_t.copernicium", @user, @passwd)
-      File.delete("comm_t.copernicium")
+      begin
+        test = @inst.transfer("cycle3.csug.rochester.edu", "./comm_t.copernicium",
+                              "/localdisk/comm_t.copernicium", @user, @passwd)
+      rescue
+        raise 'Cannot connect.'
+      ensure
+        File.delete("comm_t.copernicium")
+      end
       @inst.connect("cycle3.csug.rochester.edu", @user, @passwd) do |x|
         x.exec!("ls /localdisk/comm_t.copernicium")
         x.exec!("rm /localdisk/comm_t.copernicium")
       end
       test.must_equal true
     end
-	
+
     it "can fetch files from a server for pull" do
       @inst.connect("cycle3.csug.rochester.edu", @user, @passwd) do |x|
         x.exec!("touch /localdisk/comm_t.copernicium")
