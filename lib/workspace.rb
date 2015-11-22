@@ -6,7 +6,7 @@ require 'pathname'
 require_relative 'RevLog'
 require_relative 'repos'
 
-module Workspace
+module Copernicium
   class FileObj
     def initialize(path, ids)
       @path = path
