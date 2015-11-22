@@ -6,11 +6,18 @@ require 'pathname'
 require_relative 'RevLog'
 require_relative 'repos'
 
-module Workspace
+module Copernicium
   class FileObj
     def initialize(path, ids)
       @path = path
       @history_hash_ids = ids
+    end
+    def ==(rhs)
+      if rhs.is_a? String
+        @path == rhs
+      else
+        @path == rhs.path
+      end
     end
     def path
       @path
@@ -20,12 +27,13 @@ module Workspace
     end
   end
   class Workspace
-    def self.writeFile(path, content)
+    
+    def writeFile(path, content)
       f = open(path, 'w')
       f.write(content)
       f.close
     end
-    def self.readFile(path)
+    def readFile(path)
       f = open(path, 'r')
       txt = f.read
       f.close
@@ -36,12 +44,40 @@ module Workspace
 
     def initialize
       @files = []
-      @branch_name = ''
+      @branch_name = 'master'
+      @revlog = RevLog::RevLog.new('.')
+      @repos = Repos::Repos.new
+      @root = "workspace"
+      if !File.directory?(@root)
+          Dir.mkdir(@root)
+      end
+    end
+
+
+    def indexOf(x)
+	index = -1
+        @files.each_with_index do |e,i|
+	    if e.path == x
+	    	index = i
+		break
+	    end
+        end
+        index
+    end
+
+    # if include all the elements in list_files
+    def include?(list_files)
+      list_files.each do |x|
+        if indexOf(x) == -1
+          return false
+        end
+      end
+      true
     end
 
     # if list_files is nil, then rollback the list of files from the branch
     # or rollback to the entire branch head pointed
-    def clean(list_files)
+    def clean(list_files=nil)
       if list_files == nil
         # reset first: delete them from disk and reset @files
         @files.each{|x| File.delete(x.path)}
@@ -49,6 +85,7 @@ module Workspace
         # and then restore it with checkout()
         # if we have had a branch name
         if @branch_name != ''
+          ###return 0
           return checkout(@branch_name)
         # or it is the initial state, no commit and no checkout
         else
@@ -56,44 +93,45 @@ module Workspace
         end
       else
         # check that every file need to be reset should have been recognized by the workspace
-        
-        list_files.each do |x|
-          if x not in @files
-            return -1
-          end
+        #workspace_files_paths = @files.each{|x| x.path}
+        if (self.include? list_files) == false
+          return -1
         end
         # the actual action, delete all of them from the workspace first
-        list_files.each{ |x| File.delete(x.path)}
-        list_files.each{ |x| @files.delete(x)}
+        list_files.each do |x| 
+	    File.delete(x)
+	    idx = indexOf(x)
+            if !idx==-1
+                @files.delete_at(idx)
+	    end
+	end
         # if we have had a branch, first we get the latest snapshot of it
         # and then checkout with the restored version of them
         if @branch_name != ''
-          snapshot_id = repos.history(@branch_name)[-1]
-          list_files_last_commit = repos.get_snapshot(snapshot_id)
-          paths = list_files.each{|x| x.path }
-          list_files_intersection = list_files_last_commit.each{|x| x if x.path in paths}
-          return checkout(list_files_intersection)
+          return checkout(list_files)
         end
       end
     end
 
     # commit a list of files or the entire workspace to make a new snapshot
-    def commit(list_files)
+    def commit(list_files=nil)
       if list_files != nil
-        #files = []
-        #list_files.each do |x|
-        #  files.push(x)
-        #end
-        #snapshot = repos.last_snapshot
-        #snapshot.files do |fff|
-        #  if not files.in?(fff)
-        #    files.push(fff)
-        #  end
-        #end
-        return repos.make_snapshot(list_files)
-      else
-        return repos.make_snapshot(@files)
+        list_files.each do |x|
+          if indexOf(x) == -1
+            content = readFile(x)
+            hash = @revlog.add_file(x, content)
+            fobj = FileObj.new(x, [hash,])
+            @files.push(fobj)
+          else
+            content = readFile(x)
+            hash = @revlog.add_file(x, content)
+            if @files[indexOf(x)].history_hash_ids[-1] != hash
+              @files[indexOf(x)].history_hash_ids << hash
+            end
+          end
+        end
       end
+      return @repos.make_snapshot(@files)
     end
 
     def checkout(argu)
@@ -101,25 +139,38 @@ module Workspace
       if argu.is_a?(Array)
         # we add the list of files to @files regardless whether it has been in it.
         # that means there may be multiple versions of a file.
-        argu.each do |x|
-          @files.push(x)
-          #path = x.path
-          #hash = x.hash
-          #content = RevLog.get_file(hash)
-          #Workspace.writeFile(path,content)
+        list_files = argu
+        snapshot_id = @repos.history(argu)[-1]
+        list_files_last_commit = @repos.get_snapshot(snapshot_id)
+        list_files_last_commit.each do |x|
+          if list_files.include? x.path
+            path = x.path
+            content = @revlog.get_file(x.history_hash_ids[-1])
+	    idx = indexOf(x.path)
+            if  idx == -1
+              @files.push(x)
+	    else
+	      @files[idx] = x
+	    end
+            writeFile(path,content)
+          end
         end
       # if argu is not an Array, we assume it is a String, representing the branch name
       # we first get the last snapshot id of the branch, and then get the commit object
       # and finally push all files of it to the workspace
       else
-        snapshot_id = repos.history(argu)[-1]
-        comm = repos.restore_snapshot(snapshot_id)
-        comm.files do |fff|
-          @files.push(fff)
-          #path = fff.path
-          #hash = fff.hash
-          #content = RevLog.get_file(hash)
-          #Workspace.writeFile(path,content)
+        snapshot_id = @repos.history(argu)[-1]
+        snapshot_obj = @repos.get_snapshot(snapshot_id)
+        snapshot_obj.each do |fff|
+          idx = indexOf(fff.path)
+	  if  idx == -1
+              @files.push(fff)
+	  else
+	      @files[idx] = fff
+	  end
+          path = fff.path
+          content = @revlog.get_file(fff.history_hash_ids[-1])
+          writeFile(path,content)
         end
       end
     end
@@ -128,27 +179,26 @@ module Workspace
       adds = []
       deletes = []
       edits = []
-      if @branch_name != ''
-        snapshot_id = repos.history(@branch_name)[-1]
-        comm = repos.restore_snapshot(snapshot_id)
-        comm.files do |x|
-          idx = @files.index(x)
-          if idx != nil
-            diff = RevLog.diff_files(@files[idx].hash, x.hash)
-            if diff.length == 0
-              edits.push(x)
-            end
-          else
-            deletes.push(x)
-          end
-        end
-        @files do |x|
-          if comm.files.index(x) == nil
-            adds.push(x)
-          end
-        end
+      wsFiles = Dir[ File.join(@root, '**', '*') ].reject { |p| File.directory? p }
+      wsFiles.each do |f|
+	idx = indexOf(f)
+	if idx != -1
+	    x1 = @revlog.get_file(@files[idx].history_hash_ids[-1])
+	    x2 = readFile(f)
+	    if x1 != x2
+		edits.push(f)
+	    end
+	else
+	    adds.push(f)
+	end
       end
-      adds, edits, deletes
+      @files.each do |f|
+	if ! (wsFiles.include? f.path)
+	    deletes.push(f.path)
+	end
+      end
+      return [adds, edits, deletes]
+    end
   end
 end
 
