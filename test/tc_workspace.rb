@@ -1,5 +1,6 @@
 require_relative 'test_helper'
 require_relative '../lib/workspace'
+require "fileutils"
 
 # test cases for clean() functions
 # This function delete all the files in the workspace and create a empty workspace
@@ -8,10 +9,14 @@ require_relative '../lib/workspace'
 class TestMyWorspaceModule < Minitest::Test
     describe "WorkspaceModule" do
         before "manipulating the workspace" do
-            @workspace = Copernicium::Workspace.new()
+            @workspace = Workspace::Workspace.new()
             @workspace.writeFile("workspace/1.txt","1")
             @workspace.writeFile("workspace/2.txt", "2")
 	    @workspace.commit(["workspace/1.txt","workspace/2.txt"])
+        end
+
+        after "manipulating the workspace" do
+            FileUtils.rm_rf("workspace")
         end
 
         it "can clean the workspace to last commit" do
