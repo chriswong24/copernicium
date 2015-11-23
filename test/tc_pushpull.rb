@@ -21,7 +21,7 @@ class TestPushPullModule < Minitest::Test
 
     it "can yield a remote connection to a block" do
       test = Object.new
-      conn = @inst.connect("cycle3.csug.rochester.edu", @user, @passwd) do |x|
+      conn = @inst.connect("cycle2.csug.rochester.edu", @user, @passwd) do |x|
         test = (x.exec!("echo Blocks Working!")).strip;
       end
       test.must_equal "Blocks Working!"
@@ -30,15 +30,9 @@ class TestPushPullModule < Minitest::Test
     it "can move files to remote servers for push" do
       tfile = File.new("comm_t.copernicium", 'w')
       tfile.close
-      begin
-        test = @inst.transfer("cycle3.csug.rochester.edu", "./comm_t.copernicium",
-                              "/localdisk/comm_t.copernicium", @user, @passwd)
-      rescue
-        raise 'Cannot connect.'
-      ensure
-        File.delete("comm_t.copernicium")
-      end
-      @inst.connect("cycle3.csug.rochester.edu", @user, @passwd) do |x|
+      test = @inst.transfer("cycle2.csug.rochester.edu", "./comm_t.copernicium", "/localdisk/comm_t.copernicium", @user, @passwd)
+      File.delete("comm_t.copernicium")
+      @inst.connect("cycle2.csug.rochester.edu", @user, @passwd) do |x|
         x.exec!("ls /localdisk/comm_t.copernicium")
         x.exec!("rm /localdisk/comm_t.copernicium")
       end
@@ -46,21 +40,21 @@ class TestPushPullModule < Minitest::Test
     end
 
     it "can fetch files from a server for pull" do
-      @inst.connect("cycle3.csug.rochester.edu", @user, @passwd) do |x|
+      @inst.connect("cycle2.csug.rochester.edu", @user, @passwd) do |x|
         x.exec!("touch /localdisk/comm_t.copernicium")
       end
-      result = @inst.fetch("cycle3.csug.rochester.edu", "/localdisk/comm_t.copernicium", "./", @user, @passwd)
+      result = @inst.fetch("cycle2.csug.rochester.edu", "/localdisk/comm_t.copernicium", "./", @user, @passwd)
       File.delete("./comm_t.copernicium")
       result.must_equal true
     end
 
     it "can clone a repository from a server" do
-      conn = @inst.connect("cycle3.csug.rochester.edu", @user, @passwd) do |x|
+      conn = @inst.connect("cycle2.csug.rochester.edu", @user, @passwd) do |x|
         x.exec!("mkdir /localdisk/.t_copernicium")
         x.exec!("touch /localdisk/.t_copernicium/comm_t.copernicium");
       end
-      result = @inst.clone("cycle3.csug.rochester.edu", "/localdisk/.t_copernicium", @user, @passwd)
-      conn = @inst.connect("cycle3.csug.rochester.edu", @user, @passwd) do |x|
+      result = @inst.clone("cycle2.csug.rochester.edu", "/localdisk/.t_copernicium", @user, @passwd)
+      conn = @inst.connect("cycle2.csug.rochester.edu", @user, @passwd) do |x|
         x.exec!("rm -r .t_copernicium")
       end
       result.must_equal true
@@ -68,4 +62,3 @@ class TestPushPullModule < Minitest::Test
   end
 end
 
-# Placeholder for real comms object
