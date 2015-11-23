@@ -45,8 +45,8 @@ module Copernicium
     def initialize
       @files = []
       @branch_name = 'master'
-      @revlog = RevLog::RevLog.new('.')
-      @repos = Repos::Repos.new
+      @revlog = Copernicium::RevLog.new('.')
+      @repos = Copernicium::Repos.new
       @root = "workspace"
       if !File.directory?(@root)
           Dir.mkdir(@root)
