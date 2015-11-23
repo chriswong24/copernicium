@@ -3,3 +3,4 @@ dummyfile.test
 .cop
 *.swp
 *.swo
+*.gem

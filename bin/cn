@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
 
+# copernicium -  a distributed version control
+
 require 'yaml'
-require 'digest'
 require 'diffy'
+require 'digest'
 require 'socket'        # Socket needed for communicating over the network
 require 'io/console'    # Needed to hide password at console
 require 'net/ssh'       # Needed to communicate with the remote
@@ -14,6 +16,6 @@ require_relative "../lib/RevLog.rb"
 require_relative "../lib/PushPull.rb"
 require_relative "../lib/workspace.rb"
 
-# copernicium -  a distributed version control
+include Copernicium
 
-UI.parse_command(ARGV.join)
+Copernicium.parse_command(ARGV.join)
