@@ -2,23 +2,30 @@ require 'rake'
 require 'rake/testtask'
 require 'rdoc/task'
 
-# run all/module tests
-task :default  => :test
-task :test, [:module] do |r, m|
-  if m[:module].nil?
-    Rake::TestTask.new {|t| t.pattern = "test/tc_*.rb"}
-  else
-    Rake::TestTask.new {|t| t.pattern = "test/tc_#{m[:module]}.rb"}
-  end
-end
 
-# setup dev env with bundler
+# setup development environment with bundler
 task :setup do
   system 'gem install bundler'
   system 'bundler install'
 end
 
-# show info about the repo
+
+# run all/module tests
+task :default  => :test
+task :test, [:module] do |r, m|
+  if m[:module].nil?
+    Rake::TestTask.new {|t| t.pattern = "test/tc_*.rb"}
+  elsif m[:module] == 'travis'
+    # dont run pushpull tests on travis, since they need auth
+    Rake::TestTask.new {|t| t.test_files = FileList['test/tc_repos.rb',
+    'test/tc_revlog.rb', 'test/tc_ui.rb', 'test/tc_workspace.rb']}
+  else # run all tests, including pushpull's
+    Rake::TestTask.new {|t| t.pattern = "test/tc_#{m[:module]}.rb"}
+  end
+end
+
+
+# show repo info
 task :info do
   # parse how many tests exist/work
   puts "Test info...\n\n"
@@ -40,7 +47,7 @@ task :info do
       checkout br
       puts cleanup(br)
       curnext = false
-    elsif br != '*'
+    elsif br != '*' # current branch has a star next to it in `git branch`
       checkout br
       puts cleanup(br)
     else
@@ -48,9 +55,10 @@ task :info do
     end
   end
 
-  # checkout original branch
+  # return to branch
   checkout original
 end
+
 
 # adding documentation cmds
 RDoc::Task.new :rdoc do |rdoc|
@@ -59,3 +67,4 @@ RDoc::Task.new :rdoc do |rdoc|
   #uncomment to show private methods
   #rdoc.options << "--all"
 end
+
