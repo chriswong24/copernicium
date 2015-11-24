@@ -18,4 +18,5 @@ require_relative "../lib/workspace.rb"
 
 include Copernicium
 
-Copernicium.parse_command(ARGV.join)
+# should just pass in arg array instead of joining, then parsing later
+Copernicium.parse_command(ARGV.join ' ')
