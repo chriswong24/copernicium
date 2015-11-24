@@ -5,6 +5,8 @@ module Copernicium
   #
   # Parameters:
   #   * cmd - the text command line given by the user
+  #   * actually should be an array of arguments, eg:
+  #   * cn hello world -> ['hello', 'world']
   #
   # Return value:
   #   A UICommandCommunicator object containing details of the command to be
