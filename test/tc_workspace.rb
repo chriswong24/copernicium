@@ -7,7 +7,7 @@ require_relative 'test_helper'
 class TestMyWorspaceModule < Minitest::Test
   describe "WorkspaceModule" do
     before "manipulating the workspace" do
-      @workspace = Workspace::Workspace.new()
+      @workspace = Copernicium::Workspace.new()
       @workspace.writeFile("workspace/1.txt","1")
       @workspace.writeFile("workspace/2.txt", "2")
       @workspace.commit(["workspace/1.txt","workspace/2.txt"])
