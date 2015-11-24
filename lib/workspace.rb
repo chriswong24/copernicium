@@ -74,7 +74,9 @@ module Copernicium
 
     # if list_files is nil, then rollback the list of files from the branch
     # or rollback to the entire branch head pointed
-    def clean(list_files=nil)
+    def clean(comm)
+      assert comm.is_a?(Copernicium::UICommandCommunicator) == true
+      list_files = comm.files
       if list_files.nil? # reset first: delete them from disk and reset @files
         @files.each{|x| File.delete(x.path)}
         @files = []
@@ -109,7 +111,9 @@ module Copernicium
     end
 
     # commit a list of files or the entire workspace to make a new snapshot
-    def commit(list_files=nil)
+    def commit(comm)
+      assert comm.is_a?(Copernicium::UICommandCommunicator) == true
+      list_files = comm.files
       if list_files != nil
         list_files.each do |x|
           if indexOf(x) == -1
@@ -129,9 +133,11 @@ module Copernicium
       return @repos.make_snapshot(@files)
     end
 
-    def checkout(argu)
+    def checkout(comm)
+      assert comm.is_a?(Copernicium::UICommandCommunicator) == true
+      argu = comm.files
       # if argu is an Array Object, we assume it is a list of files to be added to the workspace
-      if argu.is_a?(Array)
+      if argu != nil
         # we add the list of files to @files regardless whether it has been in it.
         # that means there may be multiple versions of a file.
         list_files = argu
@@ -154,6 +160,7 @@ module Copernicium
         # we first get the last snapshot id of the branch, and then get the commit object
         # and finally push all files of it to the workspace
       else
+        argu = comm.rev #branch name
         snapshot_id = @repos.history(argu)[-1]
         snapshot_obj = @repos.get_snapshot(snapshot_id)
         snapshot_obj.each do |fff|
@@ -170,7 +177,7 @@ module Copernicium
       end
     end
 
-    def status
+    def status(comm)
       adds = []
       deletes = []
       edits = []
