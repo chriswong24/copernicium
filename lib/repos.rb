@@ -39,7 +39,7 @@ require 'digest'
 
 # Also do a get_snapshot
 
-module Repos
+module Copernicium
   class Snapshot
     def initialize(in_array)
       @files = in_array
