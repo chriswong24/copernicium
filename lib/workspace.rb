@@ -52,7 +52,10 @@ module Copernicium
     def UICommandParser(ui_comm)
       case ui_comm.command
       when "checkout" # Might change later because of slight differences of interpretation between UI and Workspace
-        checkout(ui_comm.rev) # This will be a branch name
+        if ui_comm.files.empty?
+          checkout(ui_comm.rev) # This will be a branch name
+        else
+          checkout(ui.comm.files) # Array of files
       when "clean"
         clean
       when "commit"
