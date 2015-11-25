@@ -10,7 +10,9 @@ class TestMyWorspaceModule < Minitest::Test
       @workspace = Copernicium::Workspace.new()
       @workspace.writeFile("workspace/1.txt","1")
       @workspace.writeFile("workspace/2.txt", "2")
-      @workspace.commit(["workspace/1.txt","workspace/2.txt"])
+      commInit = Copernicium::UICommandCommunicator.new
+      commInit.files = ["workspace/1.txt", "workspace/2.txt"]
+      @workspace.commit(commInit)
     end
 
     after "manipulating the workspace" do
@@ -20,6 +22,9 @@ class TestMyWorspaceModule < Minitest::Test
     it "can clean the workspace to last commit" do
       @workspace.writeFile("workspace/1.txt","1_1")
       @workspace.writeFile("workspace/2.txt", "2_2")
+      comm = Copernicium::UICommandCommunicator.new
+      comm.files = nil
+
       @workspace.clean()
 
       content = @workspace.readFile("workspace/1.txt")
@@ -31,7 +36,9 @@ class TestMyWorspaceModule < Minitest::Test
 
     it "can clean specific files in the workspace" do
       @workspace.writeFile("workspace/1.txt", "1_1")
-      @workspace.clean(["workspace/1.txt"])
+      comm = Copernicium::UICommandCommunicator.new
+      comm.files = ["workspace/1.txt"]
+      @workspace.clean(comm)
 
       content = @workspace.readFile("workspace/1.txt")
       content.must_equal "1"
@@ -40,8 +47,10 @@ class TestMyWorspaceModule < Minitest::Test
     it "can commit a entire worksapce" do
       @workspace.writeFile("workspace/1.txt","1_1")
       @workspace.writeFile("workspace/2.txt","2_2")
-      @workspace.commit()
-      @workspace.clean()
+      comm = Copernicium::UICommandCommunicator.new
+      comm.files = nil
+      @workspace.commit(comm)
+      @workspace.clean(comm)
 
       content = @workspace.readFile("workspace/1.txt")
       content.must_equal "1"
@@ -52,7 +61,9 @@ class TestMyWorspaceModule < Minitest::Test
 
     it "can commit a list of file" do
       @workspace.writeFile("workspace/1.txt","1_1_1")
-      @workspace.commit(["workspace/1.txt"])
+      comm = Copernicium::UICommandCommunicator.new
+      comm.files = ["workspace/1.txt"]
+      @workspace.commit(comm)
       @workspace.clean()
 
       content = @workspace.readFile("workspace/1.txt")
@@ -62,8 +73,12 @@ class TestMyWorspaceModule < Minitest::Test
     it "can checkout a entire branch" do
       @workspace.writeFile("workspace/1.txt","1_1_1_1")
       @workspace.writeFile("workspace/2.txt","2_2_2_2")
-      @workspace.commit(["workspace/1.txt","workspace/2.txt"])
-      @workspace.checkout('master')
+      comm = Copernicium::UICommandCommunicator.new
+      comm.files = ["workspace/1.txt", "workspace/2.txt"]
+      @workspace.commit(comm)
+      comm.files = nil
+      comm.rev = "master"
+      @workspace.checkout(comm)
 
       content = @workspace.readFile("workspace/1.txt")
       content.must_equal "1_1_1_1"
@@ -74,7 +89,9 @@ class TestMyWorspaceModule < Minitest::Test
 
     it "can checkout a list of files" do
       @workspace.writeFile("workspace/1.txt","none")
-      @workspace.checkout('workspace/1.txt')
+      comm = Copernicium::UICommandCommunicator.new
+      comm.files = ["workspace/1.txt"]
+      @workspace.checkout(comm)
 
       content = @workspace.readFile("workspace/1.txt")
       content.must_equal "1"
@@ -85,7 +102,7 @@ class TestMyWorspaceModule < Minitest::Test
       @workspace.writeFile("workspace/1.txt","edit")
       @workspace.writeFile("workspace/3.txt","3")
 
-      changedFiles = @workspace.status()
+      changedFiles = @workspace.status(nil)
       changedFiles.must_equal([["workspace/3.txt"],["workspace/1.txt"],["workspace/2.txt"]])
     end
   end
