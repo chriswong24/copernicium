@@ -3,19 +3,31 @@ GEM
   specs:
     ansi (1.5.0)
     builder (3.2.2)
+    diffy (3.0.7)
     minitest (5.8.1)
     minitest-reporters (1.1.4)
       ansi
       builder
       minitest (>= 5.0)
       ruby-progressbar
+    net-scp (1.2.1)
+      net-ssh (>= 2.6.5)
+    net-ssh (3.0.1)
     rake (10.3.2)
+    rdoc (4.2.0)
     ruby-progressbar (1.7.5)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  diffy
   minitest
   minitest-reporters
+  net-scp
+  net-ssh
   rake
+  rdoc
+
+BUNDLED WITH
+   1.10.6
