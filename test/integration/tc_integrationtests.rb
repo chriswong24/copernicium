@@ -1,14 +1,7 @@
 require 'minitest/spec'
 require 'minitest/autorun'
+require_relative 'test_helper'
 
-# Temporary until we fix module names
-require_relative '../../lib/workspace.rb'
-require_relative '../../lib/ui.rb'
-require_relative '../../lib/pushpull.rb'
-require_relative '../../lib/repos.rb'
-require_relative '../../lib/RevLog.rb'
-
-include Copernicium
 
 class Workspace
 	attr_reader :repos, :files

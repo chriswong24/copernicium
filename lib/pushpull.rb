@@ -7,6 +7,23 @@
 module Copernicium
   class PushPull
 
+    # Chris's edit
+    # Takes in Ethan's UICommandCommunicator object and calls
+    # a method based on the command
+    def UICommandParser(UIComm)
+      case UIComm.command
+      when "clone"
+        # Do stuff
+      when "push"
+        # Do Push stuff
+      when "pull"
+        # Do pull stuff
+      else
+        print "Error: Invalid command supplied to PushPull!" # Bad error handling, will fix later
+        return nil
+      end
+    end
+
     def connect(remote, user = nil, passwd = nil, &block)
       exit_code = false
       if(block.nil?)

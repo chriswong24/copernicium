@@ -1,4 +1,3 @@
-# This is the workspace module
 # The functions are clean, commit, checkout and status
 
 module Copernicium
@@ -19,6 +18,7 @@ module Copernicium
   end
 
   class Workspace
+
     def writeFile(path, content)
       f = open(path, 'w')
       f.write(content)
@@ -43,6 +43,25 @@ module Copernicium
       @root = rootdir
       if !File.directory?(@root)
         Dir.mkdir(@root)
+      end
+    end
+
+    # Chris's edit
+    # Takes in Ethan's UICommandCommunicator object and calls
+    # a method based on the command
+    def UICommandParser(ui_comm)
+      case ui_comm.command
+      when "checkout" # Might change later because of slight differences of interpretation between UI and Workspace
+        checkout(ui_comm.rev) # This will be a branch name
+      when "clean"
+        clean
+      when "commit"
+        commit # How will the commit message be paired with snapshot?  Currently stored in UIComm.commit_message
+      when "status"
+        status
+      else
+        print "Error: Invalid command supplied to workspace!" # Bad error handling, will fix later
+        return nil
       end
     end
 
