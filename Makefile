@@ -7,6 +7,7 @@ build:
 
 clean:
 	rm -vf *.gem
+	rm -rf html
 
 push: clean build
 	gem push $(g)-$(v).gem

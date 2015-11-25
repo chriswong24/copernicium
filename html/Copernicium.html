@@ -92,6 +92,8 @@ merge: given two files, try to merge them
 in - file_id_1, file_id_2
 out - success and merged file name/content, or failure and conflict</pre>
 
+<p>Also do a get_snapshot</p>
+
 <p>user interface module</p>
 
   </section>
@@ -133,7 +135,9 @@ href="Copernicium.html#method-i-parse_command">#parse_command</a>()</p>
 
 <p>Parameters:</p>
 
-<pre>* cmd - the text command line given by the user</pre>
+<pre>* cmd - the text command line given by the user
+* actually should be an array of arguments, eg:
+* cn hello world -&gt; [&#39;hello&#39;, &#39;world&#39;]</pre>
 
 <p>Return value:</p>
 
@@ -144,7 +148,7 @@ executed by the respective backend module.</pre>
 
           
           <div class="method-source-code" id="parse_command-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 13</span>
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 15</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">parse_command</span>(<span class="ruby-identifier">cmd</span>)
   <span class="ruby-comment"># Handle no-argument commands</span>
   <span class="ruby-keyword">if</span> <span class="ruby-identifier">cmd</span> <span class="ruby-operator">==</span> <span class="ruby-string">&quot;init&quot;</span> <span class="ruby-keyword">or</span> <span class="ruby-identifier">cmd</span> <span class="ruby-operator">==</span> <span class="ruby-string">&quot;status&quot;</span> <span class="ruby-keyword">or</span> <span class="ruby-identifier">cmd</span> <span class="ruby-operator">==</span> <span class="ruby-string">&quot;push&quot;</span> <span class="ruby-keyword">or</span> <span class="ruby-identifier">cmd</span> <span class="ruby-operator">==</span> <span class="ruby-string">&quot;pull&quot;</span>
@@ -189,6 +193,36 @@ executed by the respective backend module.</pre>
     <span class="ruby-keyword">end</span>
 
     <span class="ruby-keyword">return</span> <span class="ruby-constant">UICommandCommunicator</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">command</span><span class="ruby-operator">:</span> <span class="ruby-string">&quot;merge&quot;</span>, <span class="ruby-identifier">rev</span><span class="ruby-operator">:</span> <span class="ruby-identifier">cmd_split</span>[<span class="ruby-value">1</span>])
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-comment"># Handle &quot;checkout&quot;</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cmd</span>.<span class="ruby-identifier">start_with?</span> <span class="ruby-string">&quot;checkout&quot;</span>
+    <span class="ruby-identifier">cmd_split</span> = <span class="ruby-identifier">cmd</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&quot; &quot;</span>)
+
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">cmd_split</span>.<span class="ruby-identifier">count</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>
+      <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;Error: no branch or revision specified to command &#39;checkout&#39;!\n&quot;</span>
+      <span class="ruby-keyword">return</span> <span class="ruby-keyword">nil</span>
+    <span class="ruby-keyword">end</span>
+
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">cmd_split</span>.<span class="ruby-identifier">count</span> <span class="ruby-operator">==</span> <span class="ruby-value">2</span>
+      <span class="ruby-comment"># No file names given - check out all files at the given revision</span>
+      <span class="ruby-keyword">return</span> <span class="ruby-constant">UICommandCommunicator</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">command</span><span class="ruby-operator">:</span> <span class="ruby-string">&quot;checkout&quot;</span>, <span class="ruby-identifier">rev</span><span class="ruby-operator">:</span> <span class="ruby-identifier">cmd_split</span>[<span class="ruby-value">1</span>])
+    <span class="ruby-keyword">end</span>
+
+    <span class="ruby-comment"># Else, we should only checkout the specified file(s) from the given revision.</span>
+    <span class="ruby-keyword">return</span> <span class="ruby-constant">UICommandCommunicator</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">command</span><span class="ruby-operator">:</span> <span class="ruby-string">&quot;checkout&quot;</span>, <span class="ruby-identifier">rev</span><span class="ruby-operator">:</span> <span class="ruby-identifier">cmd_split</span>[<span class="ruby-value">1</span>], <span class="ruby-identifier">files</span><span class="ruby-operator">:</span> <span class="ruby-identifier">cmd_split</span>[<span class="ruby-value">2</span><span class="ruby-operator">..</span>(<span class="ruby-identifier">cmd_split</span>.<span class="ruby-identifier">count</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>)])
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-comment"># Handle &quot;clone&quot;</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cmd</span>.<span class="ruby-identifier">start_with?</span> <span class="ruby-string">&quot;clone&quot;</span>
+    <span class="ruby-identifier">cmd_split</span> = <span class="ruby-identifier">cmd</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&quot; &quot;</span>)
+
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">cmd_split</span>.<span class="ruby-identifier">count</span> <span class="ruby-operator">!=</span> <span class="ruby-value">2</span>
+      <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;Error: wrong number of arguments to command &#39;clone&#39;! Please specify a single remote repository to clone.\n&quot;</span>
+      <span class="ruby-keyword">return</span> <span class="ruby-keyword">nil</span>
+    <span class="ruby-keyword">end</span>
+
+    <span class="ruby-keyword">return</span> <span class="ruby-constant">UICommandCommunicator</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">command</span><span class="ruby-operator">:</span> <span class="ruby-string">&quot;clone&quot;</span>, <span class="ruby-identifier">repo</span><span class="ruby-operator">:</span> <span class="ruby-identifier">cmd_split</span>[<span class="ruby-value">1</span>])
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
