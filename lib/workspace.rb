@@ -37,8 +37,8 @@ module Copernicium
       txt
     end
 
-    #private_class_method: writeFile
-    #private_class_method: readFile
+    #private_class_method :writeFile
+    #private_class_method :readFile
 
     def initialize
       @files = []
