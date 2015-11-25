@@ -70,21 +70,18 @@ class TestUI < Minitest::Test
       ui_test_helper(comm, "push")
     end
 
-    #it "supports 'merge' command" do
-    #comm = parse_command "merge some_revision" # Merge some_revision into current branch
-    #comm.must_be_instance_of UICommandCommunicator
-    #comm.command.must_equal "merge"
-    #comm.files.must_be_nil
-    #comm.rev.must_equal "some_revision"
-    #comm.commit_message.must_be_nil
-    #end
+    it "supports 'merge' command" do # Merge some_revision into current branch
+      comm = parse_command %w{merge some_revision}
+      ui_test_helper(comm, "merge", nil, "some_revision")
+    end
 
-    #it "supports 'clone' command" do
-    ## Format:
-    ##   cn clone path-to-remote-repository
-    #comm = parse_command "clone ssh://user@some-host.com/some/repo/path"
-    #ui_test_helper(comm, "clone", nil, nil, nil, "ssh://user@some-host.com/some/repo/path")
-    #end
+    # Format: cn clone path-to-remote-repository
+    it "supports 'clone' command" do
+      # todo make cloning work haha
+      #host = "ssh://user@some-host.com/some/repo/path"
+      #comm = parse_command "clone " + host
+      #ui_test_helper(comm, "clone", nil, nil, nil, host)
+    end
   end
 end
 
