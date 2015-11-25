@@ -58,6 +58,7 @@ module Copernicium
           checkout(ui_comm.rev) # This will be a branch name
         else
           checkout(ui.comm.files) # Array of files
+        end
       when "clean"
         clean
       when "commit"
