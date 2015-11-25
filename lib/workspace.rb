@@ -113,14 +113,18 @@ module Copernicium
 
     # commit a list of files or the entire workspace to make a new snapshot
     def commit(comm)
-      list_files = @files.each{|x| x.path}
-      if comm.files != nil
-        comm.files.each do |x|
-          if indexOf(x) == -1
-            list_files.push(x)
-          end
-        end
-      end
+      # for this commented version, we first get all files in the workspace and then add files from comm obj
+      # it's not used at this time
+      # Linfeng Song
+      #list_files = @files.each{|x| x.path}
+      #if comm.files != nil
+      #  comm.files.each do |x|
+      #    if indexOf(x) == -1
+      #      list_files.push(x)
+      #    end
+      #  end
+      #end
+      list_files = Dir[ File.join(@root, '**', '*') ].reject { |p| File.directory? p }
       if list_files != nil
         list_files.each do |x|
           if indexOf(x) == -1
