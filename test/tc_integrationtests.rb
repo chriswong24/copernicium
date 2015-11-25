@@ -2,103 +2,129 @@ require 'minitest/spec'
 require 'minitest/autorun'
 require_relative 'test_helper'
 
-
 class Workspace
 	attr_reader :repos, :files
 end
 
-# Possible changes
-
-
 class CoperniciumIntegrationTests < Minitest::Test
 	describe "CoperniciumDVCS" do
 		before "Calling basic copernicium commands" do
-
-			@inst = Copernicium::PushPull.new
+			@pushpull = Copernicium::PushPull.new
 			@workspace = Copernicium::Workspace.new
-			@workspace.repos.make_branch("dev")
 
-			@workspace.writeFile("workspace/1.txt","1")
-      @workspace.writeFile("workspace/2.txt", "2")
-      @workspace.commit(["workspace/1.txt","workspace/2.txt"])
-
+			#initial commit?
+			@workspace.writeFile("workspace/1.txt", "1")
+     	@workspace.writeFile("workspace/2.txt", "2")
+     	comm = parse_command("commit -m Test Commit")
+     	@workspace.commit(comm)
 		end
 
 		it "can commit changes" do
-
 			@workspace.repos.manifest["default"].size.must_equal 1
-			@workspace.writeFile("1.txt", "1_1")
-     	@workspace.writeFile("2.txt", "2_2")
-			comm = parse_command("commit -m \"Test Commit\"")
+			@workspace.writeFile("workspace/1.txt", "1_1")
+     	@workspace.writeFile("workspace/2.txt", "2_2")
 
-			# Will include this once we start using UICommandCommunicator
+     	comm = parse_command("commit -m Test Commit")
+			@workspace.commit(comm)
 
-			#@workspace.commit(comm).must_be_instance_of String
-			#@workspace.repos.manifest.size.must_equal 1
+			@workspace.readFile("1.txt").must_equal "1_1"
+			@workspace.readFile("2.txt").must_equal "2_2"
+			@workspace.repos.manifest.size.must_equal 2
 		end
 
+		# Won't work because clean not handled by UI yet
 		it "can revert back to the last commit" do
-			@workspace.
+     	@workspace.writeFile("workspace/1.txt", "1_1")
+     	@workspace.writeFile("workspace/2.txt", "2_2")
+
+      comm = parse_command("clean")
+      @workspace.clean(comm)
+
+      content = @workspace.readFile("workspace/1.txt")
+      content.must_equal "1"
+      content = @workspace.readFile("workspace/2.txt")
+      content.must_equal "2"
 		end
 
-		it "can checkout a list of files" do
-			comm = parse_command("checkout ")
+		# Won't work because clean not handled by UI yet
+		it "can clean specific files in the workspace" do
+			@workspace.writeFile("workspace/1.txt", "1_1")
+			@workspace.writeFile("workspace/2.txt", "2_2")
 
+			comm = parse_command("clean workspace/1.txt") 
+			@workspace.clean(comm)
+
+			@workspace.readFile("workspace/1.txt").must_equal "1"
+			@workspace.readFile("workspace/2.txt").must_equal "2_2"
+		end
+
+		# Tests don't work because branch handling not complete
+		it "can make and delete a branch" do
+			comm = parse_command("branch test")
+			@workspace.UICommandParser(comm)
+			@workspace.repos.manifest["test"].wont_be_nil
+
+			comm = parse_command("branch -d test")
+			@workspace.UICommandParser(comm)
+			@workspace.repos.manifest["test"].must_be_nil
+		end
+
+		it "can check the status of the repository" do
+		 	File.delete('workspace/2.txt')
+      @workspace.writeFile("workspace/1.txt","edit")
+      @workspace.writeFile("workspace/3.txt","3")
+
+      comm = parse_command("status")
+      changedFiles = @workspace.status(comm)
+      changedFiles.must_equal([["workspace/3.txt"],["workspace/1.txt"],["workspace/2.txt"]])
 		end
 
 		it "can checkout a branch" do
-
 			@workspace.readFile("workspace/1.txt").must_equal "1"
 			@workspace.readFile("workspace/2.txt").must_equal "2"
 			@workspace.writeFile("workspace/1.txt", "1_1")
 			@workspace.writeFile("workspace/2.txt", "2_2")
-			@workspace.commit(["workspace/1.txt","workspace/2.txt"])
+			comm = parse_command("commit -m Test Commit")
+			@workspace.commit(comm)
 
 			comm = parse_command("checkout dev")
-			#@workspace.checkout(comm)
-			@workspace.checkout("dev")
+			@workspace.checkout(comm)
+
+			# Switch to dev, files should not be modified
 			@workspace.readFile("workspace/1.txt").must_equal "1"
 			@workspace.readFile("workspace/2.txt").must_equal "2"
 			
 		end
 
-		it "can make a branch" do
-			comm = parse_command("branch")
+		it "can checkout a list of files" do
+			@workspace.writeFile("workspace/1.txt","none")
+			comm = parse_command("checkout workspace/1.txt")
+      @workspace.checkout(comm)
+
+      content = @workspace.readFile("workspace/1.txt")
+      content.must_equal "1"
 		end
 
-		it "can delete a branch" do 
-			comm = 
-		end
+		## Will flesh out merge, push, and pull once they
+		# are fleshed out
 
 		it "can merge two branches" do
-
+		# Assuming currently on master branch, merge dev
+		# make sure things work or something.
 		comm = parse_command("merge dev")
+		@pushpull.UICommandParser(comm)
 
 		end
 
 		it "can push a branch" do
 			#push branchname
-			comm = parse_command("push")
+			comm = parse_command("push dev")
 		end
 
 		it "can pull a branch" do
 			#pull branchname
-			comm = parse_command("pull")
+			comm = parse_command("pull origin dev")
 		end
 
-		# Probably will delete this test because doesn't require any modular communication
-
-		it "can check the status of the repository" do
-
-		 	File.delete('workspace/2.txt')
-      @workspace.writeFile("workspace/1.txt","edit")
-      @workspace.writeFile("workspace/3.txt","3")
-
-      changedFiles = @workspace.status()
-      changedFiles.must_equal([["workspace/3.txt"],["workspace/1.txt"],["workspace/2.txt"]])
-
-			#comm = parse_command("status")
-
-		end
 	end
 end

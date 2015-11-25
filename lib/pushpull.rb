@@ -10,14 +10,16 @@ module Copernicium
     # Chris's edit
     # Takes in Ethan's UICommandCommunicator object and calls
     # a method based on the command
-    def UICommandParser(comm)
-      case comm.command
+    def UICommandParser(ui_comm)
+      case ui_comm.command
       when "clone"
-        # Do stuff
+        #clone()
+      when "merge"
+        # do merge stuff
       when "push"
-        # Do Push stuff
+        #push(ui_comm.)
       when "pull"
-        # Do pull stuff
+        #pull(ui_comm.branchname,)
       else
         print "Error: Invalid command supplied to PushPull!" # Bad error handling, will fix later
         return nil
