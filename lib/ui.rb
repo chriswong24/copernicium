@@ -4,88 +4,37 @@ module Copernicium
   # Function: parse_command()
   #
   # Parameters:
-  #   * argv - an array containing the tokenized command line from the user
-  #       For instance:
-  #         "cn hello world" -> ['hello', 'world']
-  #   * cmds - the text command line given by the user
-  #   * actually should be an array of arguments, eg:
-  #   * cn hello world -> ['hello', 'world']
+  #   * args - an array containing the tokenized command line from the user
+  #       For instance: "cn hello world" -> ['hello', 'world']
   #
   # Return value:
   #   A UICommandCommunicator object containing details of the command to be
   #   executed by the respective backend module.
   #
-  def parse_command(cmds)
+  def parse_command(args)
 
-    # handle no arguments given - show help information
-    # TODO
+    # TODO handle no arguments given - show help information
 
     %w{init status push pull}.each do |noarg| # Handle no-argument commands
-      if cmds.first == noarg
-        first = cmds.shift
-        return UICommandCommunicator.new(command: first, opts: cmds)
+      if args.first == noarg
+        first = args.shift
+        return UICommandCommunicator.new(command: first, opts: args)
       end
     end
 
-    # Handle "commit"
-    if cmds.first == "commit"
-      messflag = cmds.find_index("-m")
-      if (messflag.nil?)
-        print "Error: commit message is empty"
-        # TODO: launch editor and get long commit message
-        # alternatively just prompt them for a commit message
-        # using rubys 'gets', and use that as the message
-        # refactor this into single method, use below
-        return nil
-      end
-
-      # mash everything after the -m flag into a single string
-      message = cmds[messflag+1..-1].join ' '
-
-      if message == '' || message.nil?
-        print "Error: commit message is empty"
-        # TODO: launch editor and get long commit message
-        # alternatively just prompt them for a commit message
-        # using rubys 'gets', and use that as the message
-        return nil
-      end
-
-      return UICommandCommunicator.new(command: "commit",
-                                       commit_message: message)
+    if args.first == "commit" # Handle commit
+      return parse_commit args
     end
 
-    # Handle "merge"
-    if cmds.start_with? "merge"
-      cmd_split = cmd.split(" ")
-
-      if cmd_split.count != 2
-        print "Error: too many/few arguments to command 'merge'! Please specify a single commit to merge into the current branch.\n"
-        return nil
-      end
-
-      return UICommandCommunicator.new(command: "merge", rev: cmd_split[1])
+    if args.first == "checkout" # Handle checkout
+      return parse_checkout args
     end
 
-    # Handle "checkout"
-    if cmds.start_with? "checkout"
-      cmd_split = cmd.split(" ")
-
-      if cmd_split.count < 2
-        print "Error: no branch or revision specified to command 'checkout'!\n"
-        return nil
-      end
-
-      if cmd_split.count == 2
-        # No file names given - check out all files at the given revision
-        return UICommandCommunicator.new(command: "checkout", rev: cmd_split[1])
-      end
-
-      # Else, we should only checkout the specified file(s) from the given revision.
-      return UICommandCommunicator.new(command: "checkout", rev: cmd_split[1], files: cmd_split[2..(cmd_split.count - 1)])
+    if args.first == "merge" # Handle merge
+      return parse_merge args
     end
 
-    # Handle "clone"
-    if cmds.start_with? "clone"
+    if args.first == "clone" # Handle clone
       cmd_split = cmd.split(" ")
 
       if cmd_split.count != 2
@@ -95,6 +44,53 @@ module Copernicium
 
       return UICommandCommunicator.new(command: "clone", repo: cmd_split[1])
     end
+  end
+
+  def parse_commit(args)
+    messflag = args.find_index("-m")
+    message = get_message if (messflag.nil?)
+
+    # mash everything after the -m flag into a single string
+    message = args[messflag + 1..-1].join ' '
+
+    # if nothing is there after the -m flag, prompt for mess
+    message = get_message if (message == '' || message.nil?)
+
+    return UICommandCommunicator.new(command: "commit", commit_message: message)
+  end
+
+  def parse_checkout(args)
+    if args.length < 2
+      # todo allow user to give the checkout instead of dying
+      puts "Error: no branch or revision given to checkout"
+      return nil
+    end
+
+    if args.length == 2 # No file names given - check out all files in revision
+      return UICommandCommunicator.new(command: "checkout", rev: args[1])
+    end
+
+    # Else we should only checkout the specified file(s) from the given revision
+    files = args[2..-1] # get all elements after checkout
+    return UICommandCommunicator.new(command: "checkout",
+                                     rev: args[1], files: files)
+  end
+
+  def parse_merge(args)
+    if args.length > 2
+      puts 'Error: too many/few arguments to merge'
+      puts 'Please specify a single commit to merge into the current branch.'
+      # perhaps optionally query to get the single commit
+      return nil
+    end
+
+    args.shift # remove merge from args
+    return UICommandCommunicator.new(command: "merge", rev: args.first)
+  end
+
+  def get_message
+    puts "No commit message (-m) specified. Please enter a commit message:"
+    gets # read a line from user, and return it
   end
 
   # Communication object that will pass commands to backend modules

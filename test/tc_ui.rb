@@ -49,16 +49,16 @@ class TestUI < Minitest::Test
     # cn checkout revision (checks out full repo at revision)
     # cn checkout revision file.txt (checks out only the specified files
     # from revision)
-    #it "supports 'checkout' command" do
-      #comm = parse_command "checkout revID"
-      #ui_test_helper(comm, "checkout", nil, "revID")
+    it "supports 'checkout' command" do
+      comm = parse_command %w{checkout revID}
+      ui_test_helper(comm, "checkout", nil, "revID")
 
-      #comm = parse_command "checkout revID file.txt"
-      #ui_test_helper(comm, "checkout", ["file.txt"], "revID")
+      comm = parse_command %w{checkout revID file.txt}
+      ui_test_helper(comm, "checkout", ["file.txt"], "revID")
 
-      #comm = parse_command "checkout revID file.txt foo.c"
-      #ui_test_helper(comm, "checkout", ["file.txt", "foo.c"], "revID")
-    #end
+      comm = parse_command %w{checkout revID file.txt foo.c}
+      ui_test_helper(comm, "checkout", ["file.txt", "foo.c"], "revID")
+    end
 
     #it "supports 'pull' command" do
     #comm = parse_command "pull"
