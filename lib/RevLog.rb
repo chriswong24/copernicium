@@ -30,8 +30,8 @@ module Copernicium
       @log_path = File.join(@cop_path, "logmap.yaml")
       @hash_path = File.join(@cop_path, "hashmap.yaml")
       if File.exist?(@log_path) and File.exist?(@hash_path) then
-        @logmap = default_hash.merge(YAML.load_file(@log_path))
-        @hashmap = default_hash.merge(YAML.load_file(@hash_path))
+        @logmap = default_hash_factory.new.merge(YAML.load_file(@log_path))
+        @hashmap = default_hash_factory.new.merge(YAML.load_file(@hash_path))
       else
         @logmap = default_hash_factory()
         @hashmap = default_hash_factory()
