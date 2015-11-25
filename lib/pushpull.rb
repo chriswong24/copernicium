@@ -10,8 +10,8 @@ module Copernicium
     # Chris's edit
     # Takes in Ethan's UICommandCommunicator object and calls
     # a method based on the command
-    def UICommandParser(UIComm)
-      case UIComm.command
+    def UICommandParser(comm)
+      case comm.command
       when "clone"
         # Do stuff
       when "push"
