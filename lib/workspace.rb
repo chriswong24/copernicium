@@ -51,6 +51,8 @@ module Copernicium
     # a method based on the command
     def UICommandParser(ui_comm)
       case ui_comm.command
+      when "branch"
+        @repos.make_branch(ui_comm.rev)
       when "checkout" # Might change later because of slight differences of interpretation between UI and Workspace
         if ui_comm.files.empty?
           checkout(ui_comm.rev) # This will be a branch name
