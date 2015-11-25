@@ -151,8 +151,9 @@ module Copernicium
         # we add the list of files to @files regardless whether it has been in it.
         # that means there may be multiple versions of a file.
         list_files = argu
-        snapshot_id = @repos.history(argu)[-1]
-        list_files_last_commit = @repos.get_snapshot(snapshot_id)
+        snapshot_id = @repos.history()[-1]
+        returned_snapshot = @repos.get_snapshot(snapshot_id)
+        list_files_last_commit = returned_snapshot.get_files()
         list_files_last_commit.each do |x|
           if list_files.include? x.path
             path = x.path
@@ -171,8 +172,8 @@ module Copernicium
         # and finally push all files of it to the workspace
       else
         argu = comm.rev #branch name
-        snapshot_id = @repos.history(argu)[-1]
-        snapshot_obj = @repos.get_snapshot(snapshot_id)
+        snapshot_id = @repos.history()[-1]
+        snapshot_obj = @repos.get_snapshot(snapshot_id).get_files()
         snapshot_obj.each do |fff|
           idx = indexOf(fff.path)
           if  idx == -1
