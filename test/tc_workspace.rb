@@ -10,7 +10,7 @@ class TestMyWorspaceModule < Minitest::Test
       @workspace = Copernicium::Workspace.new()
       @workspace.writeFile("workspace/1.txt","1")
       @workspace.writeFile("workspace/2.txt", "2")
-      commInit = parse_command("commit -m 'init commit'")
+      commInit = parse_command("commit -m 'init commit'".split(" "))
       @workspace.commit(commInit)
     end
 
@@ -45,9 +45,9 @@ class TestMyWorspaceModule < Minitest::Test
     it "can commit a entire worksapce" do
       @workspace.writeFile("workspace/1.txt","1_1")
       @workspace.writeFile("workspace/2.txt","2_2")
-      comm = parse_command("commit -m 'commit entire workspace'")
+      comm = parse_command("commit -m 'commit entire workspace'".split(" "))
       @workspace.commit(comm)
-      comm = parse_command("checkout master")
+      comm = parse_command("checkout master".split(" "))
       @workspace.checkout(comm)
 
       content = @workspace.readFile("workspace/1.txt")
@@ -71,9 +71,9 @@ class TestMyWorspaceModule < Minitest::Test
     it "can checkout a entire branch" do
       @workspace.writeFile("workspace/1.txt","1_1_1_1")
       @workspace.writeFile("workspace/2.txt","2_2_2_2")
-      comm = parse_command("commit -m 'commit two files'")
+      comm = parse_command("commit -m 'commit two files'".split(" "))
       @workspace.commit(comm)
-      comm = parse_command("checkout master")
+      comm = parse_command("checkout master".split(" "))
       @workspace.checkout(comm)
 
       content = @workspace.readFile("workspace/1.txt")
@@ -85,7 +85,7 @@ class TestMyWorspaceModule < Minitest::Test
 
     it "can checkout a list of files" do
       @workspace.writeFile("workspace/1.txt","none")
-      comm = parse_command("checkout master ./workspace/1.txt")
+      comm = parse_command("checkout master ./workspace/1.txt".split(" "))
       @workspace.checkout(comm)
 
       content = @workspace.readFile("workspace/1.txt")
