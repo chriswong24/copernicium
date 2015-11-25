@@ -60,14 +60,10 @@ class TestUI < Minitest::Test
       ui_test_helper(comm, "checkout", ["file.txt", "foo.c"], "revID")
     end
 
-    #it "supports 'pull' command" do
-    #comm = parse_command "pull"
-    #comm.must_be_instance_of UICommandCommunicator
-    #comm.command.must_equal "pull"
-    #comm.files.must_be_nil
-    #comm.rev.must_be_nil
-    #comm.commit_message.must_be_nil
-    #end
+    it "supports 'pull' command" do
+      comm = parse_command ["pull"]
+      ui_test_helper(comm, "pull")
+    end
 
     #it "supports 'push' command" do
     #comm = parse_command "push"
