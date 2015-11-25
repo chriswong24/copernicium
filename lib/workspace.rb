@@ -75,7 +75,6 @@ module Copernicium
     # if list_files is nil, then rollback the list of files from the branch
     # or rollback to the entire branch head pointed
     def clean(comm)
-      assert comm.is_a?(Copernicium::UICommandCommunicator) == true
       list_files = comm.files
       if list_files.nil? # reset first: delete them from disk and reset @files
         @files.each{|x| File.delete(x.path)}
@@ -112,7 +111,6 @@ module Copernicium
 
     # commit a list of files or the entire workspace to make a new snapshot
     def commit(comm)
-      assert comm.is_a?(Copernicium::UICommandCommunicator) == true
       list_files = comm.files
       if list_files != nil
         list_files.each do |x|
@@ -134,7 +132,6 @@ module Copernicium
     end
 
     def checkout(comm)
-      assert comm.is_a?(Copernicium::UICommandCommunicator) == true
       argu = comm.files
       # if argu is an Array Object, we assume it is a list of files to be added to the workspace
       if argu != nil
