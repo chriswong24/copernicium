@@ -4,15 +4,33 @@ module Copernicium
   # Function: parse_command()
   #
   # Parameters:
-  #   * cmd - the text command line given by the user
-  #   * actually should be an array of arguments, eg:
-  #   * cn hello world -> ['hello', 'world']
+  #   * argv - an array containing the tokenized command line from the user
+  #       For instance:
+  #         "cn hello world" -> ['hello', 'world']
   #
   # Return value:
   #   A UICommandCommunicator object containing details of the command to be
   #   executed by the respective backend module.
   #
-  def parse_command(cmd)
+  def parse_command(argv)
+    #
+    # Convert the array of arguments to a space-separated string (i.e., as it
+    # would actually be entered on the command line). This makes it easier to
+    # parse some commands, such as commit messages given with "commit -m".
+    #
+    # (Some of the commands could probably be more easily parsed by dealing
+    # directly, with argv, i.e., I'm just splitting them back up, but I've
+    # already written the code and it's most important to get it working. This
+    # can be refactored later if we have time, but in the meantime, it should
+    # be sound, if slightly roundabout.)
+    #
+    cmd = ""
+    argv.each do |arg|
+      cmd << arg
+      cmd << " "
+    end
+    cmd.chop! # Remove extra space at the end
+    
     # Handle no-argument commands
     if cmd == "init" or cmd == "status" or cmd == "push" or cmd == "pull"
       return UICommandCommunicator.new(command: cmd)

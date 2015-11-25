@@ -27,25 +27,25 @@ class TestUI < Minitest::Test
     end
 
     it "supports 'init' command" do
-      comm = parse_command "init"
+      comm = parse_command ["init"]
       ui_test_helper(comm, 'init')
     end
 
     it "supports 'status' command" do
-      comm = parse_command "status"
+      comm = parse_command ["status"]
       ui_test_helper(comm, "status")
     end
 
     it "supports 'commit' command" do
       # -m is optional, but if the user doesn't give it, the UI will prompt for a message in an
       # editor. Thus, the UICommandCommunicator will always include a commit message.
-      comm = parse_command "commit -m 'a commit message'"
+      comm = parse_command "commit -m 'a commit message'".split(" ")
       ui_test_helper(comm, "commit", nil, nil, "a commit message")
 
-      comm = parse_command "commit -m a commit message"
+      comm = parse_command "commit -m a commit message".split(" ")
       ui_test_helper(comm, "commit", nil, nil, "a commit message")
 
-      comm = parse_command 'commit -m "a commit message"'
+      comm = parse_command 'commit -m "a commit message"'.split(" ")
       ui_test_helper(comm, "commit", nil, nil, "a commit message")
     end
 
@@ -53,18 +53,18 @@ class TestUI < Minitest::Test
       # Two valid forms of "checkout" command:
       #   cn checkout revision              (checks out full repo at revision)
       #   cn checkout revision file.txt     (checks out only the specified files from revision)
-      comm = parse_command "checkout revID"
+      comm = parse_command "checkout revID".split(" ")
       ui_test_helper(comm, "checkout", nil, "revID")
 
-      comm = parse_command "checkout revID file.txt"
+      comm = parse_command "checkout revID file.txt".split(" ")
       ui_test_helper(comm, "checkout", ["file.txt"], "revID")
 
-      comm = parse_command "checkout revID file.txt foo.c"
+      comm = parse_command "checkout revID file.txt foo.c".split(" ")
       ui_test_helper(comm, "checkout", ["file.txt", "foo.c"], "revID")
     end
 
     it "supports 'pull' command" do
-      comm = parse_command "pull"
+      comm = parse_command ["pull"]
       comm.must_be_instance_of UICommandCommunicator
       comm.command.must_equal "pull"
       comm.files.must_be_nil
@@ -73,7 +73,7 @@ class TestUI < Minitest::Test
     end
 
     it "supports 'push' command" do
-      comm = parse_command "push"
+      comm = parse_command ["push"]
       comm.must_be_instance_of UICommandCommunicator
       comm.command.must_equal "push"
       comm.files.must_be_nil
@@ -82,7 +82,7 @@ class TestUI < Minitest::Test
     end
 
     it "supports 'merge' command" do
-      comm = parse_command "merge some_revision" # Merge some_revision into current branch
+      comm = parse_command "merge some_revision".split(" ") # Merge some_revision into current branch
       comm.must_be_instance_of UICommandCommunicator
       comm.command.must_equal "merge"
       comm.files.must_be_nil
@@ -93,7 +93,7 @@ class TestUI < Minitest::Test
     it "supports 'clone' command" do
       # Format:
       #   cn clone path-to-remote-repository
-      comm = parse_command "clone ssh://user@some-host.com/some/repo/path"
+      comm = parse_command "clone ssh://user@some-host.com/some/repo/path".split(" ")
       ui_test_helper(comm, "clone", nil, nil, nil, "ssh://user@some-host.com/some/repo/path")
     end
 
