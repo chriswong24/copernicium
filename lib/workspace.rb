@@ -40,12 +40,12 @@ module Copernicium
     #private_class_method :writeFile
     #private_class_method :readFile
 
-    def initialize
+    def initialize(bname = 'master', rootdir = './workspace')
       @files = []
-      @branch_name = 'master'
+      @branch_name = bname
       @revlog = Copernicium::RevLog.new('.')
       @repos = Copernicium::Repos.new
-      @root = "workspace"
+      @root = rootdir
       if !File.directory?(@root)
         Dir.mkdir(@root)
       end
@@ -105,13 +105,22 @@ module Copernicium
         # and then checkout with the restored version of them
         if @branch_name != ''
           return checkout(list_files)
+        else
+          return 0
         end
       end
     end
 
     # commit a list of files or the entire workspace to make a new snapshot
     def commit(comm)
-      list_files = comm.files
+      list_files = @files.each{|x| x.path}
+      if comm.files != nil
+        comm.files.each do |x|
+          if indexOf(x) == -1
+            list_files.push(x)
+          end
+        end
+      end
       if list_files != nil
         list_files.each do |x|
           if indexOf(x) == -1
