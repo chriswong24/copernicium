@@ -65,14 +65,10 @@ class TestUI < Minitest::Test
       ui_test_helper(comm, "pull")
     end
 
-    #it "supports 'push' command" do
-    #comm = parse_command "push"
-    #comm.must_be_instance_of UICommandCommunicator
-    #comm.command.must_equal "push"
-    #comm.files.must_be_nil
-    #comm.rev.must_be_nil
-    #comm.commit_message.must_be_nil
-    #end
+    it "supports 'push' command" do
+      comm = parse_command ["push"]
+      ui_test_helper(comm, "push")
+    end
 
     #it "supports 'merge' command" do
     #comm = parse_command "merge some_revision" # Merge some_revision into current branch
