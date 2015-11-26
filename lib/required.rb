@@ -15,6 +15,6 @@ require 'net/scp'       # Needed for file transfer between servers
 require_relative "../lib/ui.rb"
 require_relative "../lib/repos.rb"
 require_relative "../lib/RevLog.rb"
-require_relative "../lib/PushPull.rb"
+require_relative "../lib/pushpull.rb"
 require_relative "../lib/workspace.rb"
 
