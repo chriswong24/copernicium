@@ -18,6 +18,9 @@ module Copernicium
   #   executed by the respective backend module.
   #
   def parse_command(args)
+    # todo not sure if first arg when calling from command line is the name of
+    # the executable - this is sometimes the case. if so, uncomment below:
+    # shift args if args.first == 'cn' # remove bin info
 
     # TODO handle no arguments given - show help information
 
@@ -41,28 +44,10 @@ module Copernicium
     end
 
     if args.first == "clone" # Handle clone
-      cmd_split = cmd.split(" ")
-
-      if cmd_split.count != 2
-        print "Error: wrong number of arguments to command 'clone'! Please specify a single remote repository to clone.\n"
-        return nil
-      end
-
-      return UICommandCommunicator.new(command: "clone", repo: cmd_split[1])
+      return parse_clone args
     end
-  end
 
-  def parse_commit(args)
-    messflag = args.find_index("-m")
-    message = get_message if (messflag.nil?)
-
-    # mash everything after the -m flag into a single string
-    message = args[messflag + 1..-1].join ' '
-
-    # if nothing is there after the -m flag, prompt for mess
-    message = get_message if (message == '' || message.nil?)
-
-    return UICommandCommunicator.new(command: "commit", commit_message: message)
+    # todo handle an unrecognized argument
   end
 
   def parse_checkout(args)
@@ -80,6 +65,29 @@ module Copernicium
     files = args[2..-1] # get all elements after checkout
     return UICommandCommunicator.new(command: "checkout",
                                      rev: args[1], files: files)
+  end
+
+  def parse_clone(args)
+      if args.length != 2
+        puts "Error: wrong number of arguments to clone"
+        puts "Please specify a single remote repository to clone"
+        return nil
+      end
+
+      return UICommandCommunicator.new(command: "clone", repo: args[1])
+  end
+
+  def parse_commit(args)
+    messflag = args.find_index("-m")
+    message = get_message if (messflag.nil?)
+
+    # mash everything after the -m flag into a single string
+    message = args[messflag + 1..-1].join ' '
+
+    # if nothing is there after the -m flag, prompt for mess
+    message = get_message if (message == '' || message.nil?)
+
+    return UICommandCommunicator.new(command: "commit", commit_message: message)
   end
 
   def parse_merge(args)
