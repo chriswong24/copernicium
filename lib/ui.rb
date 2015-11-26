@@ -1,6 +1,12 @@
 # user interface module
 
 module Copernicium
+  # Function: run()
+  #   * execute a string command, wrapper around parse command
+  def run(string)
+    parse_command string.split
+  end
+
   # Function: parse_command()
   #
   # Parameters:
@@ -88,7 +94,7 @@ module Copernicium
     return UICommandCommunicator.new(command: "merge", rev: args.first)
   end
 
-  def get_message
+  def get_message # havent tested this...
     puts "No commit message (-m) specified. Please enter a commit message:"
     gets # read a line from user, and return it
   end
