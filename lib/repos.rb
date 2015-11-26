@@ -1,8 +1,6 @@
 # repos module
 
-require 'digest'
 #require 'marshal'
-
 # Details from this link:
 #   https://docs.google.com/document/d/1r3-NquhyRLbCncqTOQPwsznSZ-en6G6xzLbWIAmxhys/edit#heading=h.7pyingf1unu
 
@@ -11,7 +9,7 @@ require 'digest'
 
 # make_snapshot: Creates new snapshot from current files and versions
 #   in - array of file objects. file object = array of all versions: {id, content}
-#   out - hash id of snapshot 
+#   out - hash id of snapshot
 
 # restore_snapshot: Set current file versions to specified snapshot
 #   in - id of target snapshot
@@ -25,7 +23,7 @@ require 'digest'
 #   in - target snapshot
 #   out -  Comm object with status
 
-# diff_snapshots: Returns diff between two different snapshots 
+# diff_snapshots: Returns diff between two different snapshots
 #   in - two ids of snapshots to perform diff on
 #   out - list of filenames and versions
 
@@ -46,23 +44,23 @@ module Copernicium
       @id = ""
       # id = hash of in array?
     end
-    
+
     def set_id(in_id)
       @id = in_id
     end
-    
+
     # drop get prefix?
     def get_id()
       @id
     end
-    
+
     def get_files()
       @files
     end
     # Initialize hash at startup
     # Possible? Or problem with self object?
   end
-  
+
   class Repos
     def initialize()
       # Create manifest
@@ -73,11 +71,11 @@ module Copernicium
       # Read in project path and make manifest file?
       # Create current
     end
-    
+
     def manifest()
       @manifest
     end
-    
+
     def make_snapshot(file_array)
       # Return hash ID of snapshot
       new_snap = Snapshot.new(file_array)
@@ -87,7 +85,7 @@ module Copernicium
       # Update manifest file?
       return new_snap.get_id()
     end
-    
+
     def get_snapshot(target_id)
       # Return snapshot (or just contents) given id
       # Find snapshot
@@ -101,14 +99,14 @@ module Copernicium
       end
       #return ret_snap
     end
-    
+
     # Not sure how I'm gonna do this one
     def restore_snapshot(target_id)
       # Return comm object with status
       # Need a way to change files in workspace
       return 1
     end
-    
+
     #def history(branch_name)
     def history()
       # Return array of snapshot IDs
@@ -116,7 +114,7 @@ module Copernicium
       @manifest[@curr_branch].each {|x| names_list.push(x.get_id())}
       return names_list
     end
-    
+
     def delete_snapshot(target_id)
       # Return comm object with status
       # Find snapshot, delete from manifest/memory
@@ -124,7 +122,7 @@ module Copernicium
       # catch error
       # update manifest file?
     end
-    
+
     # Finds the files in snap1 that aren't in snap2, change this?
     # Consider using diffy?
     def diff_snapshots(id1, id2)
@@ -142,7 +140,7 @@ module Copernicium
       return diff_files
       # Use revlog diff on each set of files? Look at Diffy
     end
-    
+
     def make_branch(branch_name)
       # Return hash ID of new branch
       # Not sure where to store branches
@@ -151,16 +149,16 @@ module Copernicium
       @curr_branch = branch_name
       return 1
     end
-    
+
     def delete_branch(branch_name)
       # Exit status code
       @manifest.delete("branch_name")
     end
-    
+
     def clear()
       # Just a placeholder for now
     end
-    
+
   end
 end
 

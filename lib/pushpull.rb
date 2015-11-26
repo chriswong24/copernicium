@@ -2,13 +2,7 @@
 # CSC 253
 # PushPull Module
 # November 6, 2015
-require 'socket'        # Socket needed for communicating over the network
-require 'io/console'    # Needed to hide password at console
-require 'net/ssh'       # Needed to communicate with the remote
-require 'net/scp'       # Needed for file transfer between servers
-require_relative 'repos' 
-require_relative 'RevLog'
-require_relative 'ui'
+
 
 module Copernicium
   class PushPull
@@ -55,7 +49,7 @@ module Copernicium
       end
       return exit_code
     end
-    
+
     def transfer(remote, local, dest, user = nil, passwd = nil)
       exit_code = false
       if(user.nil?)

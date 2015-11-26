@@ -10,7 +10,7 @@ Gem::Specification.new do |g|
   g.license     = 'MIT'
   g.executables = ['cn']
   g.files       = ['lib/pushpull.rb', 'lib/repos.rb', 'lib/RevLog.rb',
-                   'lib/ui.rb', 'lib/workspace.rb']
+                   'lib/ui.rb', 'lib/workspace.rb', 'lib/required.rb']
   g.add_runtime_dependency 'diffy',                  '~> 3.0', '>= 3.0.7'
   g.add_runtime_dependency 'net-scp',                '~> 1.2', '>= 1.2.1'
   g.add_runtime_dependency 'net-ssh',                '~> 3.0', '>= 3.0.1'
