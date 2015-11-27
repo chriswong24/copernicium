@@ -5,11 +5,6 @@ VERSION = "0.0.1"
 
 module Copernicium
   class Driver
-    # execute an array command, wrapper around parse command
-    def run(array)
-      parse_command array
-    end
-
     # Get some info from the user when they dont specify it
     def get(info)
       puts "Hi, #{info} not specified. Enter #{info}:"
@@ -22,13 +17,11 @@ module Copernicium
       exit sig
     end
 
-    # Function: run()
-    #
     # Executes the required action for a given user command.
     #
     # Parameters:
-    #   * args - an array containing the tokenized command line from the user
-    #       For instance: "cn hello world" -> ['hello', 'world']
+    #   * args - an array containing the tokenized argv from the user
+    #   For instance: "cn hello world" -> ['hello', 'world']
     #
     # Return value:
     #   A UIComm object containing details of the command to be
@@ -53,44 +46,33 @@ module Copernicium
         end
       end
 
-      if args.first == "commit" # Handle commit
-        return parse_commit args
-      end
+      return commit args if args.first == "commit"
+      return checkout args if args.first == "checkout"
+      return merge args if args.first == "merge"
+      return clone args if args.first == "clone"
 
-      if args.first == "checkout" # Handle checkout
-        return parse_checkout args
-      end
-
-      if args.first == "merge" # Handle merge
-        return parse_merge args
-      end
-
-      if args.first == "clone" # Handle clone
-        return parse_clone args
-      end
-
-      # handle an unrecognized argument
+      # handle an unrecognized argument, show help and exit
       pexit "Unrecognized command #{args.first}\n" + HELP_BANNER, 1
     end
 
-    def parse_checkout(args)
+    def checkout(args)
       if args.length < 2
         # todo allow user to give the checkout instead of dying
         puts "Error: no branch or revision given to checkout"
         return nil
       end
 
-      if args.length == 2 # No file names given - check out all files in revision
+          # No file names given - check out all files in revision
+      if args.length == 2
         return UIComm.new(command: "checkout", rev: args[1])
       end
 
-      # Else we should only checkout the specified file(s) from the given revision
-      files = args[2..-1] # get all elements after checkout
-      return UIComm.new(command: "checkout",
-                                       rev: args[1], files: files)
+      # Else only checkout the specified file(s) from the given revision
+      files = args[2..-1] # get all elements after checkout command
+      return UIComm.new(command: "checkout", rev: args[1], files: files)
     end
 
-    def parse_clone(args)
+    def clone(args)
       if args.length != 2
         puts "Error: wrong number of arguments to clone"
         puts "Please specify a single remote repository to clone"
@@ -100,7 +82,7 @@ module Copernicium
       return UIComm.new(command: "clone", repo: args[1])
     end
 
-    def parse_commit(args)
+    def commit(args)
       messflag = args.find_index("-m")
       message = get_message if (messflag.nil?)
 
@@ -113,7 +95,7 @@ module Copernicium
       return UIComm.new(command: "commit", commit_message: message)
     end
 
-    def parse_merge(args)
+    def merge(args)
       if args.length > 2
         puts 'Hi: too many/few arguments to merge'
         puts 'Please specify a single commit to merge into the current branch.'
