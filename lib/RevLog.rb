@@ -1,26 +1,28 @@
-require 'yaml'
-require 'digest'
-require 'diffy'
-
 # Revlog Top Level Function Definitions (Xiangru)
+#
 # add_file: add a file to the revision history
 # in - file name, content
 # out - hash id of file (file_id)
+#
 # delete_file: a delete a file from revision history
 # in - file_id
 # out - exit status code
+#
 # diff_files: generate the differences between 2 files
 # in - two file_ids
 # out - list of differences
+#
 # get_file: get the contents of a file based on hash id
 # in - file_id
 # out - content of specified file
+#
 # hash_file: generate hash id for a given file
-#                               in - file name, content
-#                               out - hashed id
-#                               merge: given two files, try to merge them
-#                               in - file_id_1, file_id_2
-#                               out - success and merged file name/content, or failure and conflict
+# in - file name, content
+# out - hashed id
+#
+# merge: given two files, try to merge them
+# in - file_id_1, file_id_2
+# out - success and merged file name/content, or failure and conflict
 
 module Copernicium
   class RevLog
@@ -39,12 +41,12 @@ module Copernicium
           Dir.mkdir(@cop_path)
         end
       end
-    end 
+    end
 
     def default_hash_factory()
       Hash.new {[]}
     end
-    
+
     def add_file(file_name, content)
       hash = hash_file(file_name, content)
       File.open(File.join(@cop_path, hash), "w") { |f|
@@ -60,9 +62,9 @@ module Copernicium
 
     ## return 1 if succeed, otherwise 0
     def delete_file(file_id)
-      begin 
+      begin
         file_name = @hashmap[file_id][0][:filename]
-        @hashmap[file_id].delete_if { |e| 
+        @hashmap[file_id].delete_if { |e|
           e[:filename] == file_name
         }
         @logmap[file_name].delete_if { |e|
@@ -75,7 +77,7 @@ module Copernicium
         return 0
       end
     end
-    
+
 
     def get_file(file_id)
       file_path = File.join(@cop_path, file_id)
@@ -120,10 +122,10 @@ module Copernicium
 
     def update_log_file()
       File.open(File.join(@cop_path, "logmap.yaml"), "w") { |f|
-        f.write(@logmap.to_yaml) 
+        f.write(@logmap.to_yaml)
       }
       File.open(File.join(@cop_path, "hashmap.yaml"), "w") { |f|
-        f.write(@hashmap.to_yaml) 
+        f.write(@hashmap.to_yaml)
       }
     end
 

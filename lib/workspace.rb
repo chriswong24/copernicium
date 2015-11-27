@@ -1,11 +1,6 @@
 # This is the workspace module
 # The functions are clean, commit, checkout and status
 
-require 'singleton'
-require 'pathname'
-require_relative 'RevLog'
-require_relative 'repos'
-
 module Copernicium
   class FileObj
     attr_reader :path, :history_hash_ids

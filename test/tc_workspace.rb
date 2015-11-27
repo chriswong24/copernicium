@@ -1,28 +1,35 @@
+# workspace module tests
+
 require_relative 'test_helper'
 
 # test cases for clean() functions
-# This function delete all the files in the workspace and create a empty workspace
-# The test cases will check if the workspace is empty after calling the clean function
+# This function delete all the files in the workspace and create a empty
+# workspace. The test cases will check if the workspace is empty after calling
+# the clean function
 
-class TestMyWorspaceModule < Minitest::Test
+class CoperniciumWorkspaceTest < Minitest::Test
   describe "WorkspaceModule" do
+    def parse_helper(string)
+      parse_command string.split
+    end
+
     before "manipulating the workspace" do
       @workspace = Copernicium::Workspace.new()
       @workspace.writeFile("workspace/1.txt","1")
       @workspace.writeFile("workspace/2.txt", "2")
-      commInit = parse_command("commit -m 'init commit'")
+      commInit = parse_helper("commit -m init commit")
       @workspace.commit(commInit)
     end
 
     after "manipulating the workspace" do
-      FileUtils.rm_rf("workspace")
+      FileUtils.rm_rf("./workspace")
     end
 
     #it "can clean the workspace to last commit" do
      # @workspace.writeFile("workspace/1.txt","1_1")
      # @workspace.writeFile("workspace/2.txt", "2_2")
-     # 
-     # comm = parse_command("clean")
+     #
+     # comm = parse_helper("clean")
 
      # @workspace.clean(comm)
 
@@ -35,7 +42,7 @@ class TestMyWorspaceModule < Minitest::Test
 
    # it "can clean specific files in the workspace" do
     #  @workspace.writeFile("workspace/1.txt", "1_1")
-    #  comm = parse_command("clean workspace/1.txt")
+    #  comm = parse_helper("clean workspace/1.txt")
     #  @workspace.clean(comm)
 
     #  content = @workspace.readFile("workspace/1.txt")
@@ -45,9 +52,9 @@ class TestMyWorspaceModule < Minitest::Test
     it "can commit a entire worksapce" do
       @workspace.writeFile("workspace/1.txt","1_1")
       @workspace.writeFile("workspace/2.txt","2_2")
-      comm = parse_command("commit -m 'commit entire workspace'")
+      comm = parse_helper("commit -m commit entire workspace")
       @workspace.commit(comm)
-      comm = parse_command("checkout master")
+      comm = parse_helper("checkout master")
       @workspace.checkout(comm)
 
       content = @workspace.readFile("workspace/1.txt")
@@ -58,22 +65,22 @@ class TestMyWorspaceModule < Minitest::Test
     end
 
     #it "can commit a list of file" do
-     # @workspace.writeFile("workspace/1.txt","1_1_1")
-     # comm.files = parse_command("commit -m 'commit one file' workspace/1.txt")
-     # @workspace.commit(comm)
-     # comm = parse_command("checkout master")
-     # @workspace.checkout(comm)
+      #@workspace.writeFile("workspace/1.txt","1_1_1")
+      #comm.files = parse_helper("commit -m 'commit one file' workspace/1.txt")
+      #@workspace.commit(comm)
+      #comm = parse_helper("checkout master")
+      #@workspace.checkout(comm)
 
-     # content = @workspace.readFile("workspace/1.txt")
-     # content.must_equal "1_1_1"
-   # end
+      #content = @workspace.readFile("workspace/1.txt")
+      #content.must_equal "1_1_1"
+    #end
 
     it "can checkout a entire branch" do
       @workspace.writeFile("workspace/1.txt","1_1_1_1")
       @workspace.writeFile("workspace/2.txt","2_2_2_2")
-      comm = parse_command("commit -m 'commit two files'")
+      comm = parse_helper("commit -m 'commit two files'")
       @workspace.commit(comm)
-      comm = parse_command("checkout master")
+      comm = parse_helper("checkout master")
       @workspace.checkout(comm)
 
       content = @workspace.readFile("workspace/1.txt")
@@ -85,7 +92,7 @@ class TestMyWorspaceModule < Minitest::Test
 
     it "can checkout a list of files" do
       @workspace.writeFile("workspace/1.txt","none")
-      comm = parse_command("checkout master ./workspace/1.txt")
+      comm = parse_helper("checkout master ./workspace/1.txt")
       @workspace.checkout(comm)
 
       content = @workspace.readFile("workspace/1.txt")
@@ -98,7 +105,8 @@ class TestMyWorspaceModule < Minitest::Test
       @workspace.writeFile("workspace/3.txt","3")
 
       changedFiles = @workspace.status(nil)
-      changedFiles.must_equal([["./workspace/3.txt"],["./workspace/1.txt"],["./workspace/2.txt"]])
+      changedFiles.must_equal([["./workspace/3.txt"],
+                               ["./workspace/1.txt"],["./workspace/2.txt"]])
     end
   end
 end

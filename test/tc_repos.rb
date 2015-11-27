@@ -2,7 +2,6 @@
 
 require_relative 'test_helper'
 
-# A preliminary outline for Repos Module unit testing
 class TestCnReposModule < Minitest::Test
 
   describe "ReposModule" do
@@ -72,7 +71,7 @@ class TestCnReposModule < Minitest::Test
       @my_repo.diff_snapshots(snap1, snap1).must_equal([])
       @my_repo.diff_snapshots(snap1, snap2).wont_be_empty
     end
-    
+
     # Add branch tests
 
   end
@@ -81,11 +80,8 @@ end
 # An oversimplified communication object that will be passed between
 # modules, containing the data needed to connect the modules.
 class UICommunicationObject
-
   attr_reader :commands
-
   def initialize
-    commands = ['push', 'remote', 'branch']
+    @commands = ['push', 'remote', 'branch']
   end
-
 end

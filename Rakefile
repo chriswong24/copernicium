@@ -3,6 +3,10 @@ require 'rake/testtask'
 require 'rdoc/task'
 
 
+# default - run travis tests
+task :default do system "rake test[travis]" end
+
+
 # setup development environment with bundler
 task :setup do
   system 'gem install bundler'
@@ -11,7 +15,6 @@ end
 
 
 # run all/module tests
-task :default  => :test
 task :test, [:module] do |r, m|
   if m[:module].nil?
     Rake::TestTask.new {|t| t.pattern = "test/tc_*.rb"}

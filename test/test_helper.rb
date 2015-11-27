@@ -1,16 +1,11 @@
-# relative requirements in lib:
+# including coperniciums requirements
 
-require_relative '../lib/ui.rb'
-require_relative '../lib/repos.rb'
-require_relative '../lib/RevLog.rb'
-require_relative '../lib/pushpull.rb'
-require_relative '../lib/workspace.rb'
+require_relative '../lib/required.rb'
 include Copernicium
 
-# universal place for requirements
+# universal place for test requirements
 
-require 'fileutils'
-require 'io/console'             # Needed to hide password at console
+require 'fileutils'              # needed for rm_rf'ing in cleanup
 require 'minitest/spec'
 require 'minitest/autorun'
 require 'minitest/reporters'
