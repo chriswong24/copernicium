@@ -2,27 +2,32 @@
 ===================
 
 
+[![Gem Version](https://badge.fury.io/rb/copernicium.svg)](https://badge.fury.io/rb/copernicium)
 [![Build Status](https://travis-ci.org/jeremywrnr/copernicium.svg)](https://travis-ci.org/jeremywrnr/copernicium)
+[![MIT](https://img.shields.io/npm/l/alt.svg?style=flat)](http://jeremywrnr.com/mit-license)
 
 
 Repository for Team Copernicium's DVCS.
 
 
-### Setup
+### installation
+
+    $ [sudo] gem install copernicium
+
+
+### development
 
 To install all runtime and testing dependencies, run:
 
+    $ [sudo] gem install rake
     $ rake setup
-
-
-### Testing
 
 To run the entire test suite, run `rake`. Else run a specific test suite, eg:
 
     $ rake 'test[pushpull]'
 
 
-### Relevant links:
+### relevant links:
 
 - [spec. documentation](https://docs.google.com/document/d/1r3-NquhyRLbCncqTOQPwsznSZ-en6G6xzLbWIAmxhys/)
 - [shared google drive](https://drive.google.com/open?id=0B3rmOUWm5OBlNzRnZTZEajFWZkU)
