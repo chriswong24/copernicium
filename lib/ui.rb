@@ -91,71 +91,71 @@ module Copernicium
       else
         rev = args.shift
         files = args
-        end
-
-        # todo - call repos checkout the given / branch
-        # todo - also, figure out if is branch or rev id
-        # this can be done by checking if it is a branch, and if not, then just
-        # assume it is a rev id. if it isnt, then something will break :/
-
-        UIComm.new(command: 'checkout', rev: rev, files: files)
       end
 
-      def clone(args)
-        # todo - optionally check for folder to clone into, instead of cwd
-        if args.empty?
-          repo = get 'repo url to clone'
-        else
-          repo = args.first
-        end
+      # todo - call repos checkout the given / branch
+      # todo - also, figure out if is branch or rev id
+      # this can be done by checking if it is a branch, and if not, then just
+      # assume it is a rev id. if it isnt, then something will break :/
 
-        # todo - actually clone remote locally
-
-        UIComm.new(command: 'clone', repo: repo)
-      end
-
-      def commit(args)
-        # todo parse file list, in case just commiting some files
-
-        messflag = args.find_index('-m')
-        message = get 'commit message' if (messflag.nil?)
-
-        # mash everything after the -m flag into a single string
-        message = args[messflag + 1..-1].join ' '
-
-        # if nothing is there after the -m flag, prompt for mess
-        message = get 'commit message' if (message == '' || message.nil?)
-
-        UIComm.new(command: 'commit', commit_message: message)
-      end
-
-      def merge(args)
-        if args.empty?
-          puts 'I need a commit to merge.'
-          rev = get 'single commit to merge'
-        else # use given
-          rev = args.first
-        end
-
-        # todo - call repos merge command
-
-        UIComm.new(command: 'merge', rev: rev)
-      end
+      UIComm.new(command: 'checkout', rev: rev, files: files)
     end
 
-    # Communication object that will pass commands to backend modules
-    # rev - A single revision indicator (commit #, branch name, HEAD, etc.)
-    # repo - URL/path to a remote repository
-    class UIComm
-      attr_reader :command, :arguments, :files, :rev, :commit_message, :repo
-      def initialize(command: nil, files: nil, rev: nil,
-                     commit_message: nil, repo: nil, opts: nil)
-        @commit_message = commit_message
-        @command = command
-        @files = files
-        @opts = opts
-        @repo = repo
-        @rev = rev
+    def clone(args)
+      # todo - optionally check for folder to clone into, instead of cwd
+      if args.empty?
+        repo = get 'repo url to clone'
+      else
+        repo = args.first
       end
+
+      # todo - actually clone remote locally
+
+      UIComm.new(command: 'clone', repo: repo)
+    end
+
+    def commit(args)
+      messflag = args.find_index('-m')
+      if messflag.nil?
+        message = get 'commit message'
+      else # mash everything after -m into a single string
+        message = args[messflag + 1..-1].join ' '
+      end
+
+      # todo parse file list, in case just commiting some files
+      # todo call revlog, commit files
+      # todo call repos, update commit
+
+      UIComm.new(command: 'commit', commit_message: message)
+    end
+
+    def merge(args)
+      if args.empty?
+        puts 'I need a commit to merge.'
+        rev = get 'single commit to merge'
+      else # use given
+        rev = args.first
+      end
+
+      # todo - call repos merge command
+
+      UIComm.new(command: 'merge', rev: rev)
     end
   end
+
+  # Communication object that will pass commands to backend modules
+  # rev - A single revision indicator (commit #, branch name, HEAD, etc.)
+  # repo - URL/path to a remote repository
+  class UIComm
+    attr_reader :command, :arguments, :files, :rev, :commit_message, :repo
+    def initialize(command: nil, files: nil, rev: nil,
+                   commit_message: nil, repo: nil, opts: nil)
+      @commit_message = commit_message
+      @command = command
+      @files = files
+      @opts = opts
+      @repo = repo
+      @rev = rev
+    end
+  end
+end

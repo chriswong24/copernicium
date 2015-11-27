@@ -37,7 +37,7 @@ class TestUI < Minitest::Test
     end
 
     # -m is optional, but if the user doesn't give it, the UI will prompt for
-    # a message in an editor. Thus, the UICommandCommunicator will always
+    # a message from command line. Thus, the UICommandCommunicator will always
     # include a commit message.
     it "supports 'commit' command" do
       comm = @driver.run %w{commit -m a commit message}
