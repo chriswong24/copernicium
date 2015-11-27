@@ -1,10 +1,22 @@
-# user interface module
+# user interface module - parse and execute commands
+
+VERSION = "0.0.1"
 
 module Copernicium
-  # Function: run()
-  #   * execute a string command, wrapper around parse command
-  def run(string)
+  # execute an array command, wrapper around parse command
+  def run(array)
+    parse_command array
+  end
+
+  # execute a string command, wrapper around parse command
+  def run_string(string)
     parse_command string.split
+  end
+
+  # Print and exit with a specific code
+  def pexit(msg, sig)
+    puts msg
+    exit sig
   end
 
   # Function: parse_command()
@@ -18,13 +30,12 @@ module Copernicium
   #   executed by the respective backend module.
   #
   def parse_command(args)
-    # todo not sure if first arg when calling from command line is the name of
-    # the executable - this is sometimes the case. if so, uncomment below:
-    # shift args if args.first == 'cn' # remove bin info
 
-    # TODO handle no arguments given - show help information
+    # if no arguments given show help information
+    pexit HELP_BANNER, 0 if args.empty?
 
-    %w{init status push pull}.each do |noarg| # Handle no-argument commands
+    # Handle no-argument commands
+    %w{init status push pull}.each do |noarg|
       if args.first == noarg
         first = args.shift
         return UICommandCommunicator.new(command: first, opts: args)
@@ -47,7 +58,8 @@ module Copernicium
       return parse_clone args
     end
 
-    # todo handle an unrecognized argument
+    # handle an unrecognized argument
+    pexit "Unrecognized command #{args.first}\n" + HELP_BANNER, 1
   end
 
   def parse_checkout(args)
@@ -68,13 +80,13 @@ module Copernicium
   end
 
   def parse_clone(args)
-      if args.length != 2
-        puts "Error: wrong number of arguments to clone"
-        puts "Please specify a single remote repository to clone"
-        return nil
-      end
+    if args.length != 2
+      puts "Error: wrong number of arguments to clone"
+      puts "Please specify a single remote repository to clone"
+      return nil
+    end
 
-      return UICommandCommunicator.new(command: "clone", repo: args[1])
+    return UICommandCommunicator.new(command: "clone", repo: args[1])
   end
 
   def parse_commit(args)
@@ -110,11 +122,8 @@ module Copernicium
   # Communication object that will pass commands to backend modules
   class UICommandCommunicator
     attr_reader :command, :arguments, :files, :rev, :commit_message, :repo
-    # Types of arguments:
-    # files    -  An array of one or more file paths
     # rev      - A single revision indicator (commit #, branch name, HEAD, etc.)
     # repo     - URL/path to a remote repository
-    # commit_message - A commit message
     def initialize(command: nil, files: nil, rev: nil,
                    commit_message: nil, repo: nil, opts: nil)
       @commit_message = commit_message

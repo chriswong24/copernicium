@@ -10,11 +10,12 @@ require 'io/console'    # Needed to hide password at console
 require 'net/ssh'       # Needed to communicate with the remote
 require 'net/scp'       # Needed for file transfer between servers
 
-# gem system files
+# coperncicium files
 
-require_relative "../lib/ui.rb"
-require_relative "../lib/repos.rb"
-require_relative "../lib/RevLog.rb"
-require_relative "../lib/pushpull.rb"
-require_relative "../lib/workspace.rb"
+require_relative "ui"
+require_relative "repos"
+require_relative "RevLog"
+require_relative "banners"
+require_relative "pushpull"
+require_relative "workspace"
 
