@@ -9,7 +9,7 @@ require_relative 'test_helper'
 
 class CoperniciumWorkspaceTest < Minitest::Test
   describe "WorkspaceModule" do
-    def parse_helper(string)
+    def runner(string)
       Copernicium::Driver.new.run string.split
     end
 
@@ -17,7 +17,7 @@ class CoperniciumWorkspaceTest < Minitest::Test
       @workspace = Copernicium::Workspace.new()
       @workspace.writeFile("workspace/1.txt","1")
       @workspace.writeFile("workspace/2.txt", "2")
-      commInit = parse_helper("commit -m init commit")
+      commInit = runner("commit -m init commit")
       @workspace.commit(commInit)
     end
 
@@ -29,7 +29,7 @@ class CoperniciumWorkspaceTest < Minitest::Test
      # @workspace.writeFile("workspace/1.txt","1_1")
      # @workspace.writeFile("workspace/2.txt", "2_2")
      #
-     # comm = parse_helper("clean")
+     # comm = runner("clean")
 
      # @workspace.clean(comm)
 
@@ -42,7 +42,7 @@ class CoperniciumWorkspaceTest < Minitest::Test
 
    # it "can clean specific files in the workspace" do
     #  @workspace.writeFile("workspace/1.txt", "1_1")
-    #  comm = parse_helper("clean workspace/1.txt")
+    #  comm = runner("clean workspace/1.txt")
     #  @workspace.clean(comm)
 
     #  content = @workspace.readFile("workspace/1.txt")
@@ -52,9 +52,9 @@ class CoperniciumWorkspaceTest < Minitest::Test
     it "can commit a entire worksapce" do
       @workspace.writeFile("workspace/1.txt","1_1")
       @workspace.writeFile("workspace/2.txt","2_2")
-      comm = parse_helper("commit -m commit entire workspace")
+      comm = runner("commit -m commit entire workspace")
       @workspace.commit(comm)
-      comm = parse_helper("checkout master")
+      comm = runner("checkout master")
       @workspace.checkout(comm)
 
       content = @workspace.readFile("workspace/1.txt")
@@ -66,9 +66,9 @@ class CoperniciumWorkspaceTest < Minitest::Test
 
     #it "can commit a list of file" do
       #@workspace.writeFile("workspace/1.txt","1_1_1")
-      #comm.files = parse_helper("commit -m 'commit one file' workspace/1.txt")
+      #comm.files = runner("commit -m 'commit one file' workspace/1.txt")
       #@workspace.commit(comm)
-      #comm = parse_helper("checkout master")
+      #comm = runner("checkout master")
       #@workspace.checkout(comm)
 
       #content = @workspace.readFile("workspace/1.txt")
@@ -78,9 +78,9 @@ class CoperniciumWorkspaceTest < Minitest::Test
     it "can checkout a entire branch" do
       @workspace.writeFile("workspace/1.txt","1_1_1_1")
       @workspace.writeFile("workspace/2.txt","2_2_2_2")
-      comm = parse_helper("commit -m 'commit two files'")
+      comm = runner("commit -m 'commit two files'")
       @workspace.commit(comm)
-      comm = parse_helper("checkout master")
+      comm = runner("checkout master")
       @workspace.checkout(comm)
 
       content = @workspace.readFile("workspace/1.txt")
@@ -92,7 +92,7 @@ class CoperniciumWorkspaceTest < Minitest::Test
 
     it "can checkout a list of files" do
       @workspace.writeFile("workspace/1.txt","none")
-      comm = parse_helper("checkout master ./workspace/1.txt")
+      comm = runner("checkout master ./workspace/1.txt")
       @workspace.checkout(comm)
 
       content = @workspace.readFile("workspace/1.txt")

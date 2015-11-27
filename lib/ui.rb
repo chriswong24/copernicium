@@ -5,7 +5,6 @@ VERSION = "0.0.1"
 
 module Copernicium
   class Driver
-
     # execute an array command, wrapper around parse command
     def run(array)
       parse_command array
@@ -25,6 +24,8 @@ module Copernicium
 
     # Function: run()
     #
+    # Executes the required action for a given user command.
+    #
     # Parameters:
     #   * args - an array containing the tokenized command line from the user
     #       For instance: "cn hello world" -> ['hello', 'world']
@@ -37,6 +38,9 @@ module Copernicium
 
       # if no arguments given show help information
       pexit HELP_BANNER, 0 if args.empty?
+
+      # if no arguments given show help information
+      pexit HELP_BANNER, 0 if args.first == "-h"
 
       # if -v flag givem show version
       pexit VERSION, 0 if args.first == "-v"
