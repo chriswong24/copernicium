@@ -12,6 +12,10 @@ clean:
 push: clean build
 	gem push $(g)-$(v).gem
 
+doc:
+	rm -rf html
+	rake rdoc
+
 dev:
 	filewatcher '**/*.rb' 'clear && yes | rake'
 
