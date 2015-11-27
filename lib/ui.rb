@@ -33,14 +33,17 @@ module Copernicium
       # if no arguments given show help information
       pexit HELP_BANNER, 0 if args.empty?
 
+      # get first command
+      cmd = args.shift
+
       # if no arguments given show help information
-      pexit HELP_BANNER, 0 if args.first == '-h'
+      pexit HELP_BANNER, 0 if cmd == '-h'
 
       # if -v flag givem show version
-      pexit VERSION, 0 if args.first == '-v'
+      pexit VERSION, 0 if cmd == '-v'
 
       # Handle standard commands
-      case args.shift
+      case cmd
       when 'init'
         init args
       when 'status'
@@ -58,7 +61,7 @@ module Copernicium
       when 'pull'
         pull args
       else # handle an unrecognized argument, show help and exit
-        pexit "Unrecognized command #{args.first}\n" + HELP_BANNER, 1
+        pexit "Unrecognized command #{cmd}\n" + HELP_BANNER, 1
       end
     end # run
 
