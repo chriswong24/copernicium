@@ -26,6 +26,10 @@ To run the entire test suite, run `rake`. Else run a specific test suite, eg:
 
     $ rake 'test[pushpull]'
 
+To show information about each module's tests, and branches commits, run:
+
+    $ rake info
+
 
 ### relevant links:
 
@@ -38,3 +42,4 @@ To run the entire test suite, run `rake`. Else run a specific test suite, eg:
 
 
 [wiki]:https://en.wikipedia.org/wiki/Copernicium
+

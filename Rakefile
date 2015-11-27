@@ -42,10 +42,10 @@ task :info do
   end
 
   # list how many commits per branch
-  puts "\nCommit info...\n\n"
+  puts "\nBranch Commits...\n\n"
   def numcommits() `git --no-pager log --oneline | wc -l` end
   def checkout(br) system "git checkout #{br} &>/dev/null" end
-  def cleanup(br) numcommits.to_i.to_s + "\t| #{br} commits" end
+  def cleanup(br) numcommits.to_i.to_s + " | #{br} commits" end
   original = 'null'
   curnext = false
   `git branch`.split.each do |br| # shows same for each if cant switch branches
