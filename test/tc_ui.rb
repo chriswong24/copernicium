@@ -49,11 +49,13 @@ class TestUI < Minitest::Test
 
     # Two valid forms of "checkout" command:
     # cn checkout revision (checks out full repo at revision)
+    #
+    # Putting this one on hold for now:
     # cn checkout revision file.txt (checks out only the specified files
     # from revision)
     it "supports 'checkout' command" do
       comm = @driver.run %w{checkout revID}
-      ui_test_helper(comm, "checkout", nil, "revID")
+      ui_test_helper(comm, "checkout", [], "revID")
 
       comm = @driver.run %w{checkout revID file.txt}
       ui_test_helper(comm, "checkout", ["file.txt"], "revID")
