@@ -23,12 +23,12 @@ First, clone this repository:
 
 To install all runtime and testing dependencies, run:
 
-    $ [sudo] gem install rake # if needed
-    $ rake setup # installing dependencies
+    $ [sudo] gem install rake
+    $ rake setup
 
 To run the entire test suite, run `rake test`. To run a specific test suite:
 
-    $ rake test[pushpull] # runs just push pull's tests
+    $ rake test[pushpull]
 
 To show information about each module's tests, and branches commits, run:
 
@@ -46,3 +46,4 @@ To show information about each module's tests, and branches commits, run:
 
 
 [wiki]:https://en.wikipedia.org/wiki/Copernicium
+
