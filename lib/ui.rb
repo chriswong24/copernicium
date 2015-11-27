@@ -48,6 +48,10 @@ module Copernicium
         init args
       when 'status'
         status args
+      when 'branch'
+        branch args
+      when 'clean'
+        clean args
       when 'clone'
         clone args
       when 'commit'
@@ -75,6 +79,10 @@ module Copernicium
       # todo - make call to workspace, get and show status
     end
 
+    def branch(args)
+      # todo - switch branches
+    end
+
     def push(args)
       UIComm.new(command: 'push', opts: args)
       # todo - make call to pushpull, push remote
@@ -99,6 +107,10 @@ module Copernicium
       # assume it is a rev id. if it isnt, then something will break :/
 
       UIComm.new(command: 'checkout', rev: rev, files: files)
+    end
+
+    def clean(args)
+      # todo - clean the workspace
     end
 
     def clone(args)
