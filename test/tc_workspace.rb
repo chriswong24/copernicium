@@ -10,7 +10,7 @@ require_relative 'test_helper'
 class CoperniciumWorkspaceTest < Minitest::Test
   describe "WorkspaceModule" do
     def parse_helper(string)
-      parse_command string.split
+      Copernicium::Driver.new.run string.split
     end
 
     before "manipulating the workspace" do
