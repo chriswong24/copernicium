@@ -17,14 +17,22 @@ Repository for Team Copernicium's DVCS.
 
 ### development
 
+First, clone this repository:
+
+    $ git clone https://github.com/jeremywrnr/copernicium.git
+
 To install all runtime and testing dependencies, run:
 
-    $ [sudo] gem install rake
-    $ rake setup
+    $ [sudo] gem install rake # if needed
+    $ rake setup # installing dependencies
 
-To run the entire test suite, run `rake`. Else run a specific test suite, eg:
+To run the entire test suite, run `rake test`. To run a specific test suite:
 
-    $ rake 'test[pushpull]'
+    $ rake test[pushpull] # runs just push pull's tests
+
+To show information about each module's tests, and branches commits, run:
+
+    $ rake info
 
 
 ### relevant links:
