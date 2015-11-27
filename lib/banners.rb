@@ -9,10 +9,10 @@ Starting:
     status - check repo status
 
 Commands:
-    clone [remote url]
     commit <files> -m [message]
     checkout [branch name]
     merge [branch name]
+    clone [remote url]
     push <remote name>
     pull <remote name>
 
