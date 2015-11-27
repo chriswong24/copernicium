@@ -48,8 +48,7 @@ task :info do
   def cleanup(br) numcommits.to_i.to_s + "\t| #{br} commits" end
   original = 'null'
   curnext = false
-  `git branch`.split.each do |br|
-    puts br
+  `git branch`.split.each do |br| # shows same for each if cant switch branches
     if curnext
       original = br
       checkout br
