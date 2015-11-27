@@ -1,3 +1,4 @@
+# workspace module
 # The functions are clean, commit, checkout and status
 
 module Copernicium
@@ -16,7 +17,6 @@ module Copernicium
       end
     end
   end
-
 
   class Workspace
     def writeFile(path, content)
@@ -138,7 +138,7 @@ module Copernicium
     # commit a list of files or the entire workspace to make a new snapshot
     def commit(comm)
       list_files = comm.files
-      if !list_files.empty
+      if !list_files.nil? && !list_files.empty?
         list_files.each do |x|
           if indexOf(x) == -1
             content = readFile(x)
@@ -160,10 +160,11 @@ module Copernicium
     def checkout(comm)
       #assert comm.is_a?(Copernicium::UICommandCommunicator) == true
       argu = comm.files
-      # if argu is an Array Object, we assume it is a list of files to be added to the workspace
+      # if argu is an Array Object, we assume it is a list of files to be added
+      # to the workspace
       if argu != nil
-        # we add the list of files to @files regardless whether it has been in it.
-        # that means there may be multiple versions of a file.
+        # we add the list of files to @files regardless whether it has been in
+        # it. # that means there may be multiple versions of a file.
         list_files = argu
         snapshot_id = @repos.history()[-1]
         returned_snapshot = @repos.get_snapshot(snapshot_id)
@@ -181,12 +182,16 @@ module Copernicium
             writeFile(path,content)
           end
         end
-        # if argu is not an Array, we assume it is a String, representing the branch name
-        # we first get the last snapshot id of the branch, and then get the commit object
-        # and finally push all files of it to the workspace
+
+        # if argu is not an Array, we assume it is a String, representing the #
+        # branch name # we first get the last snapshot id of the branch, and
+        # then get the commit object # and finally push all files of it to the
+        # workspace
+
       else
         argu = comm.rev #branch name
-        snapshot_id = @repos.history(argu)[-1] # Conflicting arguments with repos.history()
+        # Conflicting arguments with repos.history()
+        snapshot_id = @repos.history(argu)[-1]
         snapshot_obj = @repos.get_snapshot(snapshot_id)
         snapshot_obj.each do |fff|
           idx = indexOf(fff.path)
