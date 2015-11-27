@@ -1,9 +1,9 @@
-Thu, 26 Nov 2015 23:21:44 -0500
-README.md	Thu, 26 Nov 2015 23:20:33 -0500
-lib/RevLog.rb	Thu, 26 Nov 2015 23:20:33 -0500
-lib/banners.rb	Thu, 26 Nov 2015 23:20:33 -0500
-lib/pushpull.rb	Thu, 26 Nov 2015 23:20:33 -0500
-lib/repos.rb	Thu, 26 Nov 2015 23:20:33 -0500
-lib/required.rb	Thu, 26 Nov 2015 23:20:33 -0500
-lib/ui.rb	Thu, 26 Nov 2015 23:20:33 -0500
-lib/workspace.rb	Thu, 26 Nov 2015 23:20:33 -0500
+Fri, 27 Nov 2015 00:33:24 -0500
+README.md	Fri, 27 Nov 2015 00:32:34 -0500
+lib/RevLog.rb	Fri, 27 Nov 2015 00:14:44 -0500
+lib/banners.rb	Fri, 27 Nov 2015 00:27:06 -0500
+lib/pushpull.rb	Fri, 27 Nov 2015 00:27:06 -0500
+lib/repos.rb	Fri, 27 Nov 2015 00:14:44 -0500
+lib/required.rb	Fri, 27 Nov 2015 00:14:44 -0500
+lib/ui.rb	Fri, 27 Nov 2015 00:27:06 -0500
+lib/workspace.rb	Fri, 27 Nov 2015 00:27:06 -0500

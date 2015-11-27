@@ -113,15 +113,24 @@ src="https://img.shields.io/npm/l/alt.svg?style=flat"></a></p>
 
 <h3 id="label-development">development<span><a href="#label-development">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
+<p>First, clone this repository:</p>
+
+<pre>$ git clone https://github.com/jeremywrnr/copernicium.git</pre>
+
 <p>To install all runtime and testing dependencies, run:</p>
 
 <pre>$ [sudo] gem install rake
 $ rake setup</pre>
 
-<p>To run the entire test suite, run <code>rake</code>. Else run a specific
-test suite, eg:</p>
+<p>To run the entire test suite, run <code>rake test</code>. To run a specific
+test suite:</p>
 
-<pre>$ rake &#39;test[pushpull]&#39;</pre>
+<pre>$ rake test[pushpull]</pre>
+
+<p>To show information about each module&#39;s tests, and branches commits,
+run:</p>
+
+<pre>$ rake info</pre>
 
 <h3 id="label-relevant+links-3A">relevant links:<span><a href="#label-relevant+links-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
