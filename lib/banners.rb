@@ -9,22 +9,22 @@ Starting:
     status - check repo status
 
 Commands:
-    clean <files>
-    commit <files> -m [message]
-    checkout <files> [commit id]
-    branch <opt> <branchname>
+    clean [files]
+    commit [files] -m <message>
+    checkout [files] <commit id>
+    branch [opt] [branchname]
       -r | rename current branch
       -c | create a new branch
-    merge [branch name]
-    clone [remote url]
-    push <remote name>
-    pull <remote name>
+    merge <branch name>
+    clone <remote url>
+    push [remote name]
+    pull [remote name]
 
 Options:
     -v: print version
     -h: show help
 
-Note: <optional> [required]
+Note: [optional] <required>
 
 EOS
 
