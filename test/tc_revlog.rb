@@ -5,7 +5,9 @@ require_relative 'test_helper'
 class TestMyRevLogModule < Minitest::Test
   describe "RevLogModule" do
     before "manipulating the log" do
-      @db = Copernicium::RevLog.new(Dir.pwd)
+      puts Dir.pwd
+      root = Dir.pwd
+      @db = Copernicium::RevLog.new(root)
     end
 
     it "can add a file" do
@@ -49,6 +51,7 @@ class TestMyRevLogModule < Minitest::Test
 
     after "RevLogModule" do
       FileUtils.rm_rf(File.join(Dir.pwd, ".cn"))
+      sleep 1
     end
   end
 end

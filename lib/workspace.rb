@@ -19,6 +19,20 @@ module Copernicium
   end
 
   class Workspace
+    def getroot
+      max = 0
+      def findcn() File.directory?(Dir.pwd + "/.cn") end
+      while max < 10 && !findcn
+        Dir.chdir("../")
+        max += 1
+      end
+      if findcn
+        return Dir.pwd
+      else
+        return nil
+      end
+    end
+
     def writeFile(path, content)
       f = open(path, 'w')
       f.write(content)
@@ -32,18 +46,21 @@ module Copernicium
       txt
     end
 
-    #private_class_method :writeFile
-    #private_class_method :readFile
-
-    def initialize(bname = 'master', rootdir = './workspace')
+    def initialize(bname = 'master')
       @files = []
-      @branch_name = bname
-      @revlog = Copernicium::RevLog.new('.')
-      @repos = Copernicium::Repos.new
-      @root = rootdir
-      if !File.directory?(@root)
-        Dir.mkdir(@root)
+      @cwd = Dir.pwd
+n     @root = getroot
+
+      if @root.nil?
+        pexit "Copernicium folder (.cn) not found."
+      else # if /.cn (project storage folder) doesnt exist, make it
+        Dir.mkdir(@root + '/.cn') if !File.directory?(@root + '/.cn')
       end
+
+      @cwd.sub!(@root, '')
+      @branch_name = bname
+      @repos = Copernicium::Repos.new
+      @revlog = Copernicium::RevLog.new('.')
     end
 
     # Chris's edit

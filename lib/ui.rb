@@ -5,17 +5,17 @@
 VERSION = "0.0.1"
 
 module Copernicium
+  # Print and exit with a specific code
+  def pexit(msg, sig)
+    puts msg
+    exit sig
+  end
+
   class Driver
     # Get some info from the user when they dont specify it
     def get(info)
       puts "Hi, #{info} not specified. Enter #{info}:"
       gets.chomp # read a line from user, and return it
-    end
-
-    # Print and exit with a specific code
-    def pexit(msg, sig)
-      puts msg
-      exit sig
     end
 
     # Executes the required action for a given user command.
