@@ -46,34 +46,6 @@ module Copernicium
       end
     end
 
-    # Chris's edit
-    # Takes in Ethan's UICommandCommunicator object and calls
-    # a method based on the command
-    def UICommandParser(ui_comm)
-      case ui_comm.command
-      when "branch"
-        # TODO: Branch deletion
-        @repos.make_branch(ui_comm.rev)
-      when "checkout" # Might change later because of slight differences of interpretation between UI and Workspace
-        if ui_comm.files.empty?
-          checkout(ui_comm.rev)
-        else
-          checkout(ui.comm.files) # Array of files
-        end
-      when "clean"
-        clean
-      when "commit"
-        # TODO: How will the commit message be paired with snapshot?  Currently stored in UIComm.commit_message
-        commit
-      when "status"
-        status
-      else
-        # TODO: Better error handling
-        print "Error: Invalid command supplied to workspace!"
-        return nil
-      end
-    end
-
     def indexOf(x)
       index = -1
       @files.each_with_index do |e,i|
