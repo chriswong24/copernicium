@@ -125,8 +125,8 @@ module Copernicium
       # Return list of filenames and versions
       diff_files = []
       # Put in error catching
-      files1 = get_snapshot(id1).get_files()
-      files2 = get_snapshot(id2).get_files()
+      files1 = get_snapshot(id1).files
+      files2 = get_snapshot(id2).files
       # Find snapshot1 and snapshot2
       files1.each do |x|
         if(!files2.include?(x))

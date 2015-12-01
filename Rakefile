@@ -22,8 +22,8 @@ task :test, [:module] do |r, m|
   elsif m[:module] == 'travis'
     # dont run pushpull tests on travis, since they need auth
     Rake::TestTask.new {|t| t.test_files = FileList['test/tc_repos.rb',
-    'test/tc_revlog.rb', 'test/tc_ui.rb', 'test/tc_workspace.rb',
-    'test/tc_integration.rb']}
+    'test/tc_revlog.rb', 'test/tc_ui.rb', 'test/tc_workspace.rb']}
+    #'test/tc_integration.rb']}
 
   else # run all tests, including pushpull's
     Rake::TestTask.new {|t| t.pattern = "test/tc_#{m[:module]}.rb"}
