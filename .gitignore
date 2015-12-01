@@ -4,3 +4,5 @@ comm_t*
 *.swp
 *.swo
 *.gem
+.cn
+workspace
