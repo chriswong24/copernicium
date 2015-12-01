@@ -2,22 +2,33 @@
 
 
 HELP_BANNER = <<-EOS
-Copernicium - simple DVCS
+Copernicium (cn) - simple DVCS
 
-Starting:
+Starting out:
     init - create a new repository
     status - check repo status
+    help - show more commands
+EOS
 
+
+COMMAND_BANNER = <<-EOS
+#{HELP_BANNER}
 Commands:
-    commit <files> -m [message]
-    checkout [branch name]
-    merge [branch name]
-    clone [remote url]
-    push <remote name>
-    pull <remote name>
+    clean [files]
+    commit [files] -m <message>
+    checkout [files] <commit id>
+    branch [opt] [branchname]
+      -r | rename current branch
+      -c | create a new branch
+    merge <branch name>
+    clone <remote url>
+    push [remote name]
+    pull [remote name]
 
 Options:
     -v: print version
     -h: show help
-EOS
 
+Note: [optional] <required>
+
+EOS

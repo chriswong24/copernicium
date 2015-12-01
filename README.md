@@ -34,6 +34,10 @@ To show information about each module's tests, and branches commits, run:
 
     $ rake info
 
+To show information about each module's tests, and branches commits, run:
+
+    $ rake info
+
 
 ### relevant links:
 

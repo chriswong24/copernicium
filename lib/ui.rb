@@ -37,7 +37,7 @@ module Copernicium
       cmd = args.shift
 
       # if no arguments given show help information
-      pexit HELP_BANNER, 0 if cmd == '-h'
+      pexit COMMAND_BANNER, 0 if (cmd == '-h' || cmd == 'help')
 
       # if -v flag givem show version
       pexit VERSION, 0 if cmd == '-v'
@@ -48,6 +48,10 @@ module Copernicium
         init args
       when 'status'
         status args
+      when 'branch'
+        branch args
+      when 'clean'
+        clean args
       when 'clone'
         clone args
       when 'commit'
@@ -61,7 +65,7 @@ module Copernicium
       when 'pull'
         pull args
       else # handle an unrecognized argument, show help and exit
-        pexit "Unrecognized command #{cmd}\n" + HELP_BANNER, 1
+        pexit "Unrecognized command #{cmd}\n" + COMMAND_BANNER, 1
       end
     end # run
 
@@ -73,6 +77,10 @@ module Copernicium
     def status(args)
       UIComm.new(command: 'status', opts: args)
       # todo - make call to workspace, get and show status
+    end
+
+    def branch(args)
+      # todo - switch branches
     end
 
     def push(args)
@@ -99,6 +107,10 @@ module Copernicium
       # assume it is a rev id. if it isnt, then something will break :/
 
       UIComm.new(command: 'checkout', rev: rev, files: files)
+    end
+
+    def clean(args)
+      # todo - clean the workspace
     end
 
     def clone(args)
