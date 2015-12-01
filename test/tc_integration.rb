@@ -31,9 +31,9 @@ class CoperniciumIntegrationTests < Minitest::Test
       comm = runner("commit -m Test Commit")
       @ws.commit(comm)
 
-      @ws.readFile("1.txt").must_equal "1_1"
-      @ws.readFile("2.txt").must_equal "2_2"
-      @ws.repos.manifest.size.must_equal 2
+      @ws.readFile("workspace/1.txt").must_equal "1_1"
+      @ws.readFile("workspace/2.txt").must_equal "2_2"
+      @ws.repos.manifest["default"].size.must_equal 2
     end
 
     # Won't work because clean not handled by UI yet
@@ -65,12 +65,16 @@ class CoperniciumIntegrationTests < Minitest::Test
     # Tests don't work because branch handling not complete
     it "can make and delete a branch" do
       comm = runner("branch test")
-      @ws.UICommandParser(comm)
+      @ws.repos.make_branch("test")
       @ws.repos.manifest["test"].wont_be_nil
+      @ws.repos.manifest.size.must_equal 2
+      @ws.repos.manifest["default"].wont_be_nil
 
       comm = runner("branch -d test")
-      @ws.UICommandParser(comm)
+      @ws.repos.delete_branch("test")
       @ws.repos.manifest["test"].must_be_nil
+      @ws.repos.manifest["default"].wont_be_nil
+      @ws.repos.manifest.size.must_equal 1
     end
 
     it "can check the status of the repository" do
@@ -91,6 +95,7 @@ class CoperniciumIntegrationTests < Minitest::Test
       comm = runner("commit -m Test Commit")
       @ws.commit(comm)
 
+      # Will work once checkout is completed
       comm = runner("checkout dev")
       @ws.checkout(comm)
 

@@ -152,7 +152,7 @@ module Copernicium
 
     def delete_branch(branch_name)
       # Exit status code
-      @manifest.delete("branch_name")
+      @manifest.delete(branch_name)
     end
 
     def clear()
