@@ -4,10 +4,15 @@
 HELP_BANNER = <<-EOS
 Copernicium (cn) - simple DVCS
 
-Starting:
+Starting out:
     init - create a new repository
     status - check repo status
+    help - show more commands
+EOS
 
+
+COMMAND_BANNER = <<-EOS
+#{HELP_BANNER}
 Commands:
     clean [files]
     commit [files] -m <message>
@@ -27,4 +32,3 @@ Options:
 Note: [optional] <required>
 
 EOS
-
