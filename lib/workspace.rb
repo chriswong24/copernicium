@@ -1,4 +1,4 @@
-# workspace module
+# This is the workspace module
 # The functions are clean, commit, checkout and status
 
 module Copernicium
@@ -98,7 +98,6 @@ module Copernicium
     # if list_files is nil, then rollback the list of files from the branch
     # or rollback to the entire branch head pointed
     def clean(comm)
-      #assert comm.is_a?(Copernicium::UICommandCommunicator) == true
       list_files = comm.files
       if list_files.nil? # reset first: delete them from disk and reset @files
         @files.each{|x| File.delete(x.path)}
@@ -114,7 +113,7 @@ module Copernicium
 
       else #list_files are not nil
         # check that every file need to be reset should have been recognized by the workspace
-        # workspace_files_paths = @files.each{|x| x.path}
+        #workspace_files_paths = @files.each{|x| x.path}
         return -1 if (self.include? list_files) == false
 
         # the actual action, delete all of them from the workspace first
@@ -138,8 +137,19 @@ module Copernicium
 
     # commit a list of files or the entire workspace to make a new snapshot
     def commit(comm)
-      list_files = comm.files
-      if !list_files.nil? && !list_files.empty?
+      # for this commented version, we first get all files in the workspace and then add files from comm obj
+      # it's not used at this time
+      # Linfeng Song
+      #list_files = @files.each{|x| x.path}
+      #if comm.files != nil
+      #  comm.files.each do |x|
+      #    if indexOf(x) == -1
+      #      list_files.push(x)
+      #    end
+      #  end
+      #end
+      list_files = Dir[ File.join(@root, '**', '*') ].reject { |p| File.directory? p }
+      if list_files != nil
         list_files.each do |x|
           if indexOf(x) == -1
             content = readFile(x)
@@ -159,13 +169,11 @@ module Copernicium
     end
 
     def checkout(comm)
-      #assert comm.is_a?(Copernicium::UICommandCommunicator) == true
       argu = comm.files
-      # if argu is an Array Object, we assume it is a list of files to be added
-      # to the workspace
+      # if argu is an Array Object, we assume it is a list of files to be added to the workspace
       if argu != nil
-        # we add the list of files to @files regardless whether it has been in
-        # it. # that means there may be multiple versions of a file.
+        # we add the list of files to @files regardless whether it has been in it.
+        # that means there may be multiple versions of a file.
         list_files = argu
         snapshot_id = @repos.history()[-1]
         returned_snapshot = @repos.get_snapshot(snapshot_id)
@@ -183,17 +191,13 @@ module Copernicium
             writeFile(path,content)
           end
         end
-
-        # if argu is not an Array, we assume it is a String, representing the #
-        # branch name # we first get the last snapshot id of the branch, and
-        # then get the commit object # and finally push all files of it to the
-        # workspace
-
+        # if argu is not an Array, we assume it is a String, representing the branch name
+        # we first get the last snapshot id of the branch, and then get the commit object
+        # and finally push all files of it to the workspace
       else
         argu = comm.rev #branch name
-        # Conflicting arguments with repos.history()
-        snapshot_id = @repos.history(argu)[-1]
-        snapshot_obj = @repos.get_snapshot(snapshot_id)
+        snapshot_id = @repos.history()[-1]
+        snapshot_obj = @repos.get_snapshot(snapshot_id).get_files()
         snapshot_obj.each do |fff|
           idx = indexOf(fff.path)
           if  idx == -1
