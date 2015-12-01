@@ -80,7 +80,7 @@ module Copernicium
     end
 
     def branch(args)
-      # todo - switch branches
+      # todo - switch branches, create branches
     end
 
     def push(args)
@@ -110,6 +110,11 @@ module Copernicium
     end
 
     def clean(args)
+      if !args.empty?
+        files = args
+      end
+
+      UIComm.new(command: 'clean', files: files)
       # todo - clean the workspace
     end
 

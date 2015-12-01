@@ -24,7 +24,7 @@ class CoperniciumIntegrationTests < Minitest::Test
     end
 
     it "can commit changes" do
-      @ws.repos.manifest["default"].size.must_equal 1
+      @ws.repos.manifest["master"].size.must_equal 1
       @ws.writeFile("workspace/1.txt", "1_1")
       @ws.writeFile("workspace/2.txt", "2_2")
 
@@ -33,7 +33,7 @@ class CoperniciumIntegrationTests < Minitest::Test
 
       @ws.readFile("workspace/1.txt").must_equal "1_1"
       @ws.readFile("workspace/2.txt").must_equal "2_2"
-      @ws.repos.manifest["default"].size.must_equal 2
+      @ws.repos.manifest["master"].size.must_equal 2
     end
 
     # Won't work because clean not handled by UI yet
@@ -68,12 +68,12 @@ class CoperniciumIntegrationTests < Minitest::Test
       @ws.repos.make_branch("test")
       @ws.repos.manifest["test"].wont_be_nil
       @ws.repos.manifest.size.must_equal 2
-      @ws.repos.manifest["default"].wont_be_nil
+      @ws.repos.manifest["master"].wont_be_nil
 
       comm = runner("branch -d test")
       @ws.repos.delete_branch("test")
       @ws.repos.manifest["test"].must_be_nil
-      @ws.repos.manifest["default"].wont_be_nil
+      @ws.repos.manifest["master"].wont_be_nil
       @ws.repos.manifest.size.must_equal 1
     end
 
@@ -107,7 +107,7 @@ class CoperniciumIntegrationTests < Minitest::Test
 
     it "can checkout a list of files" do
       @ws.writeFile("workspace/1.txt","none")
-      comm = runner("checkout workspace/1.txt")
+      comm = runner("checkout master ./workspace/1.txt")
       @ws.checkout(comm)
 
       content = @ws.readFile("workspace/1.txt")

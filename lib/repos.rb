@@ -65,8 +65,8 @@ module Copernicium
     def initialize()
       # Create manifest
       # It's a list of snapshots in chronological order
-      @manifest = {"default" => []}
-      @curr_branch = "default"
+      @manifest = {"master" => []}
+      @curr_branch = "master"
       # what to do about branch IDs?
       # Read in project path and make manifest file?
       # Create current
@@ -106,12 +106,24 @@ module Copernicium
       # Need a way to change files in workspace
       return 1
     end
-
+=begin
     #def history(branch_name)
     def history()
       # Return array of snapshot IDs
       names_list = []
       @manifest[@curr_branch].each {|x| names_list.push(x.get_id())}
+      return names_list
+    end
+=end
+    
+    def history(branch_name = nil)
+      names_list = []
+      if branch_name
+        @manifest[branch_name].each{|x| names_list.push(x.get_id())}
+      else
+        @manifest[@curr_branch].each{|x| names_list.push(x.get_id())}
+      end
+
       return names_list
     end
 
