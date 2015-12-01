@@ -28,7 +28,7 @@ module Copernicium
   class RevLog
     def initialize(project_path)
       @project_path = project_path
-      @cop_path = File.join(project_path, ".cop")
+      @cop_path = File.join(project_path, ".cn")
       @log_path = File.join(@cop_path, "logmap.yaml")
       @hash_path = File.join(@cop_path, "hashmap.yaml")
       if File.exist?(@log_path) and File.exist?(@hash_path) then

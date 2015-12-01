@@ -71,6 +71,8 @@ module Copernicium
 
     def init(args)
       UIComm.new(command: 'init', opts: args)
+      snap_id = Repos.new.make_snapshot
+
       # todo - make call to repos to create repo
     end
 

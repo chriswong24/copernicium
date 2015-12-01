@@ -48,7 +48,7 @@ class TestMyRevLogModule < Minitest::Test
     end
 
     after "RevLogModule" do
-      FileUtils.rm_rf(File.join(Dir.pwd, ".cop"))
+      FileUtils.rm_rf(File.join(Dir.pwd, ".cn"))
     end
   end
 end

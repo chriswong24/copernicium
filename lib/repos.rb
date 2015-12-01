@@ -38,58 +38,42 @@
 # Also do a get_snapshot
 
 module Copernicium
+  # Initialize hash at startup
+  # Possible? Or problem with self object?
+  # id = hash of in array?
   class Snapshot
+    attr_accessor :id, :files
     def initialize(in_array)
       @files = in_array
       @id = ""
-      # id = hash of in array?
     end
-
-    def set_id(in_id)
-      @id = in_id
-    end
-
-    # drop get prefix?
-    def get_id()
-      @id
-    end
-
-    def get_files()
-      @files
-    end
-    # Initialize hash at startup
-    # Possible? Or problem with self object?
   end
 
   class Repos
-    def initialize()
-      # Create manifest
-      # It's a list of snapshots in chronological order
-      @manifest = {"master" => []}
-      @curr_branch = "master"
       # what to do about branch IDs?
       # Read in project path and make manifest file?
       # Create current
+    attr_reader :manifest
+    def initialize
+      # read in file of manifests (./copernicium/...?)
+      @manifest = {"master" => []}
+      @curr_branch = "master"
     end
 
-    def manifest()
-      @manifest
-    end
-
-    def make_snapshot(file_array)
+    def make_snapshot(file_array=nil)
       # Return hash ID of snapshot
       new_snap = Snapshot.new(file_array)
       # Set ID, consider breaking up that line
-      new_snap.set_id(Digest::SHA256.hexdigest(Marshal.dump(new_snap)))
+      new_snap.id = (Digest::SHA256.hexdigest(Marshal.dump(new_snap)))
       @manifest[@curr_branch].push(new_snap)
       # Update manifest file?
-      return new_snap.get_id()
+      return new_snap.id
     end
 
     def get_snapshot(target_id)
       # Return snapshot (or just contents) given id
       # Find snapshot
-      found_index = @manifest[@curr_branch].index{ |x| x.get_id() == target_id }
+      found_index = @manifest[@curr_branch].index{ |x| x.id == target_id }
       # Handle not found case
       # Return it
       if(found_index)
@@ -108,10 +92,10 @@ module Copernicium
     end
 =begin
     #def history(branch_name)
-    def history()
-      # Return array of snapshot IDs
+    # Return array of snapshot IDs
+    def history
       names_list = []
-      @manifest[@curr_branch].each {|x| names_list.push(x.get_id())}
+      @manifest[@curr_branch].each {|x| names_list.push(x.id)}
       return names_list
     end
 =end
@@ -130,7 +114,7 @@ module Copernicium
     def delete_snapshot(target_id)
       # Return comm object with status
       # Find snapshot, delete from manifest/memory
-      @manifest[@curr_branch].delete_if { |x| x.get_id() == target_id }
+      @manifest[@curr_branch].delete_if { |x| x.id == target_id }
       # catch error
       # update manifest file?
     end
@@ -162,16 +146,14 @@ module Copernicium
       return 1
     end
 
-    def delete_branch(branch_name)
-      # Exit status code
+    def delete_branch(branch_name) # Exit status code
       @manifest.delete(branch_name)
     end
 
-    def clear()
-      # Just a placeholder for now
+    # Just a placeholder for now
+    def clear
     end
-
-  end
+  end # repo class
 end
 
 

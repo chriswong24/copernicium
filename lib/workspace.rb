@@ -177,7 +177,7 @@ module Copernicium
         list_files = argu
         snapshot_id = @repos.history()[-1]
         returned_snapshot = @repos.get_snapshot(snapshot_id)
-        list_files_last_commit = returned_snapshot.get_files()
+        list_files_last_commit = returned_snapshot.files
         list_files_last_commit.each do |x|
           if list_files.include? x.path
             path = x.path
