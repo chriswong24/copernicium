@@ -3,6 +3,11 @@
 require_relative '../lib/required.rb'
 include Copernicium
 
+# mute output, overwrite puts
+# you can uncomment for debug
+
+def puts(*x) end
+
 # universal place for test requirements
 
 require 'fileutils'              # needed for rm_rf'ing in cleanup
