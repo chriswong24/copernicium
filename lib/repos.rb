@@ -32,113 +32,129 @@
 # Also do a get_snapshot
 
 module Copernicium
-  # Initialize hash at startup
-  # id = hash of in array?
   class Snapshot
     attr_accessor :id, :files
-    def initialize(in_array)
-      @files = in_array
-      @id = ''
+    # id is computed after creation
+    def initialize(files = [])
+      @files = files
+      @id = id
     end
   end
 
   class Repos
-    # what to do about branch IDs?
-    # Read in project path and make manifest file?
-    # Create current
-    attr_reader :manifest
-    def initialize
-      # read in file of manifests (./copernicium/...?)
-      @manifest = {'master' => []}
-      @curr_branch = 'master'
-    end
+    attr_reader :snaps
+    # read in file of snapshots (.cn/history)
+    # check the current branch (.cn/branch)
+    def initialize(root, branch = 'master')
+      @root = root
+      @copn = File.join(@root, '.cn')
+      @bpath = File.join(@copn, 'branch')
+      @spath = File.join(@copn, 'history')
 
-    def make_snapshot(file_array=nil)
-      # Return hash ID of snapshot
-      new_snap = Snapshot.new(file_array)
-      # Set ID, consider breaking up that line
-      new_snap.id = (Digest::SHA256.hexdigest(Marshal.dump(new_snap)))
-      @manifest[@curr_branch].push(new_snap)
-      # Update manifest file?
-      return new_snap.id
-    end
-
-    def get_snapshot(target_id)
-      # Return snapshot (or just contents) given id
-      # Find snapshot
-      found_index = @manifest[@curr_branch].index{ |x| x.id == target_id }
-      # Handle not found case
-      # Return it
-      if(found_index)
-        return @manifest[@curr_branch][found_index]
-      else
-        return found_index
+      # check if files exist, read them
+      if File.exist?(@spath) && File.exist?(@bpath)
+        @snaps = Marshal.read readFile(@spath)
+        @branch = readFile(@bpath)
+      else # use defaults
+        @snaps = {branch => []}
+        @branch = branch
       end
-      #return ret_snap
     end
 
-    # Not sure how I'm gonna do this one
+    # returns the hash if of an object
+    def hasher(obj)
+      Digest::SHA256.hexdigest Marshal.dump(obj)
+    end
+
+    # Return string array of what branches we have
+    def branches
+      @snaps.keys
+    end
+
+    def update_snap
+      writeFile(@spath, Marshal.dump(@snaps))
+    end
+
+    def update_branch
+      writeFile(@bpath, @branch)
+    end
+
+    # Create snapshot, and return hash ID of snapshot
+    def make_snapshot(files = [])
+      snap = Snapshot.new(files)
+      snap.id = hasher snap
+      @snaps[@branch] << snap
+
+      # Update snaps file
+      update_snap
+      snap.id
+    end
+
+    # Find snapshot, return snapshot (or just contents) given id
+    def get_snapshot(target_id)
+      found_index = @snaps[@branch].index { |x| x.id == target_id }
+      if found_index
+        @snaps[@branch][found_index]
+      else
+        Snapshot.new
+      end
+    end
+
+    # Return comm object with status
+    # change files in workspace back to specified commit
+    # get clear the current workspace
+    # revert back to given commit
     def restore_snapshot(target_id)
-      # Return comm object with status
-      # Need a way to change files in workspace
-      return 1
+      # todo
     end
 
     # Return array of snapshot IDs
     def history(branch_name = nil)
-      names_list = []
-      if branch_name
-        @manifest[branch_name].each{|x| names_list.push(x.id)}
+      snapids = []
+      if branch_name.nil?
+        @snaps[@branch].each {|x| snapids << x.id }
       else
-        @manifest[@curr_branch].each {|x| names_list.push(x.id)}
+        @snaps[branch_name].each{|x| snapids << x.id }
       end
-      names_list
+      snapids
     end
 
-
-    # Return comm object with status
+    # Find snapshot, delete from snaps/memory
     def delete_snapshot(target_id)
-      # Find snapshot, delete from manifest/memory
-      @manifest[@curr_branch].delete_if { |x| x.id == target_id }
-      # catch error
-      # update manifest file?
+      @snaps[@branch].delete_if { |x| x.id == target_id }
+      update_snap
     end
 
-    # Finds the files in snap1 that aren't in snap2, change this?
-    # Consider using diffy?
+    # Return list of filenames and versions
     def diff_snapshots(id1, id2)
-      # Return list of filenames and versions
-      diff_files = []
+      diffed = []
+
       # Put in error catching
       files1 = get_snapshot(id1).files
       files2 = get_snapshot(id2).files
-      # Find snapshot1 and snapshot2
-      files1.each do |x|
-        if(!files2.include?(x))
-          diff_files.push(x)
-        end
-      end
-      # Use revlog diff on each set of files? Look at Diffy
-      return diff_files
+
+      # Find difference between snapshot1 and snapshot2
+      files1.each { |x| diffed << x unless !files2.include?(x) }
+
+      diffed
     end
 
     # Return hash ID of new branch
-    def make_branch(branch_name)
-      # Not sure where to store branches
-      # What goes in to the hash?
-      @manifest[branch_name] = @manifest[@curr_branch]
-      @curr_branch = branch_name
-      return 1
+    def make_branch(branch)
+      @snaps[branch] = @snaps[@branch]
+      @branch = branch
+      hasher 1
     end
 
-    def delete_branch(branch_name) # Exit status code
-      @manifest.delete(branch_name)
+    # Merge the target branch into current
+    def merge_branch(branch)
+      # todo
     end
 
-    # Just a placeholder for now
-    def clear
+    # Exit status code
+    def delete_branch(branch)
+      @snaps.delete(branch)
     end
   end # repo class
 end
-
 

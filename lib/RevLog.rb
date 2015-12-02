@@ -25,6 +25,11 @@
 # out - success and merged file name/content, or failure and conflict
 
 module Copernicium
+  # pushed outside of class so repos can also use
+  def hash_array
+    Hash.new {[]}
+  end
+
   class RevLog
     def initialize(root)
       @root = root
@@ -39,10 +44,6 @@ module Copernicium
         @hashmap = hash_array
         Dir.mkdir(@cop_path) unless File.exist?(@cop_path)
       end
-    end
-
-    def hash_array
-      Hash.new {[]}
     end
 
     def add_file(file_name, content)
@@ -77,14 +78,12 @@ module Copernicium
     end
 
 
-    def get_file(file_id)
-      file_path = File.join(@cop_path, file_id)
-      if File.exist?(file_path)
-        File.open(file_path, 'r') { |f|
-          return f.read
-        }
+    def get_file(id)
+      file_path = File.join(@cop_path, id)
+      if File.exist? file_path
+        File.open(file_path, 'r') { |f| return f.read }
       else
-        raise Exception, 'Invalid file_id!'
+        raise Exception, 'Invalid id!'
       end
     end
 

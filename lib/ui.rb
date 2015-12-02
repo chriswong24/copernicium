@@ -103,21 +103,20 @@ module Copernicium
         files = args
       end
 
-      # todo - call repos checkout the given / branch
       # todo - also, figure out if is branch or rev id
       # this can be done by checking if it is a branch, and if not, then just
       # assume it is a rev id. if it isnt, then something will break :/
 
-      UIComm.new(command: 'checkout', rev: rev, files: files)
+      # call workspace checkout the given / branch
+      ui = UIComm.new(command: 'checkout', rev: rev, files: files)
+      Workspace.new.checkout(ui)
+      ui
     end
 
-    def clean(args)
-      if !args.empty?
-        files = args
-      end
-
-      UIComm.new(command: 'clean', files: files)
-      # todo - clean the workspace
+    def clean(args = [])
+      ui = UIComm.new(command: 'clean', files: args)
+      Workspace.new.clean(ui)
+      ui
     end
 
     def clone(args)
