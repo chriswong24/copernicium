@@ -142,15 +142,16 @@ module Copernicium
       messflag = args.find_index('-m')
       if messflag.nil?
         message = get 'commit message'
-      else # mash everything after -m into a single string
+      elsif message == 0 # commit everything
+        # mash everything after -m into a string
         message = args[messflag + 1..-1].join ' '
+      else # commit only some files
+        files = args[0..messflag - 1]
       end
 
-      # todo parse file list, in case just commiting some files
-      # todo call revlog, commit files
-      # todo call repos, update commit
+      # todo call repos, make commit
 
-      UIComm.new(command: 'commit', commit_message: message)
+      UIComm.new(command: 'commit', files: files, commit_message: message)
     end
 
     def merge(args)
