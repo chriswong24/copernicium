@@ -47,6 +47,8 @@ module Copernicium
         init args
       when 'status'
         status args
+      #when 'log' || 'history'
+        # show list of commits
       when 'branch'
         branch args
       when 'clean'

@@ -21,12 +21,12 @@ end
 
 
 # travis testing - dont do push pull since ssh needed
-task :travis do
-  Rake::TestTask.new  do |t|
-    t.test_files = FileList['test/tc_repos.rb', 'test/tc_revlog.rb',
-                            'test/tc_ui.rb', 'test/tc_workspace.rb']
-  end
-  # add in later: 'test/tc_integration.rb']}
+# add in later: 'test/tc_integration.rb']}
+Rake::TestTask.new do |t|
+  t.name = 'travis'
+  t.verbose = true
+  t.test_files = FileList['test/tc_repos.rb', 'test/tc_revlog.rb',
+                          'test/tc_ui.rb', 'test/tc_workspace.rb']
 end
 
 
