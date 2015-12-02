@@ -31,6 +31,7 @@ module Copernicium
   end
 
   class Workspace
+    attr_reader :repos, :revlog
     def initialize(bname = 'master')
       @files = []
       @cwd = Dir.pwd
@@ -39,7 +40,7 @@ module Copernicium
       @root = @cwd if @root.nil?
       @cwd.sub!(@root, '.')
       @branch = bname
-      @repos = Repos.new(@cwd)
+      @repo = Repos.new(@cwd)
       @revlog = RevLog.new(@cwd)
 
       pexit 'Copernicium folder (.cn) not found.', 1 if @root.nil?
@@ -56,9 +57,9 @@ module Copernicium
       end
 
       if notcn # return where cn was found
-        return Dir.pwd
+        Dir.pwd
       else # directory not found
-        return nil
+        nil
       end
     end
 
@@ -135,7 +136,7 @@ module Copernicium
           end
         end
       end
-      @repos.make_snapshot(@files) # return snapshot id
+      @repo.make_snapshot(@files) # return snapshot id
     end
 
     def checkout(comm = UIComm.new(rev: @branch))
@@ -147,7 +148,7 @@ module Copernicium
       # of a file.
       unless comm.files.nil?
         list_files = comm.files
-        returned_snapshot = @repos.get_snapshot(@repos.history.last)
+        returned_snapshot = @repo.get_snapshot(@repo.history.last)
         list_files_last_commit = returned_snapshot.files
         list_files_last_commit.each do |x|
           if list_files.include? x.path
@@ -169,7 +170,7 @@ module Copernicium
 
       # we first get the last snapshot id of the branch, and then get the commit
       # object and finally push all files of it to the # workspace
-      @repos.get_snapshot(@repos.history.last).files.each do |file|
+      @repo.get_snapshot(@repo.history.last).files.each do |file|
         idx = indexOf(file.path)
         if  idx == -1
           @files << file

@@ -70,21 +70,16 @@ module Copernicium
     end # run
 
     def init(args)
-      ui = UIComm.new(command: 'init', opts: args)
       if args.nil?
-        root = Workspace.new(Dir.pwd).getroot
-        puts root
-        snapid = Repos.new(root).make_snapshot
+        Workspace.new
       else # init into a folder
         target = File.join Dir.pwd, args.join(' ')
         Dir.mkdir target if !File.exists? target
         Dir.chdir target
-        root = Workspace.new.getroot
-        snapid = Repos.new(root).make_snapshot
+        Workspace.new
       end
-      puts "Created Copernicium repo in " + root
-      puts "Created initial commit: " + snapid
-      ui
+      puts "Created Copernicium repo in " + Dir.pwd
+      UIComm.new(command: 'init', opts: args)
     end
 
     def status(args)
