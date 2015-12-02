@@ -149,9 +149,12 @@ module Copernicium
         files = args[0..messflag - 1]
       end
 
-      # todo call repos, make commit
+      # specified the -m flag, but didnt give anything
+      message = get 'commit message' if message.nil?
 
-      UIComm.new(command: 'commit', files: files, commit_message: message)
+      ui = UIComm.new(command: 'commit', files: files, commit_message: message)
+      Workspace.new.commit(ui)
+      ui
     end
 
     def merge(args)
