@@ -22,7 +22,7 @@ class TestUI < Minitest::Test
       comm.command.must_equal cmd
       comm.files.must_equal files
       comm.rev.must_equal rev
-      comm.commit_message.must_equal msg
+      comm.cmt_msg.must_equal msg
       comm.repo.must_equal repo
     end
 

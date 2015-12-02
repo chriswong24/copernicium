@@ -1,7 +1,6 @@
 # user interface module - parse and execute commands
 # integrates all modules, central module
 
-
 VERSION = "0.0.2"
 
 module Copernicium
@@ -69,6 +68,7 @@ module Copernicium
       end
     end # run
 
+    # create a new copernicium repository
     def init(args)
       if args.nil?
         Workspace.new
@@ -78,21 +78,23 @@ module Copernicium
         Dir.chdir target
         Workspace.new
       end
-      puts "Created Copernicium repo in " + Dir.pwd
+      puts "Created Copernicium repo in " + Dir.pwd.grn
       UIComm.new(command: 'init', opts: args)
     end
 
+    # show the current repos status
     def status(args)
       ui = UIComm.new(command: 'status', opts: args)
       st = Workspace.new.status(ui)
-      puts "added:".grn + st[0].join(', ')   unless st[0].empty?
-      puts "edited:".yel + st[1].join(', ')   unless st[1].empty?
-      puts "removed:".red + st[2].join(', ') unless st[2].empty?
+      puts "added:\t".grn + st[0].join(', ')   unless st[0].empty?
+      puts "edited:\t".yel + st[1].join(', ')  unless st[1].empty?
+      puts "removed:\t".red + st[2].join(', ') unless st[2].empty?
       ui
     end
 
     def branch(args)
       # todo - switch branches, create branches
+      # if branch does not exist, create it
     end
 
     def push(args)
@@ -131,6 +133,7 @@ module Copernicium
 
     def clone(args)
       # todo - optionally check for folder to clone into, instead of cwd
+      # see init for an example
       if args.empty?
         repo = get 'repo url to clone'
       else
@@ -157,7 +160,7 @@ module Copernicium
       message = get 'commit message' if message.nil?
 
       # perform the commit, with workspace
-      ui = UIComm.new(command: 'commit', files: files, commit_message: message)
+      ui = UIComm.new(command: 'commit', files: files, cmt_msg: message)
       Workspace.new.commit(ui)
       ui
     end
@@ -177,13 +180,13 @@ module Copernicium
   end
 
   # Communication object that will pass commands to backend modules
-  # rev - A single revision indicator (commit #, branch name, HEAD, etc.)
+  # rev - revision indicator (commit #, branch name, HEAD, etc.)
   # repo - URL/path to a remote repository
   class UIComm
-    attr_reader :command, :arguments, :files, :rev, :commit_message, :repo
+    attr_reader :command, :files, :rev, :cmt_msg, :repo, :opts
     def initialize(command: nil, files: nil, rev: nil,
-                   commit_message: nil, repo: nil, opts: nil)
-      @commit_message = commit_message
+                   cmt_msg: nil, repo: nil, opts: nil)
+      @cmt_msg = cmt_msg
       @command = command
       @files = files
       @opts = opts
@@ -192,3 +195,4 @@ module Copernicium
     end
   end
 end
+
