@@ -146,9 +146,9 @@ module Copernicium
       messflag = args.find_index('-m')
       if messflag.nil?
         message = get 'commit message'
-      elsif message == 0 # commit everything
+      elsif messflag == 0 # commit everything
         # mash everything after -m into a string
-        message = args[messflag + 1..-1].join ' '
+        message = args[1..-1].join ' '
       else # commit only some files
         files = args[0..messflag - 1]
       end
