@@ -2,6 +2,9 @@
 
 require_relative 'test_helper'
 
+# Note on these tests: rather than merely checking that they are not empty
+# values, check that they are equal to what you would expect them to be.
+
 class TestCnReposModule < Minitest::Test
   describe 'ReposModule' do
     before 'create repo instance' do
