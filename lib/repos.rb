@@ -66,6 +66,11 @@ module Copernicium
       Digest::SHA256.hexdigest Marshal.dump(obj)
     end
 
+    # array of hashes constructor
+    def hash_array
+      Hash.new {[]}
+    end
+
     # Return string array of what branches we have
     def branches
       @snaps.keys

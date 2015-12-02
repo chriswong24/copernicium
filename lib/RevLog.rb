@@ -25,11 +25,6 @@
 # out - success and merged file name/content, or failure and conflict
 
 module Copernicium
-  # pushed outside of class so repos can also use
-  def hash_array
-    Hash.new {[]}
-  end
-
   class RevLog
     def initialize(root)
       @root = root
@@ -46,6 +41,10 @@ module Copernicium
       end
     end
 
+  def hash_array
+    Hash.new {[]}
+  end
+
     def add_file(file_name, content)
       hash = hash_file(file_name, content)
       File.open(File.join(@cop_path, hash), 'w') { |f|
@@ -55,7 +54,7 @@ module Copernicium
                                                   :hash => hash}
       @hashmap[hash] = @hashmap[hash] << {:time => Time.now,
                                           :filename => file_name}
-      update_log_file()
+      update_log_file
       return hash
     end
 
@@ -63,13 +62,9 @@ module Copernicium
     def delete_file(file_id)
       begin
         file_name = @hashmap[file_id][0][:filename]
-        @hashmap[file_id].delete_if { |e|
-          e[:filename] == file_name
-        }
-        @logmap[file_name].delete_if { |e|
-          e[:hash] == file_id
-        }
-        update_log_file()
+        @hashmap[file_id].delete_if { |e| e[:filename] == file_name }
+        @logmap[file_name].delete_if { |e| e[:hash] == file_id }
+        update_log_file
         File.delete(File.join(@cop_path, file_id))
         return 1
       rescue Exception
@@ -89,21 +84,17 @@ module Copernicium
 
 
     def diff_files(file_id1, file_id2)
-      return Diffy::Diff.new(get_file(file_id1),
-                             get_file(file_id2)).to_s()
+      Diffy::Diff.new(get_file(file_id1), get_file(file_id2)).to_s()
     end
 
     def hash_file(file_name, content)
       Digest::SHA256.hexdigest(file_name + content.to_s)
     end
 
-    def merge(file_id1, file_id2)
-      diff_a = Diffy::Diff.new(get_file(file_id1),
-                               get_file(file_id2)).each_chunk.to_a
-      return get_file(file_id2) if diff_a.all? { |d| d[0]!='-'}
-      # if diff_a.all? { |d| d[0]!='+'}
-      #   return get_file(file_id1)
-      # end
+    def merge(id1, id2)
+      diff_a = Diffy::Diff.new(get_file(id1), get_file(id2)).each_chunk.to_a
+      return get_file(id2) if diff_a.all? { |d| d[0]!='-'}
+      # return get_file(id1) if diff_a.all? { |d| d[0]!='+'}
       diff_a
     end
 

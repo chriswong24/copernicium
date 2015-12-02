@@ -2,12 +2,14 @@
 
 require_relative 'test_helper'
 
-class TestMyRevLogModule < Minitest::Test
+class TestCoperniciumRevLog < Minitest::Test
   describe "RevLogModule" do
     before "manipulating the log" do
-      puts Dir.pwd
-      root = Dir.pwd
-      @db = Copernicium::RevLog.new(root)
+      @db = Copernicium::RevLog.new(Dir.pwd)
+    end
+
+    after "manipulating the log" do
+      FileUtils.rm_rf(File.join(Dir.pwd, ".cn"))
     end
 
     it "can add a file" do
@@ -47,11 +49,6 @@ class TestMyRevLogModule < Minitest::Test
     it "can hash a file" do
       hash = @db.hash_file("testfilename", "testfilecontent")
       hash.must_equal "dc198016e4d7dcace98d5843a3e6fd506c1c790110091e6748a15c79fefc02ca"
-    end
-
-    after "RevLogModule" do
-      FileUtils.rm_rf(File.join(Dir.pwd, ".cn"))
-      sleep 1
     end
   end
 end
