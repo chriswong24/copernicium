@@ -73,6 +73,7 @@ module Copernicium
       ui = UIComm.new(command: 'init', opts: args)
       if args.nil?
         root = Workspace.new(Dir.pwd).getroot
+        puts root
         snapid = Repos.new(root).make_snapshot
       else # init into a folder
         target = File.join Dir.pwd, args.join(' ')
