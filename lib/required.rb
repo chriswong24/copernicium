@@ -9,6 +9,8 @@ require 'socket'        # Socket needed for communicating over the network
 require 'io/console'    # Needed to hide password at console
 require 'net/ssh'       # Needed to communicate with the remote
 require 'net/scp'       # Needed for file transfer between servers
+#require 'marshal'
+
 
 # coperncicium files
 

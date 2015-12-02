@@ -1,14 +1,8 @@
-# repos module
-
-#require 'marshal'
-# Details from this link:
-#   https://docs.google.com/document/d/1r3-NquhyRLbCncqTOQPwsznSZ-en6G6xzLbWIAmxhys/edit#heading=h.7pyingf1unu
-
-
 # Repos Top Level Function Definitions (Logan)
 
 # make_snapshot: Creates new snapshot from current files and versions
-#   in - array of file objects. file object = array of all versions: {id, content}
+#   in - array of file objects. file object = array of all versions:
+#   {id, content}
 #   out - hash id of snapshot
 
 # restore_snapshot: Set current file versions to specified snapshot
@@ -50,9 +44,9 @@ module Copernicium
   end
 
   class Repos
-      # what to do about branch IDs?
-      # Read in project path and make manifest file?
-      # Create current
+    # what to do about branch IDs?
+    # Read in project path and make manifest file?
+    # Create current
     attr_reader :manifest
     def initialize
       # read in file of manifests (./copernicium/...?)
@@ -90,29 +84,21 @@ module Copernicium
       # Need a way to change files in workspace
       return 1
     end
-=begin
-    #def history(branch_name)
+
     # Return array of snapshot IDs
-    def history
-      names_list = []
-      @manifest[@curr_branch].each {|x| names_list.push(x.id)}
-      return names_list
-    end
-=end
-    
     def history(branch_name = nil)
       names_list = []
       if branch_name
-        @manifest[branch_name].each{|x| names_list.push(x.get_id())}
+        @manifest[branch_name].each{|x| names_list.push(x.id)}
       else
-        @manifest[@curr_branch].each{|x| names_list.push(x.get_id())}
+        @manifest[@curr_branch].each {|x| names_list.push(x.id)}
       end
-
-      return names_list
+      names_list
     end
 
+
+    # Return comm object with status
     def delete_snapshot(target_id)
-      # Return comm object with status
       # Find snapshot, delete from manifest/memory
       @manifest[@curr_branch].delete_if { |x| x.id == target_id }
       # catch error
@@ -137,8 +123,8 @@ module Copernicium
       # Use revlog diff on each set of files? Look at Diffy
     end
 
+    # Return hash ID of new branch
     def make_branch(branch_name)
-      # Return hash ID of new branch
       # Not sure where to store branches
       # What goes in to the hash?
       @manifest[branch_name] = @manifest[@curr_branch]
