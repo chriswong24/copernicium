@@ -2,9 +2,10 @@
 ===================
 
 
+[![MIT](https://img.shields.io/npm/l/alt.svg?style=flat)](http://jeremywrnr.com/mit-license)
 [![Gem Version](https://badge.fury.io/rb/copernicium.svg)](https://badge.fury.io/rb/copernicium)
 [![Build Status](https://travis-ci.org/jeremywrnr/copernicium.svg)](https://travis-ci.org/jeremywrnr/copernicium)
-[![MIT](https://img.shields.io/npm/l/alt.svg?style=flat)](http://jeremywrnr.com/mit-license)
+[![Code Climate](https://codeclimate.com/github/jeremywrnr/copernicium/badges/gpa.svg)](https://codeclimate.com/github/jeremywrnr/copernicium)
 
 
 Repository for Team Copernicium's DVCS.
