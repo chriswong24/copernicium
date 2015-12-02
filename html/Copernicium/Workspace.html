@@ -76,17 +76,17 @@
     
     <li ><a href="#method-i-clean">#clean</a>
     
+    <li ><a href="#method-i-clear">#clear</a>
+    
     <li ><a href="#method-i-commit">#commit</a>
     
     <li ><a href="#method-i-include-3F">#include?</a>
     
     <li ><a href="#method-i-indexOf">#indexOf</a>
     
-    <li ><a href="#method-i-readFile">#readFile</a>
-    
     <li ><a href="#method-i-status">#status</a>
     
-    <li ><a href="#method-i-writeFile">#writeFile</a>
+    <li ><a href="#method-i-ws_files">#ws_files</a>
     
   </ul>
 </div>
@@ -114,6 +114,40 @@
     
 
     
+    <section class="attribute-method-details" class="method-section">
+      <header>
+        <h3>Attributes</h3>
+      </header>
+
+      
+      <div id="attribute-i-repos" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">repos</span><span
+            class="attribute-access-type">[R]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-revlog" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">revlog</span><span
+            class="attribute-access-type">[R]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+    </section>
+    
 
     
      <section id="public-class-5Buntitled-5D-method-details" class="method-section">
@@ -126,7 +160,7 @@
         
         <div class="method-heading">
           <span class="method-name">new</span><span
-            class="method-args">(bname = 'master', rootdir = './workspace')</span>
+            class="method-args">(bname = 'master')</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -135,22 +169,25 @@
 
         <div class="method-description">
           
-          <p>private_class_method :writeFile private_class_method :readFile</p>
+          
           
           
 
           
           <div class="method-source-code" id="new-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 38</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">bname</span> = <span class="ruby-string">&#39;master&#39;</span>, <span class="ruby-identifier">rootdir</span> = <span class="ruby-string">&#39;./workspace&#39;</span>)
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 57</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">bname</span> = <span class="ruby-string">&#39;master&#39;</span>)
   <span class="ruby-ivar">@files</span> = []
-  <span class="ruby-ivar">@branch_name</span> = <span class="ruby-identifier">bname</span>
-  <span class="ruby-ivar">@revlog</span> = <span class="ruby-constant">Copernicium</span><span class="ruby-operator">::</span><span class="ruby-constant">RevLog</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&#39;.&#39;</span>)
-  <span class="ruby-ivar">@repos</span> = <span class="ruby-constant">Copernicium</span><span class="ruby-operator">::</span><span class="ruby-constant">Repos</span>.<span class="ruby-identifier">new</span>
-  <span class="ruby-ivar">@root</span> = <span class="ruby-identifier">rootdir</span>
-  <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-ivar">@root</span>)
-    <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">mkdir</span>(<span class="ruby-ivar">@root</span>)
-  <span class="ruby-keyword">end</span>
+  <span class="ruby-ivar">@cwd</span> = <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>
+  <span class="ruby-ivar">@root</span> = <span class="ruby-identifier">getroot</span>
+  <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">chdir</span>(<span class="ruby-ivar">@cwd</span>)
+  <span class="ruby-ivar">@root</span> = <span class="ruby-ivar">@cwd</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@root</span>.<span class="ruby-identifier">nil?</span>
+  <span class="ruby-ivar">@cwd</span>.<span class="ruby-identifier">sub!</span>(<span class="ruby-ivar">@root</span>, <span class="ruby-string">&#39;.&#39;</span>)
+  <span class="ruby-ivar">@branch</span> = <span class="ruby-identifier">bname</span>
+  <span class="ruby-ivar">@repo</span> = <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@cwd</span>)
+  <span class="ruby-ivar">@revlog</span> = <span class="ruby-constant">RevLog</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@cwd</span>)
+
+  <span class="ruby-identifier">pexit</span> <span class="ruby-string">&#39;Copernicium folder (.cn) not found.&#39;</span>, <span class="ruby-value">1</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@root</span>.<span class="ruby-identifier">nil?</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -174,7 +211,7 @@
         
         <div class="method-heading">
           <span class="method-name">checkout</span><span
-            class="method-args">(comm)</span>
+            class="method-args">(comm = UIComm.new(rev: @branch))</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -189,50 +226,47 @@
 
           
           <div class="method-source-code" id="checkout-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 142</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">checkout</span>(<span class="ruby-identifier">comm</span>)
-  <span class="ruby-identifier">argu</span> = <span class="ruby-identifier">comm</span>.<span class="ruby-identifier">files</span>
-  <span class="ruby-comment"># if argu is an Array Object, we assume it is a list of files to be added to the workspace</span>
-  <span class="ruby-keyword">if</span> <span class="ruby-identifier">argu</span> <span class="ruby-operator">!=</span> <span class="ruby-keyword">nil</span>
-    <span class="ruby-comment"># we add the list of files to @files regardless whether it has been in it.</span>
-    <span class="ruby-comment"># that means there may be multiple versions of a file.</span>
-    <span class="ruby-identifier">list_files</span> = <span class="ruby-identifier">argu</span>
-    <span class="ruby-identifier">snapshot_id</span> = <span class="ruby-ivar">@repos</span>.<span class="ruby-identifier">history</span>()[<span class="ruby-value">-1</span>]
-    <span class="ruby-identifier">returned_snapshot</span> = <span class="ruby-ivar">@repos</span>.<span class="ruby-identifier">get_snapshot</span>(<span class="ruby-identifier">snapshot_id</span>)
-    <span class="ruby-identifier">list_files_last_commit</span> = <span class="ruby-identifier">returned_snapshot</span>.<span class="ruby-identifier">get_files</span>()
-    <span class="ruby-identifier">list_files_last_commit</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
-      <span class="ruby-keyword">if</span> <span class="ruby-identifier">list_files</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">path</span>
-        <span class="ruby-identifier">path</span> = <span class="ruby-identifier">x</span>.<span class="ruby-identifier">path</span>
-        <span class="ruby-identifier">content</span> = <span class="ruby-ivar">@revlog</span>.<span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">x</span>.<span class="ruby-identifier">history_hash_ids</span>[<span class="ruby-value">-1</span>])
-        <span class="ruby-identifier">idx</span> = <span class="ruby-identifier">indexOf</span>(<span class="ruby-identifier">x</span>.<span class="ruby-identifier">path</span>)
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 147</span>
+    <span class="ruby-keyword">def</span> <span class="ruby-identifier">checkout</span>(<span class="ruby-identifier">comm</span> = <span class="ruby-constant">UIComm</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">rev</span><span class="ruby-operator">:</span> <span class="ruby-ivar">@branch</span>))
+<span class="ruby-comment">      # just support branches for now
+      # if argu is an Array Object, we assume it is a list of files to be added
+      # # to the workspace # we add the list of files to @files regardless
+      # whether it has been in # it. that means there may be multiple versions
+      # of a file.
+      unless comm.files.nil?
+        list_files = comm.files
+        returned_snapshot = @repo.get_snapshot(@repo.history.last)
+        list_files_last_commit = returned_snapshot.files
+        list_files_last_commit.each do |x|
+          if list_files.include? x.path
+            content = @revlog.get_file(x.history.last)
+            idx = indexOf(x.path)
+            if  idx == -1
+              @files &lt;&lt; x
+            else
+              @files[idx] = x
+            end
+            writeFile(x.path, content)
+          end
+        end
+      else # if argu is not an Array, we assume it is a String, representing the
+      end
+</span>
+      <span class="ruby-identifier">clear</span> <span class="ruby-comment"># reset workspace</span>
+
+      <span class="ruby-comment"># we first get the last snapshot id of the branch, and then get the commit</span>
+      <span class="ruby-comment"># object and finally push all files of it to the # workspace</span>
+      <span class="ruby-ivar">@repo</span>.<span class="ruby-identifier">get_snapshot</span>(<span class="ruby-ivar">@repo</span>.<span class="ruby-identifier">history</span>.<span class="ruby-identifier">last</span>).<span class="ruby-identifier">files</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">idx</span> = <span class="ruby-identifier">indexOf</span>(<span class="ruby-identifier">file</span>.<span class="ruby-identifier">path</span>)
         <span class="ruby-keyword">if</span>  <span class="ruby-identifier">idx</span> <span class="ruby-operator">==</span> <span class="ruby-value">-1</span>
-          <span class="ruby-ivar">@files</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">x</span>)
+          <span class="ruby-ivar">@files</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">file</span>
         <span class="ruby-keyword">else</span>
-          <span class="ruby-ivar">@files</span>[<span class="ruby-identifier">idx</span>] = <span class="ruby-identifier">x</span>
+          <span class="ruby-ivar">@files</span>[<span class="ruby-identifier">idx</span>] = <span class="ruby-identifier">file</span>
         <span class="ruby-keyword">end</span>
-        <span class="ruby-identifier">writeFile</span>(<span class="ruby-identifier">path</span>,<span class="ruby-identifier">content</span>)
+        <span class="ruby-identifier">content</span> = <span class="ruby-ivar">@revlog</span>.<span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">file</span>.<span class="ruby-identifier">history</span>.<span class="ruby-identifier">last</span>)
+        <span class="ruby-identifier">writeFile</span>(<span class="ruby-identifier">file</span>.<span class="ruby-identifier">path</span>, <span class="ruby-identifier">content</span>)
       <span class="ruby-keyword">end</span>
-    <span class="ruby-keyword">end</span>
-    <span class="ruby-comment"># if argu is not an Array, we assume it is a String, representing the branch name</span>
-    <span class="ruby-comment"># we first get the last snapshot id of the branch, and then get the commit object</span>
-    <span class="ruby-comment"># and finally push all files of it to the workspace</span>
-  <span class="ruby-keyword">else</span>
-    <span class="ruby-identifier">argu</span> = <span class="ruby-identifier">comm</span>.<span class="ruby-identifier">rev</span> <span class="ruby-comment">#branch name</span>
-    <span class="ruby-identifier">snapshot_id</span> = <span class="ruby-ivar">@repos</span>.<span class="ruby-identifier">history</span>()[<span class="ruby-value">-1</span>]
-    <span class="ruby-identifier">snapshot_obj</span> = <span class="ruby-ivar">@repos</span>.<span class="ruby-identifier">get_snapshot</span>(<span class="ruby-identifier">snapshot_id</span>).<span class="ruby-identifier">get_files</span>()
-    <span class="ruby-identifier">snapshot_obj</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">fff</span><span class="ruby-operator">|</span>
-      <span class="ruby-identifier">idx</span> = <span class="ruby-identifier">indexOf</span>(<span class="ruby-identifier">fff</span>.<span class="ruby-identifier">path</span>)
-      <span class="ruby-keyword">if</span>  <span class="ruby-identifier">idx</span> <span class="ruby-operator">==</span> <span class="ruby-value">-1</span>
-        <span class="ruby-ivar">@files</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">fff</span>)
-      <span class="ruby-keyword">else</span>
-        <span class="ruby-ivar">@files</span>[<span class="ruby-identifier">idx</span>] = <span class="ruby-identifier">fff</span>
-      <span class="ruby-keyword">end</span>
-      <span class="ruby-identifier">path</span> = <span class="ruby-identifier">fff</span>.<span class="ruby-identifier">path</span>
-      <span class="ruby-identifier">content</span> = <span class="ruby-ivar">@revlog</span>.<span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">fff</span>.<span class="ruby-identifier">history_hash_ids</span>[<span class="ruby-value">-1</span>])
-      <span class="ruby-identifier">writeFile</span>(<span class="ruby-identifier">path</span>,<span class="ruby-identifier">content</span>)
-    <span class="ruby-keyword">end</span>
-  <span class="ruby-keyword">end</span>
-<span class="ruby-keyword">end</span></pre>
+    <span class="ruby-keyword">end</span></pre>
           </div>
           
         </div>
@@ -256,49 +290,70 @@
 
         <div class="method-description">
           
-          <p>if list_files is nil, then rollback the list of files from the branch or
-rollback to the entire branch head pointed</p>
+          <p>reset first: delete them from disk and reset @files restore it with
+checkout() if we have had a branch name or it is the initial state, no
+commit and no checkout if list_files is nil, then rollback the list of
+files from the branch or rollback to the entire branch head pointed</p>
           
           
 
           
           <div class="method-source-code" id="clean-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 72</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 104</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">clean</span>(<span class="ruby-identifier">comm</span>)
-  <span class="ruby-identifier">list_files</span> = <span class="ruby-identifier">comm</span>.<span class="ruby-identifier">files</span>
-  <span class="ruby-keyword">if</span> <span class="ruby-identifier">list_files</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-comment"># reset first: delete them from disk and reset @files</span>
-    <span class="ruby-ivar">@files</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">x</span>.<span class="ruby-identifier">path</span>)}
-    <span class="ruby-ivar">@files</span> = []
-    <span class="ruby-comment"># restore it with checkout() if we have had a branch name</span>
-    <span class="ruby-keyword">if</span> <span class="ruby-ivar">@branch_name</span> <span class="ruby-operator">!=</span> <span class="ruby-string">&#39;&#39;</span>
-      <span class="ruby-comment"># or it is the initial state, no commit and no checkout</span>
-      <span class="ruby-keyword">return</span> <span class="ruby-identifier">checkout</span>(<span class="ruby-ivar">@branch_name</span>)
-    <span class="ruby-keyword">else</span>
-      <span class="ruby-keyword">return</span> <span class="ruby-value">0</span>
-    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">comm</span>.<span class="ruby-identifier">files</span>.<span class="ruby-identifier">empty?</span>
+    <span class="ruby-identifier">clear</span> <span class="ruby-comment"># reset, checkout last commit</span>
+    <span class="ruby-identifier">checkout</span>
+  <span class="ruby-keyword">else</span> <span class="ruby-comment"># list_files are not nil</span>
 
-  <span class="ruby-keyword">else</span> <span class="ruby-comment">#list_files are not nil</span>
-    <span class="ruby-comment"># check that every file need to be reset should have been recognized by the workspace</span>
-    <span class="ruby-comment">#workspace_files_paths = @files.each{|x| x.path}</span>
-    <span class="ruby-keyword">return</span> <span class="ruby-value">-1</span> <span class="ruby-keyword">if</span> (<span class="ruby-keyword">self</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">list_files</span>) <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>
+    <span class="ruby-comment"># exit if the specified file is not in the workspace</span>
+    <span class="ruby-keyword">return</span> <span class="ruby-value">-1</span> <span class="ruby-keyword">if</span> (<span class="ruby-keyword">self</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">comm</span>.<span class="ruby-identifier">files</span>) <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>
 
     <span class="ruby-comment"># the actual action, delete all of them from the workspace first</span>
-    <span class="ruby-identifier">list_files</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">comm</span>.<span class="ruby-identifier">files</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
       <span class="ruby-constant">File</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">x</span>)
       <span class="ruby-identifier">idx</span> = <span class="ruby-identifier">indexOf</span>(<span class="ruby-identifier">x</span>)
-      <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">idx</span><span class="ruby-operator">==</span><span class="ruby-value">-1</span>
-        <span class="ruby-ivar">@files</span>.<span class="ruby-identifier">delete_at</span>(<span class="ruby-identifier">idx</span>)
-      <span class="ruby-keyword">end</span>
+      <span class="ruby-ivar">@files</span>.<span class="ruby-identifier">delete_at</span>(<span class="ruby-identifier">idx</span>) <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">idx</span> <span class="ruby-operator">==</span> <span class="ruby-value">-1</span>
     <span class="ruby-keyword">end</span>
 
     <span class="ruby-comment"># if we have had a branch, first we get the latest snapshot of it</span>
     <span class="ruby-comment"># and then checkout with the restored version of them</span>
-    <span class="ruby-keyword">if</span> <span class="ruby-ivar">@branch_name</span> <span class="ruby-operator">!=</span> <span class="ruby-string">&#39;&#39;</span>
-      <span class="ruby-keyword">return</span> <span class="ruby-identifier">checkout</span>(<span class="ruby-identifier">list_files</span>)
-    <span class="ruby-keyword">else</span>
-      <span class="ruby-keyword">return</span> <span class="ruby-value">0</span>
-    <span class="ruby-keyword">end</span>
+    <span class="ruby-identifier">checkout</span>
   <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-clear" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">clear</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Clear the current workspace</p>
+          
+          
+
+          
+          <div class="method-source-code" id="clear-source">
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 94</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">clear</span>
+  <span class="ruby-ivar">@files</span>.<span class="ruby-identifier">each</span>{ <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">x</span>.<span class="ruby-identifier">path</span>) }
+  <span class="ruby-ivar">@files</span> = []
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -329,22 +384,10 @@ rollback to the entire branch head pointed</p>
 
           
           <div class="method-source-code" id="commit-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 110</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 127</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">commit</span>(<span class="ruby-identifier">comm</span>)
-  <span class="ruby-comment"># for this commented version, we first get all files in the workspace and then add files from comm obj</span>
-  <span class="ruby-comment"># it&#39;s not used at this time</span>
-  <span class="ruby-comment"># Linfeng Song</span>
-  <span class="ruby-comment">#list_files = @files.each{|x| x.path}</span>
-  <span class="ruby-comment">#if comm.files != nil</span>
-  <span class="ruby-comment">#  comm.files.each do |x|</span>
-  <span class="ruby-comment">#    if indexOf(x) == -1</span>
-  <span class="ruby-comment">#      list_files.push(x)</span>
-  <span class="ruby-comment">#    end</span>
-  <span class="ruby-comment">#  end</span>
-  <span class="ruby-comment">#end</span>
-  <span class="ruby-identifier">list_files</span> = <span class="ruby-constant">Dir</span>[ <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@root</span>, <span class="ruby-string">&#39;**&#39;</span>, <span class="ruby-string">&#39;*&#39;</span>) ].<span class="ruby-identifier">reject</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-identifier">p</span> }
-  <span class="ruby-keyword">if</span> <span class="ruby-identifier">list_files</span> <span class="ruby-operator">!=</span> <span class="ruby-keyword">nil</span>
-    <span class="ruby-identifier">list_files</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
+  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">ws_files</span>.<span class="ruby-identifier">empty?</span>
+    <span class="ruby-identifier">ws_files</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
       <span class="ruby-keyword">if</span> <span class="ruby-identifier">indexOf</span>(<span class="ruby-identifier">x</span>) <span class="ruby-operator">==</span> <span class="ruby-value">-1</span>
         <span class="ruby-identifier">content</span> = <span class="ruby-identifier">readFile</span>(<span class="ruby-identifier">x</span>)
         <span class="ruby-identifier">hash</span> = <span class="ruby-ivar">@revlog</span>.<span class="ruby-identifier">add_file</span>(<span class="ruby-identifier">x</span>, <span class="ruby-identifier">content</span>)
@@ -353,13 +396,13 @@ rollback to the entire branch head pointed</p>
       <span class="ruby-keyword">else</span>
         <span class="ruby-identifier">content</span> = <span class="ruby-identifier">readFile</span>(<span class="ruby-identifier">x</span>)
         <span class="ruby-identifier">hash</span> = <span class="ruby-ivar">@revlog</span>.<span class="ruby-identifier">add_file</span>(<span class="ruby-identifier">x</span>, <span class="ruby-identifier">content</span>)
-        <span class="ruby-keyword">if</span> <span class="ruby-ivar">@files</span>[<span class="ruby-identifier">indexOf</span>(<span class="ruby-identifier">x</span>)].<span class="ruby-identifier">history_hash_ids</span>[<span class="ruby-value">-1</span>] <span class="ruby-operator">!=</span> <span class="ruby-identifier">hash</span>
-          <span class="ruby-ivar">@files</span>[<span class="ruby-identifier">indexOf</span>(<span class="ruby-identifier">x</span>)].<span class="ruby-identifier">history_hash_ids</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">hash</span>
+        <span class="ruby-keyword">if</span> <span class="ruby-ivar">@files</span>[<span class="ruby-identifier">indexOf</span>(<span class="ruby-identifier">x</span>)].<span class="ruby-identifier">history</span>[<span class="ruby-value">-1</span>] <span class="ruby-operator">!=</span> <span class="ruby-identifier">hash</span>
+          <span class="ruby-ivar">@files</span>[<span class="ruby-identifier">indexOf</span>(<span class="ruby-identifier">x</span>)].<span class="ruby-identifier">history</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">hash</span>
         <span class="ruby-keyword">end</span>
       <span class="ruby-keyword">end</span>
     <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">end</span>
-  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@repos</span>.<span class="ruby-identifier">make_snapshot</span>(<span class="ruby-ivar">@files</span>)
+  <span class="ruby-ivar">@repo</span>.<span class="ruby-identifier">make_snapshot</span>(<span class="ruby-ivar">@files</span>) <span class="ruby-comment"># return snapshot id</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -375,7 +418,7 @@ rollback to the entire branch head pointed</p>
         
         <div class="method-heading">
           <span class="method-name">include?</span><span
-            class="method-args">(list_files)</span>
+            class="method-args">(files)</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -390,13 +433,9 @@ rollback to the entire branch head pointed</p>
 
           
           <div class="method-source-code" id="include-3F-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 61</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">include?</span>(<span class="ruby-identifier">list_files</span>)
-  <span class="ruby-identifier">list_files</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
-    <span class="ruby-keyword">if</span> <span class="ruby-identifier">indexOf</span>(<span class="ruby-identifier">x</span>) <span class="ruby-operator">==</span> <span class="ruby-value">-1</span>
-      <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>
-    <span class="ruby-keyword">end</span>
-  <span class="ruby-keyword">end</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 83</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">include?</span>(<span class="ruby-identifier">files</span>)
+  <span class="ruby-identifier">files</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">indexOf</span>(<span class="ruby-identifier">x</span>) <span class="ruby-operator">==</span> <span class="ruby-value">-1</span> }
   <span class="ruby-keyword">true</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
@@ -428,7 +467,7 @@ rollback to the entire branch head pointed</p>
 
           
           <div class="method-source-code" id="indexOf-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 49</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 71</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">indexOf</span>(<span class="ruby-identifier">x</span>)
   <span class="ruby-identifier">index</span> = <span class="ruby-value">-1</span>
   <span class="ruby-ivar">@files</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">e</span>,<span class="ruby-identifier">i</span><span class="ruby-operator">|</span>
@@ -438,42 +477,6 @@ rollback to the entire branch head pointed</p>
     <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">end</span>
   <span class="ruby-identifier">index</span>
-<span class="ruby-keyword">end</span></pre>
-          </div>
-          
-        </div>
-
-        
-
-        
-      </div>
-
-    
-      <div id="method-i-readFile" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">readFile</span><span
-            class="method-args">(path)</span>
-          
-          <span class="method-click-advice">click to toggle source</span>
-          
-        </div>
-        
-
-        <div class="method-description">
-          
-          
-          
-          
-
-          
-          <div class="method-source-code" id="readFile-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 28</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">readFile</span>(<span class="ruby-identifier">path</span>)
-  <span class="ruby-identifier">f</span> = <span class="ruby-identifier">open</span>(<span class="ruby-identifier">path</span>, <span class="ruby-string">&#39;r&#39;</span>)
-  <span class="ruby-identifier">txt</span> = <span class="ruby-identifier">f</span>.<span class="ruby-identifier">read</span>
-  <span class="ruby-identifier">f</span>.<span class="ruby-identifier">close</span>
-  <span class="ruby-identifier">txt</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -504,30 +507,26 @@ rollback to the entire branch head pointed</p>
 
           
           <div class="method-source-code" id="status-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 186</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 190</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">status</span>(<span class="ruby-identifier">comm</span>)
-  <span class="ruby-identifier">adds</span> = []
-  <span class="ruby-identifier">deletes</span> = []
+  <span class="ruby-identifier">added</span> = []
   <span class="ruby-identifier">edits</span> = []
-  <span class="ruby-identifier">wsFiles</span> = <span class="ruby-constant">Dir</span>[ <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@root</span>, <span class="ruby-string">&#39;**&#39;</span>, <span class="ruby-string">&#39;*&#39;</span>) ].<span class="ruby-identifier">reject</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-identifier">p</span> }
-  <span class="ruby-identifier">wsFiles</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">remov</span> = []
+  <span class="ruby-identifier">ws_files</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
     <span class="ruby-identifier">idx</span> = <span class="ruby-identifier">indexOf</span>(<span class="ruby-identifier">f</span>)
-    <span class="ruby-keyword">if</span> <span class="ruby-identifier">idx</span> <span class="ruby-operator">!=</span> <span class="ruby-value">-1</span>
-      <span class="ruby-identifier">x1</span> = <span class="ruby-ivar">@revlog</span>.<span class="ruby-identifier">get_file</span>(<span class="ruby-ivar">@files</span>[<span class="ruby-identifier">idx</span>].<span class="ruby-identifier">history_hash_ids</span>[<span class="ruby-value">-1</span>])
-      <span class="ruby-identifier">x2</span> = <span class="ruby-identifier">readFile</span>(<span class="ruby-identifier">f</span>)
-      <span class="ruby-keyword">if</span> <span class="ruby-identifier">x1</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">x2</span>
-        <span class="ruby-identifier">edits</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">f</span>)
-      <span class="ruby-keyword">end</span>
-    <span class="ruby-keyword">else</span>
-      <span class="ruby-identifier">adds</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">f</span>)
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">idx</span> <span class="ruby-operator">==</span> <span class="ruby-value">-1</span> <span class="ruby-comment"># new file</span>
+      <span class="ruby-identifier">added</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">f</span>
+    <span class="ruby-keyword">else</span> <span class="ruby-comment"># changed file?</span>
+      <span class="ruby-identifier">x2</span> = <span class="ruby-identifier">readFile</span>(<span class="ruby-identifier">f</span>) <span class="ruby-comment"># get the current version</span>
+      <span class="ruby-identifier">x1</span> = <span class="ruby-ivar">@revlog</span>.<span class="ruby-identifier">get_file</span>(<span class="ruby-ivar">@files</span>[<span class="ruby-identifier">idx</span>].<span class="ruby-identifier">history</span>.<span class="ruby-identifier">last</span>)
+      <span class="ruby-identifier">edits</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">f</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">x1</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">x2</span>
     <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">end</span>
-  <span class="ruby-ivar">@files</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
-    <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span> (<span class="ruby-identifier">wsFiles</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">path</span>)
-      <span class="ruby-identifier">deletes</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">f</span>.<span class="ruby-identifier">path</span>)
-    <span class="ruby-keyword">end</span>
-  <span class="ruby-keyword">end</span>
-  <span class="ruby-keyword">return</span> [<span class="ruby-identifier">adds</span>, <span class="ruby-identifier">edits</span>, <span class="ruby-identifier">deletes</span>]
+
+  <span class="ruby-comment"># any deleted files from the last commit?</span>
+  <span class="ruby-ivar">@files</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">remov</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">path</span> <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">ws_files</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">path</span>) }
+
+  [<span class="ruby-identifier">added</span>, <span class="ruby-identifier">edits</span>, <span class="ruby-identifier">remov</span>]
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -539,11 +538,11 @@ rollback to the entire branch head pointed</p>
       </div>
 
     
-      <div id="method-i-writeFile" class="method-detail ">
+      <div id="method-i-ws_files" class="method-detail ">
         
         <div class="method-heading">
-          <span class="method-name">writeFile</span><span
-            class="method-args">(path, content)</span>
+          <span class="method-name">ws_files</span><span
+            class="method-args">()</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -552,17 +551,15 @@ rollback to the entire branch head pointed</p>
 
         <div class="method-description">
           
-          
+          <p>get all files currently in workspace</p>
           
           
 
           
-          <div class="method-source-code" id="writeFile-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 22</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">writeFile</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">content</span>)
-  <span class="ruby-identifier">f</span> = <span class="ruby-identifier">open</span>(<span class="ruby-identifier">path</span>, <span class="ruby-string">&#39;w&#39;</span>)
-  <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-identifier">content</span>)
-  <span class="ruby-identifier">f</span>.<span class="ruby-identifier">close</span>
+          <div class="method-source-code" id="ws_files-source">
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 89</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">ws_files</span>
+  <span class="ruby-constant">Dir</span>[ <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@root</span>, <span class="ruby-string">&#39;**&#39;</span>, <span class="ruby-string">&#39;*&#39;</span>) ].<span class="ruby-identifier">reject</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-identifier">p</span> }
 <span class="ruby-keyword">end</span></pre>
           </div>
           

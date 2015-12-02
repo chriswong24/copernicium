@@ -85,9 +85,9 @@
 
   <section class="description">
     
-<p>Communication object that will pass commands to backend modules rev - A
-single revision indicator (commit #, branch name, HEAD, etc.) repo -
-URL/path to a remote repository</p>
+<p>Communication object that will pass commands to backend modules rev -
+revision indicator (commit #, branch name, HEAD, etc.) repo - URL/path to a
+remote repository</p>
 
   </section>
 
@@ -108,9 +108,9 @@ URL/path to a remote repository</p>
       </header>
 
       
-      <div id="attribute-i-arguments" class="method-detail">
+      <div id="attribute-i-cmt_msg" class="method-detail">
         <div class="method-heading attribute-method-heading">
-          <span class="method-name">arguments</span><span
+          <span class="method-name">cmt_msg</span><span
             class="attribute-access-type">[R]</span>
         </div>
 
@@ -134,9 +134,9 @@ URL/path to a remote repository</p>
         </div>
       </div>
       
-      <div id="attribute-i-commit_message" class="method-detail">
+      <div id="attribute-i-files" class="method-detail">
         <div class="method-heading attribute-method-heading">
-          <span class="method-name">commit_message</span><span
+          <span class="method-name">files</span><span
             class="attribute-access-type">[R]</span>
         </div>
 
@@ -147,9 +147,9 @@ URL/path to a remote repository</p>
         </div>
       </div>
       
-      <div id="attribute-i-files" class="method-detail">
+      <div id="attribute-i-opts" class="method-detail">
         <div class="method-heading attribute-method-heading">
-          <span class="method-name">files</span><span
+          <span class="method-name">opts</span><span
             class="attribute-access-type">[R]</span>
         </div>
 
@@ -200,7 +200,7 @@ URL/path to a remote repository</p>
         
         <div class="method-heading">
           <span class="method-name">new</span><span
-            class="method-args">(command: nil, files: nil, rev: nil, commit_message: nil, repo: nil, opts: nil)</span>
+            class="method-args">(command: nil, files: nil, rev: nil, cmt_msg: nil, repo: nil, opts: nil)</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -215,10 +215,10 @@ URL/path to a remote repository</p>
 
           
           <div class="method-source-code" id="new-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 151</span>
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 187</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">command</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">files</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">rev</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>,
-               <span class="ruby-identifier">commit_message</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">repo</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>)
-  <span class="ruby-ivar">@commit_message</span> = <span class="ruby-identifier">commit_message</span>
+               <span class="ruby-identifier">cmt_msg</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">repo</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>)
+  <span class="ruby-ivar">@cmt_msg</span> = <span class="ruby-identifier">cmt_msg</span>
   <span class="ruby-ivar">@command</span> = <span class="ruby-identifier">command</span>
   <span class="ruby-ivar">@files</span> = <span class="ruby-identifier">files</span>
   <span class="ruby-ivar">@opts</span> = <span class="ruby-identifier">opts</span>

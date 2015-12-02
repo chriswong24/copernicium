@@ -74,13 +74,13 @@
     
     <li ><a href="#method-i-add_file">#add_file</a>
     
-    <li ><a href="#method-i-default_hash_factory">#default_hash_factory</a>
-    
     <li ><a href="#method-i-delete_file">#delete_file</a>
     
     <li ><a href="#method-i-diff_files">#diff_files</a>
     
     <li ><a href="#method-i-get_file">#get_file</a>
+    
+    <li ><a href="#method-i-hash_array">#hash_array</a>
     
     <li ><a href="#method-i-hash_file">#hash_file</a>
     
@@ -128,7 +128,7 @@
         
         <div class="method-heading">
           <span class="method-name">new</span><span
-            class="method-args">(project_path)</span>
+            class="method-args">(root)</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -144,20 +144,18 @@
           
           <div class="method-source-code" id="new-source">
             <pre><span class="ruby-comment"># File lib/RevLog.rb, line 29</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">project_path</span>)
-  <span class="ruby-ivar">@project_path</span> = <span class="ruby-identifier">project_path</span>
-  <span class="ruby-ivar">@cop_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">project_path</span>, <span class="ruby-string">&quot;.cop&quot;</span>)
-  <span class="ruby-ivar">@log_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@cop_path</span>, <span class="ruby-string">&quot;logmap.yaml&quot;</span>)
-  <span class="ruby-ivar">@hash_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@cop_path</span>, <span class="ruby-string">&quot;hashmap.yaml&quot;</span>)
-  <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-ivar">@log_path</span>) <span class="ruby-keyword">and</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-ivar">@hash_path</span>) <span class="ruby-keyword">then</span>
-    <span class="ruby-ivar">@logmap</span> = <span class="ruby-identifier">default_hash_factory</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load_file</span>(<span class="ruby-ivar">@log_path</span>))
-    <span class="ruby-ivar">@hashmap</span> = <span class="ruby-identifier">default_hash_factory</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load_file</span>(<span class="ruby-ivar">@hash_path</span>))
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">root</span>)
+  <span class="ruby-ivar">@root</span> = <span class="ruby-identifier">root</span>
+  <span class="ruby-ivar">@cop_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">root</span>, <span class="ruby-string">&#39;.cn&#39;</span>)
+  <span class="ruby-ivar">@log_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@cop_path</span>, <span class="ruby-string">&#39;logmap.yaml&#39;</span>)
+  <span class="ruby-ivar">@hash_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@cop_path</span>, <span class="ruby-string">&#39;hashmap.yaml&#39;</span>)
+  <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-ivar">@log_path</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-ivar">@hash_path</span>)
+    <span class="ruby-ivar">@logmap</span> = <span class="ruby-identifier">hash_array</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load_file</span>(<span class="ruby-ivar">@log_path</span>))
+    <span class="ruby-ivar">@hashmap</span> = <span class="ruby-identifier">hash_array</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load_file</span>(<span class="ruby-ivar">@hash_path</span>))
   <span class="ruby-keyword">else</span>
-    <span class="ruby-ivar">@logmap</span> = <span class="ruby-identifier">default_hash_factory</span>()
-    <span class="ruby-ivar">@hashmap</span> = <span class="ruby-identifier">default_hash_factory</span>()
-    <span class="ruby-keyword">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-ivar">@cop_path</span>)
-      <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">mkdir</span>(<span class="ruby-ivar">@cop_path</span>)
-    <span class="ruby-keyword">end</span>
+    <span class="ruby-ivar">@logmap</span> = <span class="ruby-identifier">hash_array</span>
+    <span class="ruby-ivar">@hashmap</span> = <span class="ruby-identifier">hash_array</span>
+    <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">mkdir</span>(<span class="ruby-ivar">@cop_path</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-ivar">@cop_path</span>)
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
@@ -197,51 +195,16 @@
 
           
           <div class="method-source-code" id="add_file-source">
-            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 50</span>
+            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 48</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">add_file</span>(<span class="ruby-identifier">file_name</span>, <span class="ruby-identifier">content</span>)
   <span class="ruby-identifier">hash</span> = <span class="ruby-identifier">hash_file</span>(<span class="ruby-identifier">file_name</span>, <span class="ruby-identifier">content</span>)
-  <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@cop_path</span>, <span class="ruby-identifier">hash</span>), <span class="ruby-string">&quot;w&quot;</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
-    <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-identifier">content</span>)
-  }
+  <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@cop_path</span>, <span class="ruby-identifier">hash</span>), <span class="ruby-string">&#39;w&#39;</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-identifier">content</span>) }
   <span class="ruby-ivar">@logmap</span>[<span class="ruby-identifier">file_name</span>] = <span class="ruby-ivar">@logmap</span>[<span class="ruby-identifier">file_name</span>] <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:time</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>,
                                               <span class="ruby-value">:hash</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">hash</span>}
   <span class="ruby-ivar">@hashmap</span>[<span class="ruby-identifier">hash</span>] = <span class="ruby-ivar">@hashmap</span>[<span class="ruby-identifier">hash</span>] <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:time</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>,
                                       <span class="ruby-value">:filename</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">file_name</span>}
-  <span class="ruby-identifier">update_log_file</span>()
+  <span class="ruby-identifier">update_log_file</span>
   <span class="ruby-keyword">return</span> <span class="ruby-identifier">hash</span>
-<span class="ruby-keyword">end</span></pre>
-          </div>
-          
-        </div>
-
-        
-
-        
-      </div>
-
-    
-      <div id="method-i-default_hash_factory" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">default_hash_factory</span><span
-            class="method-args">()</span>
-          
-          <span class="method-click-advice">click to toggle source</span>
-          
-        </div>
-        
-
-        <div class="method-description">
-          
-          
-          
-          
-
-          
-          <div class="method-source-code" id="default_hash_factory-source">
-            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 46</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_hash_factory</span>()
-  <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span> {[]}
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -272,17 +235,13 @@
 
           
           <div class="method-source-code" id="delete_file-source">
-            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 64</span>
+            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 60</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">delete_file</span>(<span class="ruby-identifier">file_id</span>)
   <span class="ruby-keyword">begin</span>
     <span class="ruby-identifier">file_name</span> = <span class="ruby-ivar">@hashmap</span>[<span class="ruby-identifier">file_id</span>][<span class="ruby-value">0</span>][<span class="ruby-value">:filename</span>]
-    <span class="ruby-ivar">@hashmap</span>[<span class="ruby-identifier">file_id</span>].<span class="ruby-identifier">delete_if</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>
-      <span class="ruby-identifier">e</span>[<span class="ruby-value">:filename</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">file_name</span>
-    }
-    <span class="ruby-ivar">@logmap</span>[<span class="ruby-identifier">file_name</span>].<span class="ruby-identifier">delete_if</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>
-      <span class="ruby-identifier">e</span>[<span class="ruby-value">:hash</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">file_id</span>
-    }
-    <span class="ruby-identifier">update_log_file</span>()
+    <span class="ruby-ivar">@hashmap</span>[<span class="ruby-identifier">file_id</span>].<span class="ruby-identifier">delete_if</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>[<span class="ruby-value">:filename</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">file_name</span> }
+    <span class="ruby-ivar">@logmap</span>[<span class="ruby-identifier">file_name</span>].<span class="ruby-identifier">delete_if</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>[<span class="ruby-value">:hash</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">file_id</span> }
+    <span class="ruby-identifier">update_log_file</span>
     <span class="ruby-constant">File</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@cop_path</span>, <span class="ruby-identifier">file_id</span>))
     <span class="ruby-keyword">return</span> <span class="ruby-value">1</span>
   <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Exception</span>
@@ -318,10 +277,9 @@
 
           
           <div class="method-source-code" id="diff_files-source">
-            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 94</span>
+            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 84</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">diff_files</span>(<span class="ruby-identifier">file_id1</span>, <span class="ruby-identifier">file_id2</span>)
-  <span class="ruby-keyword">return</span> <span class="ruby-constant">Diffy</span><span class="ruby-operator">::</span><span class="ruby-constant">Diff</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">file_id1</span>),
-                         <span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">file_id2</span>)).<span class="ruby-identifier">to_s</span>()
+  <span class="ruby-constant">Diffy</span><span class="ruby-operator">::</span><span class="ruby-constant">Diff</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">file_id1</span>), <span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">file_id2</span>)).<span class="ruby-identifier">to_s</span>()
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -337,7 +295,7 @@
         
         <div class="method-heading">
           <span class="method-name">get_file</span><span
-            class="method-args">(file_id)</span>
+            class="method-args">(id)</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -352,16 +310,47 @@
 
           
           <div class="method-source-code" id="get_file-source">
-            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 82</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">file_id</span>)
-  <span class="ruby-identifier">file_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@cop_path</span>, <span class="ruby-identifier">file_id</span>)
-  <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">file_path</span>)
-    <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">file_path</span>, <span class="ruby-string">&quot;r&quot;</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
-      <span class="ruby-keyword">return</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">read</span>
-    }
+            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 74</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">id</span>)
+  <span class="ruby-identifier">file_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@cop_path</span>, <span class="ruby-identifier">id</span>)
+  <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">file_path</span>
+    <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">file_path</span>, <span class="ruby-string">&#39;r&#39;</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">read</span> }
   <span class="ruby-keyword">else</span>
-    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Exception</span>, <span class="ruby-string">&quot;Invalid file_id!&quot;</span>
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Exception</span>, <span class="ruby-string">&#39;Invalid id!&#39;</span>
   <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-hash_array" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">hash_array</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="hash_array-source">
+            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 44</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">hash_array</span>
+  <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span> {[]}
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -392,7 +381,7 @@
 
           
           <div class="method-source-code" id="hash_file-source">
-            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 99</span>
+            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 88</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">hash_file</span>(<span class="ruby-identifier">file_name</span>, <span class="ruby-identifier">content</span>)
   <span class="ruby-constant">Digest</span><span class="ruby-operator">::</span><span class="ruby-constant">SHA256</span>.<span class="ruby-identifier">hexdigest</span>(<span class="ruby-identifier">file_name</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">content</span>.<span class="ruby-identifier">to_s</span>)
 <span class="ruby-keyword">end</span></pre>
@@ -425,13 +414,11 @@
 
           
           <div class="method-source-code" id="history-source">
-            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 115</span>
+            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 99</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">history</span>(<span class="ruby-identifier">file_name</span>)
   <span class="ruby-identifier">hashs</span> = []
-  <span class="ruby-keyword">for</span> <span class="ruby-identifier">m</span> <span class="ruby-keyword">in</span> <span class="ruby-ivar">@logmap</span>[<span class="ruby-identifier">file_name</span>]
-    <span class="ruby-identifier">hashs</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>[<span class="ruby-value">:hash</span>]
-  <span class="ruby-keyword">end</span>
-  <span class="ruby-keyword">return</span> <span class="ruby-identifier">hashs</span>
+  <span class="ruby-ivar">@logmap</span>[<span class="ruby-identifier">file_name</span>].<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">hashs</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>[<span class="ruby-value">:hash</span>] }
+  <span class="ruby-identifier">hashs</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -447,7 +434,7 @@
         
         <div class="method-heading">
           <span class="method-name">merge</span><span
-            class="method-args">(file_id1, file_id2)</span>
+            class="method-args">(id1, id2)</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -462,17 +449,12 @@
 
           
           <div class="method-source-code" id="merge-source">
-            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 103</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">merge</span>(<span class="ruby-identifier">file_id1</span>, <span class="ruby-identifier">file_id2</span>)
-  <span class="ruby-identifier">diff_a</span> = <span class="ruby-constant">Diffy</span><span class="ruby-operator">::</span><span class="ruby-constant">Diff</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">file_id1</span>),
-                           <span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">file_id2</span>)).<span class="ruby-identifier">each_chunk</span>.<span class="ruby-identifier">to_a</span>()
-  <span class="ruby-keyword">if</span> <span class="ruby-identifier">diff_a</span>.<span class="ruby-identifier">all?</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">d</span><span class="ruby-operator">|</span> <span class="ruby-identifier">d</span>[<span class="ruby-value">0</span>]<span class="ruby-operator">!=</span><span class="ruby-string">&quot;-&quot;</span>}
-    <span class="ruby-keyword">return</span> <span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">file_id2</span>)
-  <span class="ruby-keyword">end</span>
-  <span class="ruby-comment"># if diff_a.all? { |d| d[0]!=&quot;+&quot;}</span>
-  <span class="ruby-comment">#   return get_file(file_id1)</span>
-  <span class="ruby-comment"># end</span>
-  <span class="ruby-keyword">return</span> <span class="ruby-identifier">diff_a</span>
+            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 92</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">merge</span>(<span class="ruby-identifier">id1</span>, <span class="ruby-identifier">id2</span>)
+  <span class="ruby-identifier">diff_a</span> = <span class="ruby-constant">Diffy</span><span class="ruby-operator">::</span><span class="ruby-constant">Diff</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">id1</span>), <span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">id2</span>)).<span class="ruby-identifier">each_chunk</span>.<span class="ruby-identifier">to_a</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">id2</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">diff_a</span>.<span class="ruby-identifier">all?</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">d</span><span class="ruby-operator">|</span> <span class="ruby-identifier">d</span>[<span class="ruby-value">0</span>]<span class="ruby-operator">!=</span><span class="ruby-string">&#39;-&#39;</span>}
+  <span class="ruby-comment"># return get_file(id1) if diff_a.all? { |d| d[0]!=&#39;+&#39;}</span>
+  <span class="ruby-identifier">diff_a</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -503,14 +485,11 @@
 
           
           <div class="method-source-code" id="update_log_file-source">
-            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 123</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">update_log_file</span>()
-  <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@cop_path</span>, <span class="ruby-string">&quot;logmap.yaml&quot;</span>), <span class="ruby-string">&quot;w&quot;</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
-    <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-ivar">@logmap</span>.<span class="ruby-identifier">to_yaml</span>)
-  }
-  <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@cop_path</span>, <span class="ruby-string">&quot;hashmap.yaml&quot;</span>), <span class="ruby-string">&quot;w&quot;</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
-    <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-ivar">@hashmap</span>.<span class="ruby-identifier">to_yaml</span>)
-  }
+            <pre><span class="ruby-comment"># File lib/RevLog.rb, line 105</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">update_log_file</span>
+  <span class="ruby-comment"># writeFile defined in workspace.rb</span>
+  <span class="ruby-identifier">writeFile</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@cop_path</span>, <span class="ruby-string">&#39;logmap.yaml&#39;</span>), <span class="ruby-ivar">@logmap</span>.<span class="ruby-identifier">to_yaml</span>)
+  <span class="ruby-identifier">writeFile</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@cop_path</span>, <span class="ruby-string">&#39;hashmap.yaml&#39;</span>), <span class="ruby-ivar">@hashmap</span>.<span class="ruby-identifier">to_yaml</span>)
 <span class="ruby-keyword">end</span></pre>
           </div>
           

@@ -70,6 +70,8 @@
 
   <ul class="link-list" role="directory">
     
+    <li ><a href="#method-i-UICommandParser">#UICommandParser</a>
+    
     <li ><a href="#method-i-clone">#clone</a>
     
     <li ><a href="#method-i-connect">#connect</a>
@@ -116,6 +118,52 @@
        </header>
 
     
+      <div id="method-i-UICommandParser" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">UICommandParser</span><span
+            class="method-args">(ui_comm)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Chris&#39;s edit Takes in Ethan&#39;s UICommandCommunicator object and
+calls a method based on the command</p>
+          
+          
+
+          
+          <div class="method-source-code" id="UICommandParser-source">
+            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 13</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">UICommandParser</span>(<span class="ruby-identifier">ui_comm</span>)
+  <span class="ruby-keyword">case</span> <span class="ruby-identifier">ui_comm</span>.<span class="ruby-identifier">command</span>
+  <span class="ruby-keyword">when</span> <span class="ruby-string">&quot;clone&quot;</span>
+    <span class="ruby-comment">#clone()</span>
+  <span class="ruby-keyword">when</span> <span class="ruby-string">&quot;merge&quot;</span>
+    <span class="ruby-comment"># do merge stuff</span>
+  <span class="ruby-keyword">when</span> <span class="ruby-string">&quot;push&quot;</span>
+    <span class="ruby-comment">#push(ui_comm.)</span>
+  <span class="ruby-keyword">when</span> <span class="ruby-string">&quot;pull&quot;</span>
+    <span class="ruby-comment">#pull(ui_comm.branchname,)</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;Error: Invalid command supplied to PushPull!&quot;</span> <span class="ruby-comment"># Bad error handling, will fix later</span>
+    <span class="ruby-keyword">return</span> <span class="ruby-keyword">nil</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
       <div id="method-i-clone" class="method-detail ">
         
         <div class="method-heading">
@@ -135,7 +183,7 @@
 
           
           <div class="method-source-code" id="clone-source">
-            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 141</span>
+            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 160</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">clone</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">dir</span>, <span class="ruby-identifier">user</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">passwd</span> = <span class="ruby-keyword">nil</span>)
   <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">false</span>
   <span class="ruby-keyword">if</span>(<span class="ruby-identifier">user</span>.<span class="ruby-identifier">nil?</span>)
@@ -190,7 +238,7 @@
 
           
           <div class="method-source-code" id="connect-source">
-            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 10</span>
+            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 29</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">passwd</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
   <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">false</span>
   <span class="ruby-keyword">if</span>(<span class="ruby-identifier">block</span>.<span class="ruby-identifier">nil?</span>)
@@ -262,7 +310,7 @@
 
           
           <div class="method-source-code" id="fetch-source">
-            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 74</span>
+            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 93</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">dest</span>, <span class="ruby-identifier">local</span>, <span class="ruby-identifier">user</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">passwd</span> = <span class="ruby-keyword">nil</span>)
   <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">false</span>
   <span class="ruby-keyword">if</span>(<span class="ruby-identifier">user</span>.<span class="ruby-identifier">nil?</span>)
@@ -314,7 +362,7 @@
 
           
           <div class="method-source-code" id="pull-source">
-            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 120</span>
+            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 139</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">pull</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">branch</span>, <span class="ruby-identifier">remote_dir</span>)
   <span class="ruby-comment">################ One way we can handle it ###################</span>
   <span class="ruby-comment">################ Needs Repos and Revlog Functionality! ######</span>
@@ -364,7 +412,7 @@
 
           
           <div class="method-source-code" id="push-source">
-            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 97</span>
+            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 116</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">push</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">branch</span>, <span class="ruby-identifier">remote_dir</span>)
   <span class="ruby-comment">################ One way we can handle it ###################</span>
   <span class="ruby-comment">################ Needs Repos and Revlog Functionality! ######</span>
@@ -416,7 +464,7 @@
 
           
           <div class="method-source-code" id="transfer-source">
-            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 53</span>
+            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 72</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">transfer</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">local</span>, <span class="ruby-identifier">dest</span>, <span class="ruby-identifier">user</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">passwd</span> = <span class="ruby-keyword">nil</span>)
   <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">false</span>
   <span class="ruby-keyword">if</span>(<span class="ruby-identifier">user</span>.<span class="ruby-identifier">nil?</span>)

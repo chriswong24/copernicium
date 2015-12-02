@@ -72,12 +72,6 @@
     
     <li ><a href="#method-c-new">::new</a>
     
-    <li ><a href="#method-i-get_files">#get_files</a>
-    
-    <li ><a href="#method-i-get_id">#get_id</a>
-    
-    <li ><a href="#method-i-set_id">#set_id</a>
-    
   </ul>
 </div>
 
@@ -104,6 +98,40 @@
     
 
     
+    <section class="attribute-method-details" class="method-section">
+      <header>
+        <h3>Attributes</h3>
+      </header>
+
+      
+      <div id="attribute-i-files" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">files</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+      <div id="attribute-i-id" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">id</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+    </section>
+    
 
     
      <section id="public-class-5Buntitled-5D-method-details" class="method-section">
@@ -116,7 +144,7 @@
         
         <div class="method-heading">
           <span class="method-name">new</span><span
-            class="method-args">(in_array)</span>
+            class="method-args">(files = [])</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -125,124 +153,16 @@
 
         <div class="method-description">
           
-          
+          <p>id is computed after creation</p>
           
           
 
           
           <div class="method-source-code" id="new-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 42</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">in_array</span>)
-  <span class="ruby-ivar">@files</span> = <span class="ruby-identifier">in_array</span>
-  <span class="ruby-ivar">@id</span> = <span class="ruby-string">&quot;&quot;</span>
-  <span class="ruby-comment"># id = hash of in array?</span>
-<span class="ruby-keyword">end</span></pre>
-          </div>
-          
-        </div>
-
-        
-
-        
-      </div>
-
-    
-    </section>
-  
-     <section id="public-instance-5Buntitled-5D-method-details" class="method-section">
-       <header>
-         <h3>Public Instance Methods</h3>
-       </header>
-
-    
-      <div id="method-i-get_files" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">get_files</span><span
-            class="method-args">()</span>
-          
-          <span class="method-click-advice">click to toggle source</span>
-          
-        </div>
-        
-
-        <div class="method-description">
-          
-          
-          
-          
-
-          
-          <div class="method-source-code" id="get_files-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 57</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">get_files</span>()
-  <span class="ruby-ivar">@files</span>
-<span class="ruby-keyword">end</span></pre>
-          </div>
-          
-        </div>
-
-        
-
-        
-      </div>
-
-    
-      <div id="method-i-get_id" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">get_id</span><span
-            class="method-args">()</span>
-          
-          <span class="method-click-advice">click to toggle source</span>
-          
-        </div>
-        
-
-        <div class="method-description">
-          
-          <p>drop get prefix?</p>
-          
-          
-
-          
-          <div class="method-source-code" id="get_id-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 53</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">get_id</span>()
-  <span class="ruby-ivar">@id</span>
-<span class="ruby-keyword">end</span></pre>
-          </div>
-          
-        </div>
-
-        
-
-        
-      </div>
-
-    
-      <div id="method-i-set_id" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">set_id</span><span
-            class="method-args">(in_id)</span>
-          
-          <span class="method-click-advice">click to toggle source</span>
-          
-        </div>
-        
-
-        <div class="method-description">
-          
-          
-          
-          
-
-          
-          <div class="method-source-code" id="set_id-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 48</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_id</span>(<span class="ruby-identifier">in_id</span>)
-  <span class="ruby-ivar">@id</span> = <span class="ruby-identifier">in_id</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 31</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">files</span> = [])
+  <span class="ruby-ivar">@files</span> = <span class="ruby-identifier">files</span>
+  <span class="ruby-ivar">@id</span> = <span class="ruby-identifier">id</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           

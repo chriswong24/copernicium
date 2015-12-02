@@ -106,9 +106,9 @@
       </header>
 
       
-      <div id="attribute-i-history_hash_ids" class="method-detail">
+      <div id="attribute-i-history" class="method-detail">
         <div class="method-heading attribute-method-heading">
-          <span class="method-name">history_hash_ids</span><span
+          <span class="method-name">history</span><span
             class="attribute-access-type">[R]</span>
         </div>
 
@@ -161,10 +161,10 @@
 
           
           <div class="method-source-code" id="new-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 7</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 41</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">ids</span>)
+  <span class="ruby-ivar">@history</span> = <span class="ruby-identifier">ids</span>
   <span class="ruby-ivar">@path</span> = <span class="ruby-identifier">path</span>
-  <span class="ruby-ivar">@history_hash_ids</span> = <span class="ruby-identifier">ids</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -203,7 +203,7 @@
 
           
           <div class="method-source-code" id="3D-3D-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 12</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 46</span>
 <span class="ruby-keyword">def</span> <span class="ruby-operator">==</span>(<span class="ruby-identifier">rhs</span>)
   <span class="ruby-keyword">if</span> <span class="ruby-identifier">rhs</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">String</span>
     <span class="ruby-ivar">@path</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">rhs</span>
