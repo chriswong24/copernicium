@@ -13,7 +13,7 @@ module Copernicium
   class Driver
     # Get some info from the user when they dont specify it
     def get(info)
-      puts "Hi, #{info} not specified. Enter #{info}:"
+      puts "Note: #{info} not specified. Enter #{info} to continue."
       gets.chomp # read a line from user, and return it
     end
 
@@ -86,9 +86,9 @@ module Copernicium
     def status(args)
       ui = UIComm.new(command: 'status', opts: args)
       st = Workspace.new.status(ui)
-      puts "added:\t".grn + st[0].join(', ')   unless st[0].empty?
-      puts "edited:\t".yel + st[1].join(', ')  unless st[1].empty?
-      puts "removed:\t".red + st[2].join(', ') unless st[2].empty?
+      puts "Added:\t".grn + st[0].join(', ')   unless st[0].empty?
+      puts "Edited:\t".yel + st[1].join(', ')  unless st[1].empty?
+      puts "Removed:\t".red + st[2].join(', ') unless st[2].empty?
       ui
     end
 
