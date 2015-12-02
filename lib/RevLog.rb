@@ -41,15 +41,13 @@ module Copernicium
       end
     end
 
-  def hash_array
-    Hash.new {[]}
-  end
+    def hash_array
+      Hash.new {[]}
+    end
 
     def add_file(file_name, content)
       hash = hash_file(file_name, content)
-      File.open(File.join(@cop_path, hash), 'w') { |f|
-        f.write(content)
-      }
+      File.open(File.join(@cop_path, hash), 'w') { |f| f.write(content) }
       @logmap[file_name] = @logmap[file_name] << {:time => Time.now,
                                                   :hash => hash}
       @hashmap[hash] = @hashmap[hash] << {:time => Time.now,

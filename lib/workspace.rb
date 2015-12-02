@@ -1,6 +1,7 @@
 # workspace module - linfeng and qiguang
 
 module Copernicium
+  # helper methods for file IO
   def writeFile(path, content)
     f = open(path, 'w')
     f.write(content)
@@ -12,6 +13,27 @@ module Copernicium
     txt = f.read
     f.close
     txt
+  end
+
+  # find  the root .cn folder
+  def getroot
+    cwd = Dir.pwd
+    max = 0
+    def notroot() Dir.pwd != '/' end
+    def notcn() File.exists? File.join(Dir.pwd, '.cn') end
+    while max < 10 && notroot && notcn
+      Dir.chdir(File.join(Dir.pwd, '..'))
+      max += 1
+    end
+
+    if notcn # return where cn was found
+      cnroot = Dir.pwd
+      Dir.chdir(cwd)
+      cnroot
+    else # directory not found
+      Dir.chdir(cwd)
+      nil
+    end
   end
 
   class FileObj
@@ -44,23 +66,6 @@ module Copernicium
       @revlog = RevLog.new(@cwd)
 
       pexit 'Copernicium folder (.cn) not found.', 1 if @root.nil?
-    end
-
-    # find where the root .cn folder is
-    def getroot
-      max = 0
-      def notroot() Dir.pwd != '/' end
-      def notcn() File.exists? File.join(Dir.pwd, '.cn') end
-      while max < 10 && notroot && notcn
-        Dir.chdir(File.join(Dir.pwd, '..'))
-        max += 1
-      end
-
-      if notcn # return where cn was found
-        Dir.pwd
-      else # directory not found
-        nil
-      end
     end
 
     def indexOf(x)

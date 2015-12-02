@@ -5,13 +5,12 @@ require_relative 'test_helper'
 class TestCnReposModule < Minitest::Test
   describe 'ReposModule' do
     before 'create repo instance' do
-      @ws = Workspace.new
-      @repo = @ws.repo
+      @repo = Repos.new Dir.pwd
     end
 
     it 'can create snapshots' do
       @repo.make_snapshot(['file1', 'file2']).wont_be_nil
-      @repo.manifest.wont_be_empty
+      @repo.history.wont_be_empty
     end
 
     it 'can restore snapshots' do
@@ -25,7 +24,7 @@ class TestCnReposModule < Minitest::Test
       snap1 = @repo.make_snapshot(['file1', 'file2'])
       snap2 = @repo.make_snapshot(['file1', 'file2', 'file3'])
       snap3 = @repo.make_snapshot(['file1', 'file3'])
-      @repo.history().must_equal([snap1, snap2, snap3])
+      @repo.history.must_equal([snap1, snap2, snap3])
     end
 
     it 'can check for deleted snapshots' do
@@ -33,7 +32,7 @@ class TestCnReposModule < Minitest::Test
       snap2 = @repo.make_snapshot(['file1', 'file2', 'file3'])
       snap3 = @repo.make_snapshot(['file1', 'file3'])
       @repo.delete_snapshot(snap1)
-      @repo.history().must_equal([snap2, snap3])
+      @repo.history.must_equal([snap2, snap3])
     end
 
     it 'can check if correct differences between snapshots' do
@@ -48,6 +47,10 @@ class TestCnReposModule < Minitest::Test
     end
 
     it 'can switch branches' do
+      assert false, 'TODO'
+    end
+
+    it 'can merge branches' do
       assert false, 'TODO'
     end
   end
