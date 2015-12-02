@@ -8,107 +8,107 @@ require_relative 'test_helper'
 # the clean function
 
 class CoperniciumWorkspaceTest < Minitest::Test
-  describe "WorkspaceModule" do
+  describe 'WorkspaceModule' do
     def runner(string)
-      Copernicium::Driver.new.run string.split
+      Driver.new.run string.split
     end
 
-    before "manipulating the workspace" do
-      FileUtils.rm_rf("./workspace")
-      Dir.mkdir("./workspace")
-      Dir.chdir("./workspace")
-      @workspace = Copernicium::Workspace.new
-      @workspace.writeFile("1.txt","1")
-      @workspace.writeFile("2.txt", "2")
-      commInit = runner("commit -m init commit")
+    before 'manipulating the workspace' do
+      FileUtils.rm_rf('workspace')
+      Dir.mkdir('workspace')
+      Dir.chdir('workspace')
+      @workspace = Workspace.new
+      @workspace.writeFile('1.txt','1')
+      @workspace.writeFile('2.txt', '2')
+      commInit = runner('commit -m init commit')
       @workspace.commit(commInit)
     end
 
-    after "manipulating the workspace" do
-      FileUtils.rm_rf("../workspace")
+    after 'manipulating the workspace' do
+      FileUtils.rm_rf('workspace')
     end
 
-    #it "can clean the workspace to last commit" do
-     # @workspace.writeFile("1.txt","1_1")
-     # @workspace.writeFile("2.txt", "2_2")
-     #
-     # comm = runner("clean")
+=begin
+    it 'can clean the workspace to last commit' do
+      @workspace.writeFile('1.txt','1_1')
+      @workspace.writeFile('2.txt', '2_2')
+      comm = runner('clean')
+      @workspace.clean(comm)
 
-     # @workspace.clean(comm)
+      content = @workspace.readFile('1.txt')
+      content.must_equal '1'
 
-     # content = @workspace.readFile("1.txt")
-     # content.must_equal "1"
+      content = @workspace.readFile('2.txt')
+      content.must_equal '2'
+    end
 
-     # content = @workspace.readFile("2.txt")
-     # content.must_equal "2"
-    #end
+    it 'can clean specific files in the workspace' do
+      @workspace.writeFile('1.txt', '1_1')
+      comm = runner('clean 1.txt')
+      @workspace.clean(comm)
 
-   # it "can clean specific files in the workspace" do
-    #  @workspace.writeFile("1.txt", "1_1")
-    #  comm = runner("clean 1.txt")
-    #  @workspace.clean(comm)
+      content = @workspace.readFile('1.txt')
+      content.must_equal '1'
+    end
 
-    #  content = @workspace.readFile("1.txt")
-    #  content.must_equal "1"
-    #end
-
-    it "can commit a entire worksapce" do
-      @workspace.writeFile("1.txt","1_1")
-      @workspace.writeFile("2.txt","2_2")
-      comm = runner("commit -m commit entire workspace")
+    it 'can commit a list of file' do
+      @workspace.writeFile('1.txt','1_1_1')
+      comm.files = runner('commit -m 'commit one file' 1.txt')
       @workspace.commit(comm)
-      comm = runner("checkout master")
+      comm = runner('checkout master')
       @workspace.checkout(comm)
 
-      content = @workspace.readFile("1.txt")
-      content.must_equal "1_1"
-
-      content = @workspace.readFile("2.txt")
-      content.must_equal "2_2"
+      content = @workspace.readFile('1.txt')
+      content.must_equal '1_1_1'
     end
+=end
 
-    #it "can commit a list of file" do
-      #@workspace.writeFile("1.txt","1_1_1")
-      #comm.files = runner("commit -m 'commit one file' 1.txt")
-      #@workspace.commit(comm)
-      #comm = runner("checkout master")
-      #@workspace.checkout(comm)
-
-      #content = @workspace.readFile("1.txt")
-      #content.must_equal "1_1_1"
-    #end
-
-    it "can checkout a entire branch" do
-      @workspace.writeFile("1.txt","1_1_1_1")
-      @workspace.writeFile("2.txt","2_2_2_2")
-      comm = runner("commit -m 'commit two files'")
+    it 'can commit a entire workspace' do
+      @workspace.writeFile('1.txt','1_1')
+      @workspace.writeFile('2.txt','2_2')
+      comm = runner('commit -m commit entire workspace')
       @workspace.commit(comm)
-      comm = runner("checkout master")
+      comm = runner('checkout master')
       @workspace.checkout(comm)
 
-      content = @workspace.readFile("1.txt")
-      content.must_equal "1_1_1_1"
+      content = @workspace.readFile('1.txt')
+      content.must_equal '1_1'
 
-      content = @workspace.readFile("2.txt")
-      content.must_equal "2_2_2_2"
+      content = @workspace.readFile('2.txt')
+      content.must_equal '2_2'
     end
 
-    it "can checkout a list of files" do
-      @workspace.writeFile("1.txt","none")
-      comm = runner("checkout master ./1.txt")
+    it 'can checkout a entire branch' do
+      @workspace.writeFile('1.txt', '1_1_1_1')
+      @workspace.writeFile('2.txt', '2_2_2_2')
+      comm = runner('commit -m commit two files')
+      @workspace.commit(comm)
+      comm = runner('checkout master')
       @workspace.checkout(comm)
 
-      content = @workspace.readFile("1.txt")
-      content.must_equal "1"
+      content = @workspace.readFile('1.txt')
+      content.must_equal '1_1_1_1'
+
+      content = @workspace.readFile('2.txt')
+      content.must_equal '2_2_2_2'
     end
 
-    it "can check the status of the workspace" do
+    it 'can checkout a list of files' do
+      @workspace.writeFile('1.txt','none')
+      comm = runner('checkout master 1.txt')
+      @workspace.checkout(comm)
+
+      content = @workspace.readFile('1.txt')
+      content.must_equal '1'
+    end
+
+    it 'can check the status of the workspace' do
       File.delete('2.txt')
-      @workspace.writeFile("1.txt","edit")
-      @workspace.writeFile("3.txt","3")
+      @workspace.writeFile('1.txt','edit')
+      @workspace.writeFile('3.txt','3')
 
       changedFiles = @workspace.status(nil)
-      changedFiles.must_equal([["./3.txt"], ["./1.txt"],["./2.txt"]])
+      changedFiles.must_equal([['./3.txt'], ['./1.txt'],['./2.txt']])
     end
   end
 end

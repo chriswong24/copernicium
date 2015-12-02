@@ -33,13 +33,12 @@
 
 module Copernicium
   # Initialize hash at startup
-  # Possible? Or problem with self object?
   # id = hash of in array?
   class Snapshot
     attr_accessor :id, :files
     def initialize(in_array)
       @files = in_array
-      @id = ""
+      @id = ''
     end
   end
 
@@ -50,8 +49,8 @@ module Copernicium
     attr_reader :manifest
     def initialize
       # read in file of manifests (./copernicium/...?)
-      @manifest = {"master" => []}
-      @curr_branch = "master"
+      @manifest = {'master' => []}
+      @curr_branch = 'master'
     end
 
     def make_snapshot(file_array=nil)
@@ -119,8 +118,8 @@ module Copernicium
           diff_files.push(x)
         end
       end
-      return diff_files
       # Use revlog diff on each set of files? Look at Diffy
+      return diff_files
     end
 
     # Return hash ID of new branch

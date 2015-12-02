@@ -26,30 +26,28 @@
 
 module Copernicium
   class RevLog
-    def initialize(project_path)
-      @project_path = project_path
-      @cop_path = File.join(project_path, ".cn")
-      @log_path = File.join(@cop_path, "logmap.yaml")
-      @hash_path = File.join(@cop_path, "hashmap.yaml")
-      if File.exist?(@log_path) and File.exist?(@hash_path) then
-        @logmap = default_hash_factory.merge(YAML.load_file(@log_path))
-        @hashmap = default_hash_factory.merge(YAML.load_file(@hash_path))
+    def initialize(root)
+      @root = root
+      @cop_path = File.join(root, '.cn')
+      @log_path = File.join(@cop_path, 'logmap.yaml')
+      @hash_path = File.join(@cop_path, 'hashmap.yaml')
+      if File.exist?(@log_path) && File.exist?(@hash_path)
+        @logmap = hash_array.merge(YAML.load_file(@log_path))
+        @hashmap = hash_array.merge(YAML.load_file(@hash_path))
       else
-        @logmap = default_hash_factory()
-        @hashmap = default_hash_factory()
-        unless File.exist?(@cop_path)
-          Dir.mkdir(@cop_path)
-        end
+        @logmap = hash_array
+        @hashmap = hash_array
+        Dir.mkdir(@cop_path) unless File.exist?(@cop_path)
       end
     end
 
-    def default_hash_factory()
+    def hash_array
       Hash.new {[]}
     end
 
     def add_file(file_name, content)
       hash = hash_file(file_name, content)
-      File.open(File.join(@cop_path, hash), "w") { |f|
+      File.open(File.join(@cop_path, hash), 'w') { |f|
         f.write(content)
       }
       @logmap[file_name] = @logmap[file_name] << {:time => Time.now,
@@ -82,11 +80,11 @@ module Copernicium
     def get_file(file_id)
       file_path = File.join(@cop_path, file_id)
       if File.exist?(file_path)
-        File.open(file_path, "r") { |f|
+        File.open(file_path, 'r') { |f|
           return f.read
         }
       else
-        raise Exception, "Invalid file_id!"
+        raise Exception, 'Invalid file_id!'
       end
     end
 
@@ -102,31 +100,24 @@ module Copernicium
 
     def merge(file_id1, file_id2)
       diff_a = Diffy::Diff.new(get_file(file_id1),
-                               get_file(file_id2)).each_chunk.to_a()
-      if diff_a.all? { |d| d[0]!="-"}
-        return get_file(file_id2)
-      end
-      # if diff_a.all? { |d| d[0]!="+"}
+                               get_file(file_id2)).each_chunk.to_a
+      return get_file(file_id2) if diff_a.all? { |d| d[0]!='-'}
+      # if diff_a.all? { |d| d[0]!='+'}
       #   return get_file(file_id1)
       # end
-      return diff_a
+      diff_a
     end
 
     def history(file_name)
       hashs = []
-      for m in @logmap[file_name]
-        hashs << m[:hash]
-      end
-      return hashs
+      @logmap[file_name].each { |m| hashs << m[:hash] }
+      hashs
     end
 
-    def update_log_file()
-      File.open(File.join(@cop_path, "logmap.yaml"), "w") { |f|
-        f.write(@logmap.to_yaml)
-      }
-      File.open(File.join(@cop_path, "hashmap.yaml"), "w") { |f|
-        f.write(@hashmap.to_yaml)
-      }
+    def update_log_file
+      # writeFile defined in workspace.rb
+      writeFile(File.join(@cop_path, 'logmap.yaml'), @logmap.to_yaml)
+      writeFile(File.join(@cop_path, 'hashmap.yaml'), @hashmap.to_yaml)
     end
 
     # def alterFile(fileObject, fileReferenceString, versionReferenceString)

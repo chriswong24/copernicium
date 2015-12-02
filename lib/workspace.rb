@@ -1,12 +1,24 @@
-# This is the workspace module
-# The functions are clean, commit, checkout and status
+# workspace module - linfeng and qiguang
 
 module Copernicium
+  def writeFile(path, content)
+    f = open(path, 'w')
+    f.write(content)
+    f.close
+  end
+
+  def readFile(path)
+    f = open(path, 'r')
+    txt = f.read
+    f.close
+    txt
+  end
+
   class FileObj
-    attr_reader :path, :history_hash_ids
+    attr_reader :path, :history
     def initialize(path, ids)
+      @history = ids
       @path = path
-      @history_hash_ids = ids
     end
 
     def ==(rhs)
@@ -21,74 +33,33 @@ module Copernicium
   class Workspace
     def getroot
       max = 0
-      def findcn() File.directory?(Dir.pwd + "/.cn") end
-      while max < 10 && !findcn
-        Dir.chdir("../")
+      def notroot() Dir.pwd != '/' end
+      def notcn() File.exists? File.join(Dir.pwd, '.cn') end
+      while max < 10 && notroot && notcn
+        Dir.chdir(File.join(Dir.pwd, '..'))
+        puts Dir.pwd
         max += 1
       end
-      if findcn
+
+      if notcn # return where cn was found
         return Dir.pwd
-      else
+      else # directory not found
         return nil
       end
-    end
-
-    def writeFile(path, content)
-      f = open(path, 'w')
-      f.write(content)
-      f.close
-    end
-
-    def readFile(path)
-      f = open(path, 'r')
-      txt = f.read
-      f.close
-      txt
     end
 
     def initialize(bname = 'master')
       @files = []
       @cwd = Dir.pwd
-n     @root = getroot
+      @root = getroot
+      Dir.chdir(@cwd)
+      @root = @cwd if @root.nil?
+      @cwd.sub!(@root, '.')
+      @branch = bname
+      @repos = Repos.new
+      @revlog = RevLog.new(@cwd)
 
-      if @root.nil?
-        pexit "Copernicium folder (.cn) not found."
-      else # if /.cn (project storage folder) doesnt exist, make it
-        Dir.mkdir(@root + '/.cn') if !File.directory?(@root + '/.cn')
-      end
-
-      @cwd.sub!(@root, '')
-      @branch_name = bname
-      @repos = Copernicium::Repos.new
-      @revlog = Copernicium::RevLog.new('.')
-    end
-
-    # Chris's edit
-    # Takes in Ethan's UICommandCommunicator object and calls
-    # a method based on the command
-    def UICommandParser(ui_comm)
-      case ui_comm.command
-      when "branch"
-        # TODO: Branch deletion
-        @repos.make_branch(ui_comm.rev)
-      when "checkout" # Might change later because of slight differences of interpretation between UI and Workspace
-        if ui_comm.files.empty?
-          checkout(ui_comm.rev)
-        else
-          checkout(ui.comm.files) # Array of files
-        end
-      when "clean"
-        clean
-      when "commit"
-        # TODO: How will the commit message be paired with snapshot?  Currently stored in UIComm.commit_message
-        commit
-      when "status"
-        status
-      else
-        # TODO: Better error handling
-        print "Error: Invalid command supplied to workspace!"
-        return nil
-      end
+      pexit 'Copernicium folder (.cn) not found.', 1 if @root.nil?
     end
 
     def indexOf(x)
@@ -103,13 +74,15 @@ n     @root = getroot
     end
 
     # if include all the elements in list_files
-    def include?(list_files)
-      list_files.each do |x|
-        if indexOf(x) == -1
-          return false
-        end
+    def include?(files)
+      files.each do |x|
+        return false if indexOf(x) == -1
       end
       true
+    end
+
+    def ws_files
+      Dir[ File.join(@root, '**', '*') ].reject { |p| File.directory? p }
     end
 
     # if list_files is nil, then rollback the list of files from the branch
@@ -120,9 +93,9 @@ n     @root = getroot
         @files.each{|x| File.delete(x.path)}
         @files = []
         # restore it with checkout() if we have had a branch name
-        if @branch_name != ''
+        if @branch != ''
           # or it is the initial state, no commit and no checkout
-          comm = UIComm.new(command: 'checkout', rev: @branch_name)
+          comm = UIComm.new(command: 'checkout', rev: @branch)
           return checkout(comm)
         else
           return 0
@@ -144,7 +117,7 @@ n     @root = getroot
 
         # if we have had a branch, first we get the latest snapshot of it
         # and then checkout with the restored version of them
-        if @branch_name != ''
+        if @branch != ''
           return checkout(list_files)
         else
           return 0
@@ -154,20 +127,8 @@ n     @root = getroot
 
     # commit a list of files or the entire workspace to make a new snapshot
     def commit(comm)
-      # for this commented version, we first get all files in the workspace and then add files from comm obj
-      # it's not used at this time
-      # Linfeng Song
-      #list_files = @files.each{|x| x.path}
-      #if comm.files != nil
-      #  comm.files.each do |x|
-      #    if indexOf(x) == -1
-      #      list_files.push(x)
-      #    end
-      #  end
-      #end
-      list_files = Dir[ File.join(@root, '**', '*') ].reject { |p| File.directory? p }
-      if list_files != nil
-        list_files.each do |x|
+      unless ws_files.empty?
+        ws_files.each do |x|
           if indexOf(x) == -1
             content = readFile(x)
             hash = @revlog.add_file(x, content)
@@ -176,82 +137,72 @@ n     @root = getroot
           else
             content = readFile(x)
             hash = @revlog.add_file(x, content)
-            if @files[indexOf(x)].history_hash_ids[-1] != hash
-              @files[indexOf(x)].history_hash_ids << hash
+            if @files[indexOf(x)].history[-1] != hash
+              @files[indexOf(x)].history << hash
             end
           end
         end
       end
-      return @repos.make_snapshot(@files)
+      @repos.make_snapshot(@files) # return snapshot id
     end
 
     def checkout(comm)
+      # if argu is an Array Object, we assume it is a list of files to be added
+      # to the workspace
       argu = comm.files
-      # if argu is an Array Object, we assume it is a list of files to be added to the workspace
       if argu != nil
-        # we add the list of files to @files regardless whether it has been in it.
-        # that means there may be multiple versions of a file.
+        # we add the list of files to @files regardless whether it has been in
+        # it. that means there may be multiple versions of a file.
         list_files = argu
-        snapshot_id = @repos.history()[-1]
+        snapshot_id = @repos.history.last
         returned_snapshot = @repos.get_snapshot(snapshot_id)
         list_files_last_commit = returned_snapshot.files
         list_files_last_commit.each do |x|
           if list_files.include? x.path
-            path = x.path
-            content = @revlog.get_file(x.history_hash_ids[-1])
+            content = @revlog.get_file(x.history.last)
             idx = indexOf(x.path)
             if  idx == -1
-              @files.push(x)
+              @files << x
             else
               @files[idx] = x
             end
-            writeFile(path,content)
+            writeFile(x.path, content)
           end
         end
-        # if argu is not an Array, we assume it is a String, representing the branch name
-        # we first get the last snapshot id of the branch, and then get the commit object
-        # and finally push all files of it to the workspace
-      else
-        argu = comm.rev #branch name
-        snapshot_id = @repos.history()[-1]
-        snapshot_obj = @repos.get_snapshot(snapshot_id).get_files()
-        snapshot_obj.each do |fff|
+      else # if argu is not an Array, we assume it is a String, representing the
+        # branch name # we first get the last snapshot id of the branch, and
+        # then get the commit object # and finally push all files of it to the
+        # workspace
+        @repos.get_snapshot(@repos.history.last).files.each do |fff|
           idx = indexOf(fff.path)
           if  idx == -1
-            @files.push(fff)
+            @files << fff
           else
             @files[idx] = fff
           end
-          path = fff.path
-          content = @revlog.get_file(fff.history_hash_ids[-1])
-          writeFile(path,content)
+          content = @revlog.get_file(fff.last)
+          writeFile(fff.path, content)
         end
       end
     end
 
     def status(comm)
-      adds = []
-      deletes = []
-      edits = []
-      wsFiles = Dir[ File.join(@root, '**', '*') ].reject { |p| File.directory? p }
-      wsFiles.each do |f|
+      added = edits = remov = []
+      ws_files.each do |f|
         idx = indexOf(f)
-        if idx != -1
-          x1 = @revlog.get_file(@files[idx].history_hash_ids[-1])
-          x2 = readFile(f)
-          if x1 != x2
-            edits.push(f)
-          end
-        else
-          adds.push(f)
+        if idx == -1 # new file
+          added << f
+        else # changed file?
+          x2 = readFile(f) # get the current version
+          x1 = @revlog.get_file(@files[idx].history.last)
+          edits << f if x1 != x2
         end
       end
-      @files.each do |f|
-        if ! (wsFiles.include? f.path)
-          deletes.push(f.path)
-        end
-      end
-      return [adds, edits, deletes]
+
+      # any deleted files from the last commit?
+      @files.each { |f| remov << f.path unless (ws_files.include? f.path) }
+
+      [added, edits, remov]
     end
   end
 end
