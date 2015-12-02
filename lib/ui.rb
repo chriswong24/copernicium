@@ -85,9 +85,10 @@ module Copernicium
     def status(args)
       ui = UIComm.new(command: 'status', opts: args)
       st = Workspace.new.status(ui)
-      puts "added:".grn + st[1].join(', ')   unless st[1].empty?
-      puts "edited:".yel + st[2].join(', ')   unless st[2].empty?
-      puts "removed:".red + st[3].join(', ') unless st[3].empty?
+      puts st
+      puts "added:".grn + st[0].join(', ')   unless st[0].empty?
+      puts "edited:".yel + st[1].join(', ')   unless st[1].empty?
+      puts "removed:".red + st[2].join(', ') unless st[2].empty?
       ui
     end
 
