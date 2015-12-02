@@ -2,7 +2,7 @@
 # integrates all modules, central module
 
 
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 
 module Copernicium
   # Print and exit with a specific code
