@@ -83,8 +83,12 @@ module Copernicium
     end
 
     def status(args)
-      UIComm.new(command: 'status', opts: args)
-      # todo - make call to workspace, get and show status
+      ui = UIComm.new(command: 'status', opts: args)
+      st = Workspace.new.status(ui)
+      puts "added:".grn + st[1].join(', ')   unless st[1].empty?
+      puts "edited:".yel + st[2].join(', ')   unless st[2].empty?
+      puts "removed:".red + st[3].join(', ') unless st[3].empty?
+      ui
     end
 
     def branch(args)
@@ -152,6 +156,7 @@ module Copernicium
       # specified the -m flag, but didnt give anything
       message = get 'commit message' if message.nil?
 
+      # perform the commit, with workspace
       ui = UIComm.new(command: 'commit', files: files, commit_message: message)
       Workspace.new.commit(ui)
       ui
@@ -159,8 +164,8 @@ module Copernicium
 
     def merge(args)
       if args.empty?
-        puts 'I need a commit to merge.'
-        rev = get 'single commit to merge'
+        puts 'I need a commit or branch to merge.'
+        rev = get 'single commit or branch to merge'
       else # use given
         rev = args.first
       end
