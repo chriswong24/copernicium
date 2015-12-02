@@ -4,7 +4,7 @@ require 'rdoc/task'
 
 
 # default - run travis tests
-task :default do system "rake test[travis]" end
+task :default do system "yes | rake test[travis]" end
 
 
 # setup development environment with bundler
