@@ -31,7 +31,7 @@ end
 
 
 # default - run travis tests
-task :default => :test
+task :default => :travis
 
 
 # show repo info
