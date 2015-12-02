@@ -3,10 +3,6 @@ require 'rake/testtask'
 require 'rdoc/task'
 
 
-# default - run travis tests
-task :default do system "yes | rake test[travis]" end
-
-
 # setup development environment with bundler
 task :setup do
   system 'gem install bundler'
@@ -16,19 +12,26 @@ end
 
 # run all/module tests
 task :test, [:module] do |r, m|
-  if m[:module].nil?
+  if m[:module].nil? # run all tests, including pushpull's
     Rake::TestTask.new {|t| t.pattern = "test/tc_*.rb"}
-
-  elsif m[:module] == 'travis'
-    # dont run pushpull tests on travis, since they need auth
-    Rake::TestTask.new {|t| t.test_files = FileList['test/tc_repos.rb',
-    'test/tc_revlog.rb', 'test/tc_ui.rb', 'test/tc_workspace.rb']}
-    #'test/tc_integration.rb']}
-
-  else # run all tests, including pushpull's
+  else # just run a specific modules tests
     Rake::TestTask.new {|t| t.pattern = "test/tc_#{m[:module]}.rb"}
   end
 end
+
+
+# travis testing - dont do push pull since ssh needed
+task :travis do
+  Rake::TestTask.new  do |t|
+    t.test_files = FileList['test/tc_repos.rb', 'test/tc_revlog.rb',
+                            'test/tc_ui.rb', 'test/tc_workspace.rb']
+  end
+  # add in later: 'test/tc_integration.rb']}
+end
+
+
+# default - run travis tests
+task :default => :test
 
 
 # show repo info
