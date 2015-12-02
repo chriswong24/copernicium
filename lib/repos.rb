@@ -4,31 +4,24 @@
 #   in - array of file objects. file object = array of all versions:
 #   {id, content}
 #   out - hash id of snapshot
-
 # restore_snapshot: Set current file versions to specified snapshot
 #   in - id of target snapshot
 #   out - Comm object with status
-
 # history: Returns ids for all snapshots
 #   in - branch name
 #   out - Array of snapshot ids
-
 # delete_snapshot: delete specified a snapshot
 #   in - target snapshot
 #   out -  Comm object with status
-
 # diff_snapshots: Returns diff between two different snapshots
 #   in - two ids of snapshots to perform diff on
 #   out - list of filenames and versions
-
 # make_branch: make a new branch
 #   in - branch name
 #   out - hash id of new branch
-
 # delete_branch: delete a branch
 #   in - branch name
 #   out - exit status code
-
 # Also do a get_snapshot
 
 module Copernicium
@@ -53,7 +46,7 @@ module Copernicium
 
       # check if files exist, read them
       if File.exist?(@spath) && File.exist?(@bpath)
-        @snaps = Marshal.read readFile(@spath)
+        @snaps = Marshal.load readFile(@spath)
         @branch = readFile(@bpath)
       else # use defaults
         @snaps = {branch => []}
@@ -96,8 +89,8 @@ module Copernicium
     end
 
     # Find snapshot, return snapshot (or just contents) given id
-    def get_snapshot(target_id)
-      found_index = @snaps[@branch].index { |x| x.id == target_id }
+    def get_snapshot(id)
+      found_index = @snaps[@branch].index { |x| x.id == id }
       if found_index
         @snaps[@branch][found_index]
       else
@@ -109,7 +102,7 @@ module Copernicium
     # change files in workspace back to specified commit
     # get clear the current workspace
     # revert back to given commit
-    def restore_snapshot(target_id)
+    def restore_snapshot(id)
       # todo
     end
 
@@ -125,8 +118,8 @@ module Copernicium
     end
 
     # Find snapshot, delete from snaps/memory
-    def delete_snapshot(target_id)
-      @snaps[@branch].delete_if { |x| x.id == target_id }
+    def delete_snapshot(id)
+      @snaps[@branch].delete_if { |x| x.id == id }
       update_snap
     end
 
