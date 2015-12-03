@@ -167,15 +167,21 @@ module Copernicium
       ui
     end
 
+    # TODO - parse whether given arg is a branch name, else assume snap id
     def merge(args)
       if args.empty?
         puts 'I need a commit or branch to merge.'
         rev = get 'single commit or branch to merge'
       else # use given
         rev = args.first
+        # get all branchs, see if arg is in it.
+        # if so, look up snapshot of <branch> head
+        if rev
+
       end
 
       # todo - call repos merge command
+      # todo show conflicting files
 
       UIComm.new(command: 'merge', rev: rev)
     end

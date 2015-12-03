@@ -4,6 +4,12 @@
 #   in - array of file objects. file object = array of all versions:
 #   {id, content}
 #   out - hash id of snapshot
+#   merge_snapshot: merge in a branch’s history into the current branch. if
+    #in - branch name
+    #out - [{path => content}, [conflicting paths]]
+#   get_snapshot: Return a specific snapshot
+    #in - snapshot id
+    #out - snapshot object
 # restore_snapshot: Set current file versions to specified snapshot
 #   in - id of target snapshot
 #   out - Comm object with status
@@ -40,6 +46,7 @@ module Copernicium
     # check the current branch (.cn/branch)
     def initialize(root, branch = 'master')
       @root = root
+      @revlog = RevLog.new @root
       @copn = File.join(@root, '.cn')
       @bpath = File.join(@copn, 'branch')
       @spath = File.join(@copn, 'history')
@@ -88,6 +95,18 @@ module Copernicium
       snap.id
     end
 
+
+    # Merge the target snapshot into HEAD snapshot of the current branch
+    # returns [{path => content}, [conflicting paths]]
+    def merge_snapshot(id)
+      # todo
+      # perform union on snapshots
+      # run diffy on conflict, keep track of conflicting
+      # if no conflicts, add new snapshot to head of current branch
+      # if there are conflicts, no snapshot
+    end
+
+    # TODO - search all branches instead of just the current one
     # Find snapshot, return snapshot (or just contents) given id
     def get_snapshot(id)
       found_index = @snaps[@branch].index { |x| x.id == id }
@@ -96,14 +115,6 @@ module Copernicium
       else
         raise "Snapshot not found."
       end
-    end
-
-    # Return comm object with status
-    # change files in workspace back to specified commit
-    # get clear the current workspace
-    # revert back to given commit
-    def restore_snapshot(id)
-      # todo
     end
 
     # Return array of snapshot IDs
@@ -144,11 +155,6 @@ module Copernicium
       @snaps[branch] = @snaps[@branch]
       @branch = branch
       hasher 1
-    end
-
-    # Merge the target branch into current
-    def merge_branch(branch)
-      # todo
     end
 
     # Exit status code

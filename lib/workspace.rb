@@ -44,6 +44,11 @@ module Copernicium
       @path = path
     end
 
+    # returns most recent file id in the snapshot it was saved in
+    def last
+      @history.last
+    end
+
     def ==(rhs)
       if rhs.is_a? String
         @path == rhs
@@ -186,6 +191,14 @@ module Copernicium
         content = @revlog.get_file(file.history.last)
         writeFile(file.path, content)
       end
+    end
+
+    # wrapper for Repos merge_snapshot, update workspace with result
+    def merge(id)
+      @repos.merge_snapshot(id)
+      # returns [{path => content}, [conflicting paths]]
+      # todo update workspace with result
+      # todo return any conflicting files
     end
 
     def status(comm)
