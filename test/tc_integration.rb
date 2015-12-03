@@ -21,6 +21,7 @@ class CoperniciumIntegrationTests < Minitest::Test
       @ws.writeFile("workspace/2.txt", "2")
       comm = runner("commit -m Test Commit")
       @ws.commit(comm)
+      @ws.repos.make_branch("dev")
     end
 
     it "can commit changes" do
@@ -67,14 +68,14 @@ class CoperniciumIntegrationTests < Minitest::Test
       comm = runner("branch test")
       @ws.repos.make_branch("test")
       @ws.repos.manifest["test"].wont_be_nil
-      @ws.repos.manifest.size.must_equal 2
+      @ws.repos.manifest.size.must_equal 3
       @ws.repos.manifest["master"].wont_be_nil
 
       comm = runner("branch -d test")
       @ws.repos.delete_branch("test")
       @ws.repos.manifest["test"].must_be_nil
       @ws.repos.manifest["master"].wont_be_nil
-      @ws.repos.manifest.size.must_equal 1
+      @ws.repos.manifest.size.must_equal 2
     end
 
     it "can check the status of the repository" do
