@@ -47,7 +47,7 @@ module Copernicium
         init args
       when 'status'
         status args
-      #when 'log' || 'history'
+        #when 'log' || 'history'
         # show list of commits
       when 'branch'
         branch args
@@ -176,31 +176,27 @@ module Copernicium
         rev = args.first
         # get all branchs, see if arg is in it.
         # if so, look up snapshot of <branch> head
-        if rev
-
+        # todo - call repos merge command
+        # todo show conflicting files
+        UIComm.new(command: 'merge', rev: rev)
       end
+    end
 
-      # todo - call repos merge command
-      # todo show conflicting files
-
-      UIComm.new(command: 'merge', rev: rev)
+    # Communication object that will pass commands to backend modules
+    # rev - revision indicator (commit #, branch name, HEAD, etc.)
+    # repo - URL/path to a remote repository
+    class UIComm
+      attr_reader :command, :files, :rev, :cmt_msg, :repo, :opts
+      def initialize(command: nil, files: nil, rev: nil,
+                     cmt_msg: nil, repo: nil, opts: nil)
+        @cmt_msg = cmt_msg
+        @command = command
+        @files = files
+        @opts = opts
+        @repo = repo
+        @rev = rev
+      end
     end
   end
 
-  # Communication object that will pass commands to backend modules
-  # rev - revision indicator (commit #, branch name, HEAD, etc.)
-  # repo - URL/path to a remote repository
-  class UIComm
-    attr_reader :command, :files, :rev, :cmt_msg, :repo, :opts
-    def initialize(command: nil, files: nil, rev: nil,
-                   cmt_msg: nil, repo: nil, opts: nil)
-      @cmt_msg = cmt_msg
-      @command = command
-      @files = files
-      @opts = opts
-      @repo = repo
-      @rev = rev
-    end
-  end
-end
 
