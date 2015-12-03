@@ -8,6 +8,7 @@ module Copernicium
     f.close
   end
 
+  # helper methods for file IO
   def readFile(path)
     f = open(path, 'r')
     txt = f.read
@@ -105,7 +106,7 @@ module Copernicium
       if comm.files.empty?
         clear # reset, checkout last commit
         checkout
-      else # list_files are not nil
+      else # files are not nil
 
         # exit if the specified file is not in the workspace
         return -1 if (self.include? comm.files) == false

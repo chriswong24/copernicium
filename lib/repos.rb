@@ -94,7 +94,7 @@ module Copernicium
       if found_index
         @snaps[@branch][found_index]
       else
-        Snapshot.new
+        raise "Snapshot not found."
       end
     end
 
