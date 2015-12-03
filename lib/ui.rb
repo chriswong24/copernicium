@@ -181,22 +181,22 @@ module Copernicium
         UIComm.new(command: 'merge', rev: rev)
       end
     end
+  end # Driver
 
-    # Communication object that will pass commands to backend modules
-    # rev - revision indicator (commit #, branch name, HEAD, etc.)
-    # repo - URL/path to a remote repository
-    class UIComm
-      attr_reader :command, :files, :rev, :cmt_msg, :repo, :opts
-      def initialize(command: nil, files: nil, rev: nil,
-                     cmt_msg: nil, repo: nil, opts: nil)
-        @cmt_msg = cmt_msg
-        @command = command
-        @files = files
-        @opts = opts
-        @repo = repo
-        @rev = rev
-      end
+  # Communication object that will pass commands to backend modules
+  # rev - revision indicator (commit #, branch name, HEAD, etc.)
+  # repo - URL/path to a remote repository
+  class UIComm
+    attr_reader :command, :files, :rev, :cmt_msg, :repo, :opts
+    def initialize(command: nil, files: nil, rev: nil,
+                   cmt_msg: nil, repo: nil, opts: nil)
+      @cmt_msg = cmt_msg
+      @command = command
+      @files = files
+      @opts = opts
+      @repo = repo
+      @rev = rev
     end
   end
-
+end
 
