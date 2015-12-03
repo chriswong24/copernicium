@@ -123,6 +123,8 @@ module Copernicium
       update_snap
     end
 
+    #diff_snapshots needs to catch both files in snap1 that aren’t and snap2 and
+    #find individual differences in between the files by calling RevLogs diffy.
     # Return list of filenames and versions
     def diff_snapshots(id1, id2)
       diffed = []
