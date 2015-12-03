@@ -35,6 +35,12 @@ class TestCoperniciumRevLog < Minitest::Test
       @db.merge(hash2, hash1).must_equal "testfilecontent\ntestfilecontent2\n"
     end
 
+    it "can merge two equal files" do
+      hash1 = @db.add_file("testfilename", "testfilecontent\n")
+      hash2 = @db.add_file("testfilename", "testfilecontent\n")
+      @db.merge(hash2, hash1).must_equal "testfilecontent\n"
+    end
+
     it "can view the history of a file" do
       hash1 = @db.add_file("testfilename", "testfilecontent\ntestfilecontent2\n")
       hash2 = @db.add_file("testfilename", "testfilecontent\n")
