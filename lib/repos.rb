@@ -138,6 +138,8 @@ module Copernicium
     #find individual differences in between the files by calling RevLogs diffy.
     # Return list of filenames and versions
     def diff_snapshots(id1, id2)
+      disjoint = []
+      intersect = []
       diffed = []
 
       # Put in error catching
@@ -145,7 +147,10 @@ module Copernicium
       files2 = get_snapshot(id2).files
 
       # Find difference between snapshot1 and snapshot2
-      files1.each { |x| diffed << x unless !files2.include?(x) }
+      #files1.each { |x| diffed << x unless !files2.include?(x) }
+      # Make sure these operations work for this class
+      disjoint = (files1-files2) + (files2-files1)
+      intersect = files1&files2
 
       diffed
     end
