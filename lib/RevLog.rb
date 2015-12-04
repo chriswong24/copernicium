@@ -25,19 +25,19 @@
 # out - success and merged file name/content, or failure and conflict
 
 module Copernicium
-  class RevLog
-    def initialize(root)
-      @root = root
-      @cop_path = File.join(root, '.cn')
-      @log_path = File.join(@cop_path, 'logmap.yaml')
-      @hash_path = File.join(@cop_path, 'hashmap.yaml')
-      if File.exist?(@log_path) && File.exist?(@hash_path)
-        @logmap = hash_array.merge(YAML.load_file(@log_path))
-        @hashmap = hash_array.merge(YAML.load_file(@hash_path))
+  module RevLog
+    def setup(root = Dir.pwd)
+      @@root = root
+      @@cop_path = File.join(@@root, '.cn')
+      @@log_path = File.join(@@cop_path, 'logmap.yaml')
+      @@hash_path = File.join(@@cop_path, 'hashmap.yaml')
+      Dir.mkdir(@@cop_path) unless Dir.exist?(@@cop_path)
+      if File.exist?(@@log_path) && File.exist?(@@hash_path)
+        @@logmap = hash_array.merge(YAML.load_file(@@log_path))
+        @@hashmap = hash_array.merge(YAML.load_file(@@hash_path))
       else
-        @logmap = hash_array
-        @hashmap = hash_array
-        Dir.mkdir(@cop_path) unless File.exist?(@cop_path)
+        @@logmap = hash_array
+        @@hashmap = hash_array
       end
     end
 
@@ -47,10 +47,10 @@ module Copernicium
 
     def add_file(file_name, content)
       hash = hash_file(file_name, content)
-      File.open(File.join(@cop_path, hash), 'w') { |f| f.write(content) }
-      @logmap[file_name] = @logmap[file_name] << {:time => Time.now,
+      File.open(File.join(@@cop_path, hash), 'w') { |f| f.write(content) }
+      @@logmap[file_name] = @@logmap[file_name] << {:time => Time.now,
                                                   :hash => hash}
-      @hashmap[hash] = @hashmap[hash] << {:time => Time.now,
+      @@hashmap[hash] = @@hashmap[hash] << {:time => Time.now,
                                           :filename => file_name}
       update_log_file
       return hash
@@ -59,11 +59,11 @@ module Copernicium
     ## return 1 if succeed, otherwise 0
     def delete_file(file_id)
       begin
-        file_name = @hashmap[file_id][0][:filename]
-        @hashmap[file_id].delete_if { |e| e[:filename] == file_name }
-        @logmap[file_name].delete_if { |e| e[:hash] == file_id }
+        file_name = @@hashmap[file_id][0][:filename]
+        @@hashmap[file_id].delete_if { |e| e[:filename] == file_name }
+        @@logmap[file_name].delete_if { |e| e[:hash] == file_id }
         update_log_file
-        File.delete(File.join(@cop_path, file_id))
+        File.delete(File.join(@@cop_path, file_id))
         return 1
       rescue Exception
         return 0
@@ -72,7 +72,7 @@ module Copernicium
 
 
     def get_file(id)
-      file_path = File.join(@cop_path, id)
+      file_path = File.join(@@cop_path, id)
       if File.exist? file_path
         File.open(file_path, 'r') { |f| return f.read }
       else
@@ -98,14 +98,14 @@ module Copernicium
 
     def history(file_name)
       hashs = []
-      @logmap[file_name].each { |m| hashs << m[:hash] }
+      @@logmap[file_name].each { |m| hashs << m[:hash] }
       hashs
     end
 
     def update_log_file
       # writeFile defined in workspace.rb
-      writeFile(File.join(@cop_path, 'logmap.yaml'), @logmap.to_yaml)
-      writeFile(File.join(@cop_path, 'hashmap.yaml'), @hashmap.to_yaml)
+      writeFile(File.join(@@cop_path, 'logmap.yaml'), @@logmap.to_yaml)
+      writeFile(File.join(@@cop_path, 'hashmap.yaml'), @@hashmap.to_yaml)
     end
 
     # def alterFile(fileObject, fileReferenceString, versionReferenceString)
