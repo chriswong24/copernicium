@@ -102,10 +102,10 @@ module Copernicium
       diff_ret = []
       curr_snap = @snaps[@branch][-1]
       # todo - Check to make sure id is from a different branch?
-      
+
       # run diff to get conflicts
       diff_ret = diff_snapshots(curr_snap.id, id)
-      
+
       # if there are conflicts, no snapshot
       # Double check this equality
       if diff_ret[1] != []
@@ -123,7 +123,7 @@ module Copernicium
     def get_snapshot(id)
       found_index = nil
       found_branch = nil
-      branches.each do |x| 
+      branches.each do |x|
         found_index = @snaps[x].index { |y| y.id == id }
         found_branch = x if found_index
       end
@@ -178,7 +178,7 @@ module Copernicium
         # If found, check if same
         if f2_index
           file_id2 = files2[f2_index].last
-          
+
           if( revlog.get_file(file_id1) == revlog.get_file(file_id2) )
             #diffed[x.path] = readFile(x.path)
             diffed[x.path] = revlog.get_file(file_id1)
@@ -191,12 +191,12 @@ module Copernicium
           diffed[x.path] = revlog.get_file(file_id1)
         end
       end
-      
+
       new_files.each do |x|
         file_id1 = x.last
         diffed[x.path] = revlog.get_file(file_id1)
       end
-      
+
       [diffed, conf_paths]
     end
 
