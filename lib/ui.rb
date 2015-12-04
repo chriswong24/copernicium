@@ -4,45 +4,27 @@
 VERSION = "0.0.2"
 
 module Copernicium
-  # Print and exit with a specific code
-  def pexit(msg, sig)
-    puts msg
-    exit sig
-  end
-
-  # find  the root .cn folder
-  def getroot
-    cwd = Dir.pwd
-    max = 0
-    def more_folders() Dir.pwd != '/' end
-    def root_found() Dir.exist? File.join(Dir.pwd, '.cn') end
-    while max < 10 && more_folders && !root_found
-      Dir.chdir(File.join(Dir.pwd, '..'))
-      max += 1
-    end
-
-    if root_found # return where cn was found
-      cnroot = Dir.pwd
-      Dir.chdir(cwd)
-      cnroot
-    else # directory not found
-      Dir.chdir(cwd)
-      nil
+  # Communication object that will pass commands to backend modules
+  # also used in unit test to make sure command is being parsed ok
+  # rev - revision indicator (commit #, branch name, HEAD, etc.)
+  # repo - URL/path to a remote repository
+  class UIComm
+    attr_reader :command, :files, :rev, :cmt_msg, :repo, :opts
+    def initialize(command: nil, files: nil, rev: nil,
+                   cmt_msg: nil, repo: nil, opts: nil)
+      @cmt_msg = cmt_msg
+      @command = command
+      @files = files
+      @opts = opts
+      @repo = repo
+      @rev = rev
     end
   end
 
-  # tells us whether we are in a cn project or not
-  def noroot?
-    getroot.nil?
-  end
-
+  # main driver for the command line user interface
   class Driver
-    # Get some info from the user when they dont specify it
-    def get(info)
-      puts "Note: #{info} not specified. Enter #{info} to continue."
-      gets.chomp # read a line from user, and return it
-    end
-
+    include Workspace
+    include Repos
     # Executes the required action for a given user command.
     #
     # Parameters:
@@ -61,14 +43,14 @@ module Copernicium
       # get first command
       cmd = args.shift
 
-      # if no arguments given show help information
-      pexit COMMAND_BANNER, 0 if (cmd == '-h' || cmd == 'help')
-
       # if -v flag givem show version
       pexit VERSION, 0 if cmd == '-v'
 
+      # if no arguments given show help information
+      pexit COMMAND_BANNER, 0 if (cmd == '-h' || cmd == 'help')
+
       # if not in a repo, warn them, tell how to create
-      puts REPO_WARNING.yel if noroot? && cmd != 'init'
+      puts REPO_WARNING.yel if (noroot? && cmd != 'init')
 
       # Handle standard commands
       case cmd
@@ -99,15 +81,25 @@ module Copernicium
       end
     end # run
 
+    # Print and exit with a specific code
+    def pexit(msg, sig)
+      puts msg
+      exit sig
+    end
+
+    # Get some info from the user when they dont specify it
+    def get(info)
+      puts "Note: #{info} not specified. Enter #{info} to continue."
+      gets.chomp # read a line from user, and return it
+    end
+
     # create a new copernicium repository
     def init(args)
+      Workspace.create args
       if args.nil?
-        Workspace.new
+        Workspace.create
       else # init into a folder
-        target = File.join Dir.pwd, args.join(' ')
-        Dir.mkdir target if !File.exists? target
-        Dir.chdir target
-        Workspace.new
+        Workspace.create args
       end
       puts "Created Copernicium repo in " + Dir.pwd.grn
       UIComm.new(command: 'init', opts: args)
@@ -116,17 +108,20 @@ module Copernicium
     # show the current repos status
     def status(args)
       ui = UIComm.new(command: 'status', opts: args)
-      st = Workspace.new.status(ui)
+      st = Workspace.status(ui)
       st[0].each { |f| puts "Added:\t".grn + f }
       st[1].each { |f| puts "Edited:\t".yel + f }
       st[2].each { |f| puts "Removed:\t".red + f }
       ui
     end
 
+    # check whether a specific branch exists
+    def isbranch?(branch)
+    end
+
     def branch(args)
-      repo = Workspace.new.repo
       if args.empty?
-        puts "Branches: ".grn + repo.branches.join(' ')
+        puts "Branches: ".grn + branches.join(' ')
       elsif args.first == '-c'
       elsif args.first == '-r'
       else # if branch does not exist, create it, switch to it
@@ -158,13 +153,13 @@ module Copernicium
 
       # call workspace checkout the given / branch
       ui = UIComm.new(command: 'checkout', rev: rev, files: files)
-      Workspace.new.checkout(ui)
+      Workspace.checkout(ui)
       ui
     end
 
     def clean(args = [])
       ui = UIComm.new(command: 'clean', files: args)
-      Workspace.new.clean(ui)
+      Workspace.clean(ui)
       ui
     end
 
@@ -196,14 +191,13 @@ module Copernicium
 
       # perform the commit, with workspace
       ui = UIComm.new(command: 'commit', files: files, cmt_msg: message)
-      Workspace.new.commit(ui)
+      Workspace.commit(ui)
       ui
     end
 
     def history(args)
     end
 
-    # TODO - parse whether given arg is a branch name, else assume snap id
     def merge(args)
       if args.empty?
         puts 'I need a commit or branch to merge.'
@@ -212,29 +206,12 @@ module Copernicium
         rev = args.first
         # get all branchs, see if arg is in it.
         # if so, look up snapshot of <branch> head
+        # TODO - parse whether given arg is a branch name, else assume snap id
         # todo - call repos merge command
         # todo show conflicting files
         UIComm.new(command: 'merge', rev: rev)
       end
     end
   end # Driver
-
-
-  # Communication object that will pass commands to backend modules
-  # also used in unit test to make sure command is being parsed ok
-  # rev - revision indicator (commit #, branch name, HEAD, etc.)
-  # repo - URL/path to a remote repository
-  class UIComm
-    attr_reader :command, :files, :rev, :cmt_msg, :repo, :opts
-    def initialize(command: nil, files: nil, rev: nil,
-                   cmt_msg: nil, repo: nil, opts: nil)
-      @cmt_msg = cmt_msg
-      @command = command
-      @files = files
-      @opts = opts
-      @repo = repo
-      @rev = rev
-    end
-  end
 end
 

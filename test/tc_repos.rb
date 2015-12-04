@@ -10,7 +10,6 @@ include Copernicium::Repos
 class TestCnReposModule < Minitest::Test
   describe 'ReposModule' do
     before 'mixin repo module' do
-      Copernicium::RevLog.setup
       Copernicium::Repos.setup
     end
 

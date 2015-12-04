@@ -4,12 +4,12 @@
 #   in - array of file objects. file object = array of all versions:
 #   {id, content}
 #   out - hash id of snapshot
-#   merge_snapshot: merge in a branch’s history into the current branch. if
-#in - branch name
-#out - [{path => content}, [conflicting paths]]
-#   get_snapshot: Return a specific snapshot
-#in - snapshot id
-#out - snapshot object
+# merge_snapshot: merge in a branch’s history into the current branch. if
+#   in - branch name
+#   out - [{path => content}, [conflicting paths]]
+# get_snapshot: Return a specific snapshot
+#   in - snapshot id
+#   out - snapshot object
 # restore_snapshot: Set current file versions to specified snapshot
 #   in - id of target snapshot
 #   out - Comm object with status
@@ -28,7 +28,6 @@
 # delete_branch: delete a branch
 #   in - branch name
 #   out - exit status code
-# Also do a get_snapshot
 
 module Copernicium
   class Snapshot
@@ -148,12 +147,14 @@ module Copernicium
       new_files = []
       conflicts = []
       diffed = {}
-
-      # todo - Put in error catching
       files1 = get_snapshot(id1).files
       files2 = get_snapshot(id2).files
       new_files = set_diff(files2, files1)
 
+      # adding each new file from the merged snapshot
+      new_files.each { |x| diffed[x.path] = get_file(x.last) }
+
+      # handle files that exist in both snapshots
       files1.each do |file|
         # find corresponding file object
         f2_index = files2.index{ |y| y == file }
@@ -178,9 +179,6 @@ module Copernicium
           diffed[file.path] = content1
         end
       end
-
-      # adding each new file from the merged snapshot
-      new_files.each { |x| diffed[x.path] = get_file(x.last) }
 
       # returns [{path => content}, [conflicting paths]]
       [diffed, conflicts]
