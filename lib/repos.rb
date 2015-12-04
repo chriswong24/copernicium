@@ -31,10 +31,6 @@
 # Also do a get_snapshot
 
 module Copernicium
-  def set_diff(ary1, ary2)
-    # Emulates ary1 - ary2 only using ==
-    ary1.select {|x| !ary2.any? { |y| x==y } }
-  end
   class Snapshot
     attr_accessor :id, :files
     # id is computed after creation
@@ -63,6 +59,11 @@ module Copernicium
         @snaps = {branch => []}
         @branch = branch
       end
+    end
+
+    # Select all elements of array1 that are not in array2
+    def set_diff(array1, array2)
+      array1.select { |x| !array2.any? { |y| x == y } }
     end
 
     # returns the hash if of an object
@@ -99,7 +100,7 @@ module Copernicium
       snap.id
     end
 
-    # todo - Check to make sure id is from a different branch?
+    # todo - Check to make sure id is from a different branch
     # Merge the target snapshot into HEAD snapshot of the current branch
     def merge_snapshot(id)
       # run diff to get conflicts
@@ -109,8 +110,7 @@ module Copernicium
 
       # if no conflicts, add new snapshot to head of current branch
       if conflicts.empty?
-        # todo - check if these are actually working union/intersections
-        make_snap( current.files + set_diff(get_snapshot(id).files, current.files) )
+        make_snap current.files + set_diff(get_snapshot(id).files, current.files)
       end
 
       # returns [{path => content}, [conflicting paths]]
@@ -192,7 +192,7 @@ module Copernicium
             conflicts << file.path
           end
         else # not found, use our version
-          diffed[file.path] = revlog.get_file(id1)
+          diffed[file.path] = content1
         end
       end
 
