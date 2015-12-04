@@ -22,9 +22,15 @@ module Copernicium
   end
 
   # main driver for the command line user interface
-  class Driver
-    include Workspace
-    include Repos
+  module Driver
+    include Repos # needed to get branch and history info
+    include Workspace # needed for most high level commands
+    def setup
+      Repos.setup
+      RevLog.setup
+      Workspace.setup
+    end
+
     # Executes the required action for a given user command.
     #
     # Parameters:
@@ -95,11 +101,10 @@ module Copernicium
 
     # create a new copernicium repository
     def init(args)
-      Workspace.setup
-      if args.nil?
+      if args.empty?
         Workspace.create_project
       else # init into a folder
-        Workspace.create_project
+        Workspace.create_project args.first
       end
       puts "Created Copernicium repo in " + Dir.pwd.grn
       UIComm.new(command: 'init', opts: args)
@@ -147,10 +152,10 @@ module Copernicium
 
         # Create and switch to a new branch with the given name
         create_branch newname
+
         # Delete the branch with the old name
         Repos.delete_branch oldname
         puts "Deleted branch '#{oldname}'".grn
-
         puts "Renamed branch '#{oldname}' to '#{newname}'".grn
       elsif branch == '-d' # Delete the specified branch
         # If branch name not specified, get it from the user
@@ -168,7 +173,7 @@ module Copernicium
       elsif isbranch? branch # switch branch
         Repos.update_branch  branch
       else # branch does not exist, create it, switch to it
-        create_branch branch
+        Repos.create_branch branch
       end
     end
 

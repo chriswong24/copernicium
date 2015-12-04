@@ -11,10 +11,13 @@
 require_relative 'test_helper'
 
 
+include Copernicium::Driver
+
+
 class TestUI < Minitest::Test
   describe "UIModule" do
-    before "checking ui performance, create repo and driver" do
-      @driver = Driver.new
+    before "checking ui performance create driver" do
+      Driver.setup
     end
 
     def ui_test_helper(comm, cmd, files=nil, rev=nil, msg=nil, repo=nil)
@@ -27,12 +30,12 @@ class TestUI < Minitest::Test
     end
 
     it "supports 'init' command" do
-      comm = @driver.run ["init"]
+      comm = Driver.run ["init"]
       ui_test_helper(comm, "init")
     end
 
     it "supports 'status' command" do
-      comm = @driver.run ["status"]
+      comm = Driver.run ["status"]
       ui_test_helper(comm, "status")
     end
 
@@ -40,10 +43,10 @@ class TestUI < Minitest::Test
     # a message from command line. Thus, the UICommandCommunicator will always
     # include a commit message.
     it "supports 'commit' command" do
-      comm = @driver.run %w{commit -m a commit message}
+      comm = Driver.run %w{commit -m a commit message}
       ui_test_helper(comm, "commit", nil, nil, "a commit message")
 
-      comm = @driver.run %w{commit -m a \strange commit $message}
+      comm = Driver.run %w{commit -m a \strange commit $message}
       ui_test_helper(comm, "commit", nil, nil, 'a \strange commit $message')
     end
 
@@ -54,28 +57,28 @@ class TestUI < Minitest::Test
     # cn checkout revision file.txt (checks out only the specified files
     # from revision)
     it "supports 'checkout' command" do
-      comm = @driver.run %w{checkout revID}
+      comm = Driver.run %w{checkout revID}
       ui_test_helper(comm, "checkout", [], "revID")
 
-      comm = @driver.run %w{checkout revID file.txt}
+      comm = Driver.run %w{checkout revID file.txt}
       ui_test_helper(comm, "checkout", ["file.txt"], "revID")
 
-      comm = @driver.run %w{checkout revID file.txt foo.c}
+      comm = Driver.run %w{checkout revID file.txt foo.c}
       ui_test_helper(comm, "checkout", ["file.txt", "foo.c"], "revID")
     end
 
     it "supports 'pull' command" do
-      comm = @driver.run ["pull"]
+      comm = Driver.run ["pull"]
       ui_test_helper(comm, "pull")
     end
 
     it "supports 'push' command" do
-      comm = @driver.run ["push"]
+      comm = Driver.run ["push"]
       ui_test_helper(comm, "push")
     end
 
     it "supports 'merge' command" do # Merge some_revision into current branch
-      comm = @driver.run %w{merge some_revision}
+      comm = Driver.run %w{merge some_revision}
       ui_test_helper(comm, "merge", nil, "some_revision")
     end
 
@@ -83,7 +86,7 @@ class TestUI < Minitest::Test
     it "supports 'clone' command" do
       # todo make cloning work haha
       #host = "ssh://user@some-host.com/some/repo/path"
-      #comm = @driver.run "clone " + host
+      #comm = Driver.run "clone " + host
       #ui_test_helper(comm, "clone", nil, nil, nil, host)
     end
   end

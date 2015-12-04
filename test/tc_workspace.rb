@@ -7,7 +7,7 @@ include Copernicium::Workspace
 class CoperniciumWorkspaceTest < Minitest::Test
   describe 'WorkspaceModule' do
     def runner(string)
-      Driver.new.run string.split
+      Driver.run string.split
     end
 
     before 'manipulating the workspace' do

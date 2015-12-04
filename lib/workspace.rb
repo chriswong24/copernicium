@@ -42,20 +42,22 @@ module Copernicium
 
   module Workspace
     include Repos # needed for keeping track of history
-    def setup(bname = 'master')
+    def Workspace.setup(bname = 'master')
       @@files = []
       @@cwd = Dir.pwd
-      @@root = (noroot?? @@cwd : getroot )
+      @@root = (noroot?? @@cwd : getroot)
+      @@copn = File.join(@@root, '.cn')
+      Dir.mkdir(@@copn) unless Dir.exist?(@@copn)
       @@cwd.sub!(@@root, '.')
       @@branch = bname
     end
 
     # create a new copernicium project
-    def create_project(location = Dir.pwd)
-      target = File.join Dir.pwd, args.join(' ')
-      Dir.mkdir target if !File.exists? target
-      Dir.chdir target
-      pexit 'Copernicium folder (.cn) not found.', 1 if @@root.nil?
+    def Workspace.create_project(location = Dir.pwd)
+      Dir.mkdir location if !File.exists? location
+      Dir.chdir location
+      errmsg = 'Copernicium folder (.cn) not found, could not create.'.red
+      pexit errmsg, 1 if noroot?
     end
 
     # find  the root .cn folder
@@ -85,7 +87,7 @@ module Copernicium
     end
 
     # workspace management
-    def indexOf(x)
+    def Workspace.indexOf(x)
       index = -1
       @@files.each_with_index do |e,i|
         if e.path == x
@@ -97,25 +99,25 @@ module Copernicium
     end
 
     # check if any snapshots exist, if not exit
-    def has_snapshots?
-      ! @@repo.history(@@branch).empty?
+    def Workspace.has_snapshots?
+      ! Repos.history(@@branch).empty?
     end
 
     # if include all the elements in list_files
-    def include?(files)
+    def Workspace.include?(files)
       files.each { |x| return false if indexOf(x) == -1 }
       true
     end
 
     # get all files currently in workspace, except folders and .cn/*
-    def ws_files
+    def Workspace.ws_files
       Dir[ File.join(@root, '**', '*') ].reject do |p|
         File.directory? p || p.include?(File.join(@root,'.cn')) == true
       end
     end
 
     # Clear the current workspace
-    def clear
+    def Workspace.clear
       @@files.each{ |x| File.delete(x.path) }
       @@files = []
     end
@@ -125,7 +127,7 @@ module Copernicium
     # or it is the initial state, no commit and no checkout
     # if list_files is nil, then rollback the list of files from the branch
     # or rollback to the entire branch head pointed
-    def clean(comm)
+    def Workspace.clean(comm)
       if comm.files.empty?
         clear # reset, checkout last commit
         checkout
@@ -148,7 +150,7 @@ module Copernicium
     end
 
     # commit a list of files or the entire workspace to make a new snapshot
-    def commit(comm)
+    def Workspace.commit(comm)
       unless ws_files.empty?
         ws_files.each do |x|
           if indexOf(x) == -1
@@ -165,10 +167,10 @@ module Copernicium
           end
         end
       end
-      @@repo.make_snapshot(@@files) # return snapshot id
+      Repos.make_snapshot(@@files) # return snapshot id
     end
 
-    def checkout(comm = UIComm.new(rev: @@branch))
+    def Workspace.checkout(comm = UIComm.new(rev: @@branch))
 =begin
       # just support branches for now
       # if argu is an Array Object, we assume it is a list of files to be added
@@ -177,7 +179,7 @@ module Copernicium
       # of a file.
       unless comm.files.nil?
         list_files = comm.files
-        returned_snapshot = @@repo.get_snapshot(@@repo.history.last)
+        returned_snapshot = Repos.get_snapshot(Repos.history.last)
         list_files_last_commit = returned_snapshot.files
         list_files_last_commit.each do |x|
           if list_files.include? x.path
@@ -207,7 +209,7 @@ module Copernicium
 
       # we first get the last snapshot id of the branch, and then get the commit
       # object and finally push all files of it to the # workspace
-      @@repo.get_snapshot(@@repo.history(@@branch).last).files.each do |file|
+      Repos.get_snapshot(Repos.history(@@branch).last).files.each do |file|
         idx = indexOf(file.path)
         if  idx == -1
           @@files << file
@@ -220,14 +222,14 @@ module Copernicium
     end
 
     # wrapper for Repos merge_snapshot, update workspace with result
-    def merge(id)
+    def Workspace.merge(id)
       Repos.merge_snapshot(id)
       # returns [{path => content}, [conflicting paths]]
       # todo update workspace with result
       # todo return any conflicting files
     end
 
-    def status(comm)
+    def Workspace.status(comm)
       added = []
       edits = []
       remov = []
