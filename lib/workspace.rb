@@ -151,14 +151,14 @@ module Copernicium
 
     # commit a list of files or the entire workspace to make a new snapshot
     def Workspace.commit(comm)
-      unless Workspace.ws_files.empty?
+      unless comm.files.nil? # commit everything
         Workspace.ws_files.each do |x|
           if indexOf(x) == -1
             content = readFile(x)
             hash = RevLog.add_file(x, content)
             fobj = FileObj.new(x, [hash,])
             @@files.push(fobj)
-          else
+          else # file exists
             content = readFile(x)
             hash = RevLog.add_file(x, content)
             if @@files[indexOf(x)].history[-1] != hash

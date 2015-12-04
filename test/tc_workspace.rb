@@ -13,8 +13,10 @@ class CoperniciumWorkspaceTest < Minitest::Test
       Dir.chdir('workspace')
       writeFile('1.txt', '1')
       writeFile('2.txt', '2')
-      commInit = UIComm.new()
-      ui = UIComm.new(command: 'commit', cmt_msg: message)
+      Workspace.create_project
+      commInit = UIComm.new(command: 'commit',
+                            files: ['1.txt', '2.txt'],
+                            cmt_msg: message)
       Workspace.commit(commInit)
     end
 
