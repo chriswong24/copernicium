@@ -124,7 +124,7 @@ module Copernicium
     # or rollback to the entire branch head pointed
     def Workspace.clean(comm)
       if comm.files.empty? # reset, checkout last commit
-        Worlspace.clear
+        Workspace.clear
         Workspace.checkout
       else # files are not nil
 
