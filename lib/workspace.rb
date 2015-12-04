@@ -93,7 +93,7 @@ module Copernicium
 
     # get all files currently in workspace
     def ws_files
-      Dir[ File.join(@root, '**', '*') ].reject { |p| File.directory? p }
+      Dir[ File.join(@root, '**', '*') ].reject { |p| File.directory? p || File.join(@root,'.cn').include? p == false }
     end
 
     # Clear the current workspace
@@ -178,6 +178,11 @@ module Copernicium
 =end
 
       clear # reset workspace
+
+      # Dec. 3th, 2015 by Linfeng, 
+      # for this command, the comm.rev should be a string representing the branch name
+      @branch = comm.rev
+      @repos.update(@branch)
 
       # we first get the last snapshot id of the branch, and then get the commit
       # object and finally push all files of it to the # workspace
