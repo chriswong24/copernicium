@@ -179,6 +179,11 @@ module Copernicium
 
       clear # reset workspace
 
+      # Dec. 3th, 2015 by Linfeng, 
+      # for this command, the comm.rev should be a string representing the branch name
+      @branch = comm.rev
+      @repos.update(@branch)
+
       # we first get the last snapshot id of the branch, and then get the commit
       # object and finally push all files of it to the # workspace
       @repo.get_snapshot(@repo.history.last).files.each do |file|
