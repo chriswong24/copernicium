@@ -31,6 +31,10 @@
 # Also do a get_snapshot
 
 module Copernicium
+  def set_diff(ary1, ary2)
+    # Emulates ary1 - ary2 only using ==
+    ary1.select {|x| !ary2.any? { |y| x==y } }
+  end
   class Snapshot
     attr_accessor :id, :files
     # id is computed after creation
@@ -106,7 +110,7 @@ module Copernicium
       # if no conflicts, add new snapshot to head of current branch
       if conflicts.empty?
         # todo - check if these are actually working union/intersections
-        make_snap( current.files + (get_snapshot(id).files - current.files) )
+        make_snap( current.files + set_diff(get_snapshot(id).files, current.files) )
       end
 
       # returns [{path => content}, [conflicting paths]]
@@ -164,7 +168,7 @@ module Copernicium
       # Make sure these operations work for this class
       #found_index = @snaps[@branch].index { |x| x.id == id }
       #files1.each{ |x| to_diff << [x, files2.find() }
-      new_files = files2 - files1
+      new_files = set_diff(files2, files1)
 
       files1.each do |file|
         # find corresponding file object
