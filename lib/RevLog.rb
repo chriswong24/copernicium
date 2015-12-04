@@ -26,7 +26,7 @@
 
 module Copernicium
   module RevLog
-    def setup(root = Dir.pwd)
+    def RevLog.setup(root = Dir.pwd)
       @@root = root
       @@cop_path = File.join(@@root, '.cn')
       @@rev_path = File.join(@@cop_path, 'revlog')
@@ -47,7 +47,7 @@ module Copernicium
       Hash.new {[]}
     end
 
-    def add_file(file_name, content)
+    def RevLog.add_file(file_name, content)
       hash = hash_file(file_name, content)
       File.open(File.join(@@cop_path, hash), 'w') { |f| f.write(content) }
       @@logmap[file_name] = @@logmap[file_name] << {:time => Time.now,
@@ -59,7 +59,7 @@ module Copernicium
     end
 
     ## return 1 if succeed, otherwise 0
-    def delete_file(file_id)
+    def RevLog.delete_file(file_id)
       begin
         file_name = @@hashmap[file_id][0][:filename]
         @@hashmap[file_id].delete_if { |e| e[:filename] == file_name }
@@ -73,7 +73,7 @@ module Copernicium
     end
 
 
-    def get_file(id)
+    def RevLog.get_file(id)
       file_path = File.join(@@cop_path, id)
       if File.exist? file_path
         File.open(file_path, 'r') { |f| return f.read }
@@ -83,40 +83,40 @@ module Copernicium
     end
 
 
-    def diff_files(file_id1, file_id2)
+    def RevLog.diff_files(file_id1, file_id2)
       Diffy::Diff.new(get_file(file_id1), get_file(file_id2)).to_s()
     end
 
-    def hash_file(file_name, content)
+    def RevLog.hash_file(file_name, content)
       Digest::SHA256.hexdigest(file_name + content.to_s)
     end
 
-    def merge(id1, id2)
+    def RevLog.merge(id1, id2)
       diff_a = Diffy::Diff.new(get_file(id1), get_file(id2)).each_chunk.to_a
       return get_file(id2) if diff_a.all? { |d| d[0]!='-'}
       # return get_file(id1) if diff_a.all? { |d| d[0]!='+'}
       diff_a
     end
 
-    def history(file_name)
+    def RevLog.history(file_name)
       hashs = []
       @@logmap[file_name].each { |m| hashs << m[:hash] }
       hashs
     end
 
-    def update_log_file
+    def RevLog.update_log_file
       # writeFile defined in workspace.rb
       writeFile(File.join(@@cop_path, 'logmap.yaml'), @@logmap.to_yaml)
       writeFile(File.join(@@cop_path, 'hashmap.yaml'), @@hashmap.to_yaml)
     end
 
-    # def alterFile(fileObject, fileReferenceString, versionReferenceString)
+    # def RevLog.alterFile(fileObject, fileReferenceString, versionReferenceString)
     # end
 
-    # def deleteFileVersion(fileReferenceString, versionReferenceString)
+    # def RevLog.deleteFileVersion(fileReferenceString, versionReferenceString)
     # end
 
-    # def viewFileHistory(fileReferenceString)
+    # def RevLog.viewFileHistory(fileReferenceString)
     # end
   end
 end

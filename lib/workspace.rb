@@ -40,8 +40,8 @@ module Copernicium
   end
 
 
-  extend Repos # needed for keeping track of history
   module Workspace
+    include Repos # needed for keeping track of history
     def setup(bname = 'master')
       @@files = []
       @@cwd = Dir.pwd
