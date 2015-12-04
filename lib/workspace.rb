@@ -40,9 +40,8 @@ module Copernicium
   end
 
 
+  extend Repos # needed for keeping track of history
   module Workspace
-    extend RevLog
-    extend Repos
     def setup(bname = 'master')
       @@files = []
       @@cwd = Dir.pwd

@@ -29,9 +29,11 @@ module Copernicium
     def setup(root = Dir.pwd)
       @@root = root
       @@cop_path = File.join(@@root, '.cn')
-      @@log_path = File.join(@@cop_path, 'logmap.yaml')
-      @@hash_path = File.join(@@cop_path, 'hashmap.yaml')
+      @@rev_path = File.join(@@cop_path, 'revlog')
+      @@log_path = File.join(@@rev_path, 'logmap.yaml')
+      @@hash_path = File.join(@@rev_path, 'hashmap.yaml')
       Dir.mkdir(@@cop_path) unless Dir.exist?(@@cop_path)
+      Dir.mkdir(@@rev_path) unless Dir.exist?(@@rev_path)
       if File.exist?(@@log_path) && File.exist?(@@hash_path)
         @@logmap = hash_array.merge(YAML.load_file(@@log_path))
         @@hashmap = hash_array.merge(YAML.load_file(@@hash_path))
