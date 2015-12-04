@@ -30,8 +30,8 @@ module Copernicium
       @@root = root
       @@cop_path = File.join(@@root, '.cn')
       @@rev_path = File.join(@@cop_path, 'revs')
-      @@log_path = File.join(@@rev_path, 'logmap.yaml')
-      @@hash_path = File.join(@@rev_path, 'hashmap.yaml')
+      @@log_path = File.join(@@cop_path, 'logmap.yaml')
+      @@hash_path = File.join(@@cop_path, 'hashmap.yaml')
       Dir.mkdir(@@cop_path) unless Dir.exist?(@@cop_path)
       Dir.mkdir(@@rev_path) unless Dir.exist?(@@rev_path)
       if File.exist?(@@log_path) && File.exist?(@@hash_path)
@@ -49,7 +49,7 @@ module Copernicium
 
     def RevLog.add_file(file_name, content)
       hash = hash_file(file_name, content)
-      File.open(File.join(@@cop_path, hash), 'w') { |f| f.write(content) }
+      File.open(File.join(@@rev_path, hash), 'w') { |f| f.write(content) }
       @@logmap[file_name] = @@logmap[file_name] << {:time => Time.now,
                                                     :hash => hash}
       @@hashmap[hash] = @@hashmap[hash] << {:time => Time.now,
@@ -65,7 +65,7 @@ module Copernicium
         @@hashmap[file_id].delete_if { |e| e[:filename] == file_name }
         @@logmap[file_name].delete_if { |e| e[:hash] == file_id }
         updatelog
-        File.delete(File.join(@@cop_path, file_id))
+        File.delete(File.join(@@rev_path, file_id))
         return 1
       rescue Exception
         return 0
@@ -74,7 +74,7 @@ module Copernicium
 
 
     def RevLog.get_file(id)
-      file_path = File.join(@@cop_path, id)
+      file_path = File.join(@@rev_path, id)
       if File.exist? file_path
         File.open(file_path, 'r') { |f| return f.read }
       else
@@ -105,8 +105,8 @@ module Copernicium
     end
 
     def RevLog.updatelog
-      File.open(File.join(@@rev_path, 'logmap.yaml'), 'w') { |f| f.write(@@logmap.to_yaml) }
-      File.open(File.join(@@rev_path, 'hashmap.yaml'), 'w') { |f| f.write(@@hashmap.to_yaml) }
+      File.open(@@log_path, 'w') { |f| f.write(@@logmap.to_yaml) }
+      File.open(@@hash_path, 'w') { |f| f.write(@@hashmap.to_yaml) }
     end
 
     # def RevLog.alterFile(fileObject, fileReferenceString, versionReferenceString)
