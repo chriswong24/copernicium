@@ -43,10 +43,11 @@ module Copernicium
   module Workspace
     include RevLog
     include Repos
+
     def setup(bname = 'master')
       @@files = []
-      @@root = getroot
-      @@root = @@cwd if @@root.nil?
+      @@cwd = Dir.pwd
+      @@root = (noroot?? @@cwd : getroot )
       @@cwd.sub!(@@root, '.')
       @@branch = bname
     end

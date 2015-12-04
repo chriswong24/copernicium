@@ -117,14 +117,20 @@ module Copernicium
 
     # check whether a specific branch exists
     def isbranch?(branch)
+      Repos.branches.include? branch
     end
 
     def branch(args)
-      if args.empty?
+      branch = args.first
+      if branch.nil? # show all branches
         puts "Branches: ".grn + branches.join(' ')
-      elsif args.first == '-c'
-      elsif args.first == '-r'
-      else # if branch does not exist, create it, switch to it
+      elsif branch == '-c' # try to create a new branch
+        # todo
+      elsif branch == '-r' # rename a branch
+        # todo - feature not yet implemented!
+      elsif isbranch? branch # switch branch
+        Repos.update_branch  brandch
+      else # branch does not exist, create it, switch to it
       end
     end
 

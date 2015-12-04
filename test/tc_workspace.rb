@@ -11,6 +11,7 @@ class CoperniciumWorkspaceTest < Minitest::Test
     end
 
     before 'manipulating the workspace' do
+      Workspace.setup
       FileUtils.rm_rf('workspace')
       Dir.mkdir('workspace')
       Dir.chdir('workspace')
