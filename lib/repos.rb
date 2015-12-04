@@ -40,7 +40,6 @@ module Copernicium
   end
 
   module Repos
-    attr_reader :snaps, :branch
     include RevLog # needs diffing and merging
     # check the current branch (.cn/branch)
     # read in file of snapshots (.cn/history)
@@ -70,6 +69,26 @@ module Copernicium
         @@branches = {branch => []}
         @@branch = branch
       end
+    end
+
+    # helper methods for file IO
+    def writeFile(path, content)
+      f = open(path, 'w')
+      f.write(content)
+      f.close
+    end
+
+    # helper methods for file IO
+    def readFile(path)
+      f = open(path, 'r')
+      txt = f.read
+      f.close
+      txt
+    end
+
+    # check if any snapshots exist, if not exit
+    def Repos.has_snapshots?
+      ! Repos.history(@@branch).empty?
     end
 
     def Repos.hash_array
@@ -134,8 +153,8 @@ module Copernicium
       snapids = []
       if branch.nil?
         @@branches[@@branch].each { |x| snapids << x.id }
-      else
-        @@branches[branch].each{ |x| snapids << x.id }
+      elsif
+        @@branches[branch].each { |x| snapids << x.id }
       end
       snapids
     end
@@ -196,6 +215,7 @@ module Copernicium
     end
 
     # BRANCHING
+    def current() @@branches end
 
     # Return hash ID of new branch
     def Repos.make_branch(branch)

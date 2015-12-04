@@ -113,7 +113,7 @@ module Copernicium
     # show the current repos status
     def status(args)
       ui = UIComm.new(command: 'status', opts: args)
-      st = Workspace.status(ui)
+      st = Workspace.status
       st[0].each { |f| puts "Added:\t".grn + f }
       st[1].each { |f| puts "Edited:\t".yel + f }
       st[2].each { |f| puts "Removed:\t".red + f }
@@ -196,9 +196,8 @@ module Copernicium
         files = args
       end
 
-      # todo - also, figure out if is branch or rev id
-      # this can be done by checking if it is a branch, and if not, then just
-      # assume it is a rev id. if it isnt, then something will break :/
+      # if it is a branch, get the last head of it
+      rev = Repos.history(rev).last.id if isbranch? rev
 
       # call workspace checkout the given / branch
       ui = UIComm.new(command: 'checkout', rev: rev, files: files)
@@ -245,6 +244,7 @@ module Copernicium
     end
 
     def history(args)
+      puts Repos.history
     end
 
     def merge(args)

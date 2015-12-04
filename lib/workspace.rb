@@ -2,22 +2,6 @@
 
 
 module Copernicium
-  # helper methods for file IO
-  def writeFile(path, content)
-    f = open(path, 'w')
-    f.write(content)
-    f.close
-  end
-
-  # helper methods for file IO
-  def readFile(path)
-    f = open(path, 'r')
-    txt = f.read
-    f.close
-    txt
-  end
-
-
   class FileObj
     attr_reader :path, :history
     def initialize(path, ids)
@@ -39,12 +23,24 @@ module Copernicium
     end
   end
 
+  # helper methods for file IO
+  def writeFile(path, content)
+    f = open(path, 'w')
+    f.write(content)
+    f.close
+  end
+
+  # helper methods for file IO
+  def readFile(path)
+    f = open(path, 'r')
+    txt = f.read
+    f.close
+    txt
+  end
 
   module Workspace
     include Repos # needed for keeping track of history
     def Workspace.setup(bname = 'master')
-      RevLog.setup
-      Repos.setup
       @@files = []
       @@cwd = Dir.pwd
       @@root = (noroot?? @@cwd : getroot)
@@ -52,6 +48,8 @@ module Copernicium
       Dir.mkdir(@@copn) unless Dir.exist?(@@copn)
       @@cwd.sub!(@@root, '.')
       @@branch = bname
+      RevLog.setup @@root
+      Repos.setup @@root
     end
 
     # create a new copernicium project
@@ -98,11 +96,6 @@ module Copernicium
         end
       end
       index
-    end
-
-    # check if any snapshots exist, if not exit
-    def Workspace.has_snapshots?
-      ! Repos.history(@@branch).empty?
     end
 
     # if include all the elements in list_files
@@ -199,20 +192,24 @@ module Copernicium
       end
 =end
 
-      # if not snapshots exist, dont checkout
-      return unless has_snapshots?
-
       clear # reset workspace
 
       # Dec. 3th, 2015 by Linfeng,
       # for this command, the comm.rev should be a string representing the branch name
       @@branch = comm.rev
-      Repos.update(@@branch)
+      Repos.update_branch(@@branch)
 
-      # we first get the last snapshot id of the branch, and then get the commit
+      # if not snapshots exist, dont checkout
+      return -1 unless Repos.has_snapshots?
+
+      # if no snapshot files, dont checkout
+      snap = Repos.get_snapshot(comm.rev)
+      return -1 if snap.files.nil?
+
       # object and finally push all files of it to the # workspace
-      Repos.get_snapshot(Repos.history(@@branch).last).files.each do |file|
+      snap.files.each do |file|
         idx = indexOf(file.path)
+        puts file
         if  idx == -1
           @@files << file
         else
@@ -232,7 +229,7 @@ module Copernicium
       # todo return any conflicting files
     end
 
-    def Workspace.status(comm)
+    def Workspace.status
       added = []
       edits = []
       remov = []

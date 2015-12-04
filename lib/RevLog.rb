@@ -51,9 +51,9 @@ module Copernicium
       hash = hash_file(file_name, content)
       File.open(File.join(@@cop_path, hash), 'w') { |f| f.write(content) }
       @@logmap[file_name] = @@logmap[file_name] << {:time => Time.now,
-                                                  :hash => hash}
+                                                    :hash => hash}
       @@hashmap[hash] = @@hashmap[hash] << {:time => Time.now,
-                                          :filename => file_name}
+                                            :filename => file_name}
       update_log_file
       return hash
     end

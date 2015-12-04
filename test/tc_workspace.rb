@@ -28,7 +28,7 @@ class CoperniciumWorkspaceTest < Minitest::Test
       writeFile('2.txt','2_2')
       comm = UIComm.new(command: 'commit', files: ['1.txt', '2.txt'])
       Workspace.commit(comm)
-      Workspace.checkout('master')
+
       content = readFile('1.txt')
       content.must_equal '1_1'
       content = readFile('2.txt')
@@ -40,7 +40,8 @@ class CoperniciumWorkspaceTest < Minitest::Test
       writeFile('2.txt', '2_2_2_2')
       comm = UIComm.new(command: 'commit', files: ['1.txt', '2.txt'])
       Workspace.commit(comm)
-      Workspace.checkout('master')
+      comm = UIComm.new(rev: 'master')
+      Workspace.checkout(comm)
 
       # todo - actually switch branches
 
@@ -54,14 +55,15 @@ class CoperniciumWorkspaceTest < Minitest::Test
       File.delete('2.txt')
       writeFile('1.txt', 'edit')
       writeFile('3.txt', '3')
-      changedFiles = status(nil)
+      changedFiles = Workspace.status
       changedFiles.must_equal([['./3.txt'], ['./1.txt'],['./2.txt']])
     end
 
     it 'can clean the workspace to last commit' do
       writeFile('1.txt', '1_1')
       writeFile('2.txt', '2_2')
-      Workspace.clean
+      comm = UIComm.new(files: ['1.txt', '2.txt'])
+      Workspace.clean(comm)
       content = readFile('1.txt')
       content.must_equal '1'
       content = readFile('2.txt')
@@ -70,8 +72,8 @@ class CoperniciumWorkspaceTest < Minitest::Test
 
     it 'can clean specific files in the workspace' do
       writeFile('1.txt', '1_1')
-      comm = runner('clean 1.txt')
-      clean(comm)
+      comm = UIComm.new(command: 'clean', files: ['1.txt'])
+      Workspace.clean(comm)
       content = readFile('1.txt')
       content.must_equal '1'
     end
@@ -81,8 +83,6 @@ class CoperniciumWorkspaceTest < Minitest::Test
       writeFile('1.txt', '1_1_1')
       comm = UIComm.new(command: 'commit', files: ['1.txt'])
       Workspace.commit(comm)
-      Workspace.checkout('master')
-      checkout(comm)
       content = readFile('1.txt')
       content.must_equal '1_1_1'
     end
