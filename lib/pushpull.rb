@@ -31,7 +31,7 @@ module Copernicium
     # Function: connect()
     #
     # Description:
-    #   a net/ssh wrapper, if given a block will execute block on server.  Otherwise tests connection.
+    #   a net/ssh wrapper, if given a block will execute block on server, otherwise tests connection.
     #
     # remote: the remote server, formatted "my.server"
     # user: the user to connect as
