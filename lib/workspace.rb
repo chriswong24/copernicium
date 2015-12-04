@@ -123,9 +123,9 @@ module Copernicium
     # if list_files is nil, then rollback the list of files from the branch
     # or rollback to the entire branch head pointed
     def Workspace.clean(comm)
-      if comm.files.empty?
-        clear # reset, checkout last commit
-        checkout
+      if comm.files.empty? # reset, checkout last commit
+        Worlspace.clear
+        Workspace.checkout
       else # files are not nil
 
         # exit if the specified file is not in the workspace
@@ -146,7 +146,7 @@ module Copernicium
 
     # commit a list of files or the entire workspace to make a new snapshot
     def Workspace.commit(comm)
-      unless comm.files.nil? # commit everything
+      if comm.files.nil? # commit everything
         Workspace.ws_files.each do |x|
           if indexOf(x) == -1
             content = readFile(x)
@@ -161,13 +161,14 @@ module Copernicium
             end
           end
         end
+      else # just commit certain files
       end
       Repos.make_snapshot(@@files) # return snapshot id
     end
 
     def Workspace.checkout(comm)
 =begin
-      # just support branches for now
+      # just support revisions for now
       # if argu is an Array Object, we assume it is a list of files to be added
       # # to the workspace # we add the list of files to @@files regardless
       # whether it has been in # it. that means there may be multiple versions
