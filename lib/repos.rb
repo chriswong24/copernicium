@@ -99,19 +99,36 @@ module Copernicium
     # Merge the target snapshot into HEAD snapshot of the current branch
     # returns [{path => content}, [conflicting paths]]
     def merge_snapshot(id)
-      # todo
-      # perform union on snapshots
-      # run diffy on conflict, keep track of conflicting
-      # if no conflicts, add new snapshot to head of current branch
+      diff_ret = []
+      curr_snap = @snaps[@branch][-1]
+      # todo - Check to make sure id is from a different branch?
+      
+      # run diff to get conflicts
+      diff_ret = diff_snapshots(curr_snap.id, id)
+      
       # if there are conflicts, no snapshot
+      # Double check this equality
+      if diff_ret[1] != []
+        diff_ret
+      else
+        # if no conflicts, add new snapshot to head of current branch
+        in_snap = get_snapshot(id)
+        make_snap( curr_snap.files + (in_snap.files - curr_snap.files) )
+        # Do I have to return ID of new snap?
+      end
     end
 
     # TODO - search all branches instead of just the current one
     # Find snapshot, return snapshot (or just contents) given id
     def get_snapshot(id)
-      found_index = @snaps[@branch].index { |x| x.id == id }
+      found_index = nil
+      found_branch = nil
+      branches.each do |x| 
+        found_index = @snaps[x].index { |y| y.id == id }
+        found_branch = x if found_index
+      end
       if found_index
-        @snaps[@branch][found_index]
+        @snaps[found_branch][found_index]
       else
         raise "Snapshot not found."
       end
@@ -136,11 +153,12 @@ module Copernicium
 
     #diff_snapshots needs to catch both files in snap1 that aren’t and snap2 and
     #find individual differences in between the files by calling RevLogs diffy.
-    # Return list of filenames and versions
+    # Return same thing as merge
+    # note: id1 gets priority for history
     def diff_snapshots(id1, id2)
-      disjoint = []
-      intersect = []
-      diffed = []
+      new_files = []
+      diffed = {}
+      conf_paths = []
 
       # Put in error catching
       files1 = get_snapshot(id1).files
@@ -149,10 +167,37 @@ module Copernicium
       # Find difference between snapshot1 and snapshot2
       #files1.each { |x| diffed << x unless !files2.include?(x) }
       # Make sure these operations work for this class
-      disjoint = (files1-files2) + (files2-files1)
-      intersect = files1&files2
-
-      diffed
+      new_files = files2 - files1
+      #found_index = @snaps[@branch].index { |x| x.id == id }
+      #files1.each{ |x| to_diff << [x, files2.find() }
+      files1.each do |x|
+        file_id1 = x.last
+        #diffed[x.path] = readFile(x.path)
+        # find corresponding file object
+        f2_index = files2.index{ |y| y == x }
+        # If found, check if same
+        if f2_index
+          file_id2 = files2[f2_index].last
+          
+          if( revlog.get_file(file_id1) == revlog.get_file(file_id2) )
+            #diffed[x.path] = readFile(x.path)
+            diffed[x.path] = revlog.get_file(file_id1)
+          else
+            # If not same, diff and add to conf_paths
+            diffed[x.path] = revlog.diff_files(file_id1, file_id2)
+            conf_paths << x.path
+          end
+        else
+          diffed[x.path] = revlog.get_file(file_id1)
+        end
+      end
+      
+      new_files.each do |x|
+        file_id1 = x.last
+        diffed[x.path] = revlog.get_file(file_id1)
+      end
+      
+      [diffed, conf_paths]
     end
 
     # Return hash ID of new branch
