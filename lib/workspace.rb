@@ -79,7 +79,7 @@ module Copernicium
     # get all files currently in workspace, except folders and .cn/*
     def ws_files
       Dir[ File.join(@root, '**', '*') ].reject do |p|
-        File.directory? p || File.join(@root,'**','.cn').include?(p) == true
+        File.directory? p || p.include?(File.join(@root,'.cn')) == true
       end
     end
 
