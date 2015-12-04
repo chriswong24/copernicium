@@ -5,11 +5,11 @@
 #   {id, content}
 #   out - hash id of snapshot
 #   merge_snapshot: merge in a branch’s history into the current branch. if
-    #in - branch name
-    #out - [{path => content}, [conflicting paths]]
+#in - branch name
+#out - [{path => content}, [conflicting paths]]
 #   get_snapshot: Return a specific snapshot
-    #in - snapshot id
-    #out - snapshot object
+#in - snapshot id
+#out - snapshot object
 # restore_snapshot: Set current file versions to specified snapshot
 #   in - id of target snapshot
 #   out - Comm object with status
@@ -97,21 +97,19 @@ module Copernicium
 
     # todo - Check to make sure id is from a different branch?
     # Merge the target snapshot into HEAD snapshot of the current branch
-    # returns [{path => content}, [conflicting paths]]
     def merge_snapshot(id)
-      curr_snap = @snaps[@branch].last
-      diff_ret = []
-
       # run diff to get conflicts
-      difference = diff_snapshots(curr_snap.id, id)
+      current = @snaps[@branch].last
+      difference = diff_snapshots(current.id, id)
+      conflicts = difference[1]
 
       # if no conflicts, add new snapshot to head of current branch
-      if difference[1].empty?
-        difference
-      else # if there are conflicts, no snapshot
-        in_snap = get_snapshot(id)
-        make_snap( curr_snap.files + (in_snap.files - curr_snap.files) )
+      if conflicts.empty?
+        make_snap( current.files + (get_snapshot(id).files - current.files) )
       end
+
+      # returns [{path => content}, [conflicting paths]]
+      difference
     end
 
     # Find snapshot, return snapshot (or just contents) given id
