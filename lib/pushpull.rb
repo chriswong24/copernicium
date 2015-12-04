@@ -202,6 +202,10 @@ module Copernicium
         contents = contents.delete_if{|x| (x.eql? '.cn') || (x.eql? '.') || (x.eql? '..')}
       end
 
+      # todo - check if branch exists on the remote server
+      # if so, dump contents and save a new commit saying pushed from user
+      # else, create branch and dump files, then make a new commit saying
+      # created branch
       connect(dest[0], user) do |session|
         session.exec!("cd #{dest[1]}")
         result = session.exec!('ls .cn')
@@ -222,7 +226,7 @@ module Copernicium
         # Commit the files and merge the branches
         session.exec!('cn add .')
         session.exec!('cn commit -m \'Temp commit for push\'')
-        session.exec!('cn checkout #{branch}')
+        session.exec!("cn checkout #{branch}")
         session.exec!("cn merge .temp_push_#{user}")
         session.exec!("cn branch -r temp_push_#{user}")
       end
@@ -295,7 +299,7 @@ module Copernicium
       exit_code = false
       dest = remote.split(':')
       begin
-        fetch(dest[0], dest[1], Dir.pwd, user) 
+        fetch(dest[0], dest[1], Dir.pwd, user)
         exit_code = true;
       rescue
         puts "Failed to clone the remote branch!"
