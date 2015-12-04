@@ -34,6 +34,7 @@ Commands:
     branch [opt] [branchname]
       -r | rename current branch
       -c | create a new branch
+      -d | delete a branch
     merge <branch name>
     clone <remote url>
     push [remote name]

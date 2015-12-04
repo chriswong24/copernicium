@@ -149,9 +149,22 @@ module Copernicium
         create_branch newname
         # Delete the branch with the old name
         Repos.delete_branch oldname
-        puts "Deleted branch '#{oldname}'"
+        puts "Deleted branch '#{oldname}'".grn
 
         puts "Renamed branch '#{oldname}' to '#{newname}'".grn
+      elsif branch == '-d' # Delete the specified branch
+        # If branch name not specified, get it from the user
+        branch = args[1]
+        branch = get "branch to delete" if branch.nil?
+
+        # Do not delete the current branch
+        if branch == Repos.branch
+          pexit "Cannot delete the current branch!".red, 1
+        end
+
+        # Delete the specified branch
+        Repos.delete_branch branch
+        puts "Deleted branch '#{branch}'".grn
       elsif isbranch? branch # switch branch
         Repos.update_branch  branch
       else # branch does not exist, create it, switch to it
