@@ -7,15 +7,14 @@ include Copernicium::Workspace
 class CoperniciumWorkspaceTest < Minitest::Test
   describe 'WorkspaceModule' do
     before 'manipulating the workspace' do
-      Workspace.setup
-      FileUtils.rm_rf('workspace')
       Dir.mkdir('workspace')
       Dir.chdir('workspace')
       writeFile('1.txt', '1')
       writeFile('2.txt', '2')
+
+      Workspace.setup
       Workspace.create_project
-      commInit = UIComm.new(command: 'commit',
-                            files: ['1.txt', '2.txt'])
+      commInit = UIComm.new(files: ['1.txt', '2.txt'])
       Workspace.commit(commInit)
     end
 
@@ -27,11 +26,9 @@ class CoperniciumWorkspaceTest < Minitest::Test
     it 'can commit a entire workspace' do
       writeFile('1.txt','1_1')
       writeFile('2.txt','2_2')
-      commInit = UIComm.new(command: 'commit',
-                            files: ['1.txt', '2.txt'])
+      comm = UIComm.new(command: 'commit', files: ['1.txt', '2.txt'])
       Workspace.commit(comm)
       Workspace.checkout('master')
-      checkout(comm)
       content = readFile('1.txt')
       content.must_equal '1_1'
       content = readFile('2.txt')
@@ -41,10 +38,9 @@ class CoperniciumWorkspaceTest < Minitest::Test
     it 'can checkout a entire branch' do
       writeFile('1.txt', '1_1_1_1')
       writeFile('2.txt', '2_2_2_2')
-      comm = runner('commit -m commit two files')
-      commit(comm)
-      comm = runner('checkout master')
-      checkout(comm)
+      comm = UIComm.new(command: 'commit', files: ['1.txt', '2.txt'])
+      Workspace.commit(comm)
+      Workspace.checkout('master')
 
       # todo - actually switch branches
 
@@ -65,8 +61,7 @@ class CoperniciumWorkspaceTest < Minitest::Test
     it 'can clean the workspace to last commit' do
       writeFile('1.txt', '1_1')
       writeFile('2.txt', '2_2')
-      comm = runner('clean')
-      clean(comm)
+      Workspace.clean
       content = readFile('1.txt')
       content.must_equal '1'
       content = readFile('2.txt')
