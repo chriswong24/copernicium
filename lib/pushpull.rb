@@ -57,6 +57,7 @@ module Copernicium
               result = ssh.exec!("echo Successful Connection!")
               puts result
               exit_code = true;
+            end
           rescue
               puts "Unsuccessful Connection"
           end
