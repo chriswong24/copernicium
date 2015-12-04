@@ -2,6 +2,8 @@
 # CSC 253
 # PushPull Module
 # November 6, 2015
+require 'net/ssh'
+require 'net/scp'
 
 
 module Copernicium
@@ -30,24 +32,69 @@ module Copernicium
       exit_code = false
       if(block.nil?)
         begin
-          if(user.nil?)
-            print "Username for remote repo?: "
-            user = (STDIN.readline).strip
-          end
-          if(passwd.nil?)
-            print "Password for #{user}: "
-            passwd = (STDIN.noecho(&:gets)).strip
-            puts
-          end
-          Net::SSH.start(remote, user, :password => passwd) do |ssh|
+          Net::SSH.start(remote, user) do |ssh|
             result = ssh.exec!("echo Successful Connection!")
             puts result
             exit_code = true;
           end
         rescue
-          puts "Connection Unsuccessful"
+          begin
+            if(user.nil?)
+              print "Username for remote repo?: "
+              user = (STDIN.readline).strip
+            end
+            if(passwd.nil?)
+              print "Password for #{user}: "
+              passwd = (STDIN.noecho(&:gets)).strip
+              puts
+            end
+
+            Net::SSH.start(remote, user, :password => passwd) do |ssh|
+              result = ssh.exec!("echo Successful Connection!")
+              puts result
+              exit_code = true;
+            end
+          rescue
+              puts "Unsuccessful Connection"
+          end
         end
       else
+        begin
+          Net::SSH.start(remote, user) do |ssh|
+            yield ssh
+          end
+          exit_code = true;
+        rescue
+          begin
+            if(user.nil?)
+              print "Username for remote repo: "
+              user = (STDIN.readline).strip
+            end
+            if(passwd.nil?)
+              print "Password for #{user}: "
+              passwd = (STDIN.noecho(&:gets)).strip
+              puts
+            end
+            Net::SSH.start(remote, user, :password => passwd) do |ssh|
+              yield ssh
+            end
+            exit_code = true;
+          rescue
+            puts "Unable to execute command!"
+          end
+        end
+      end
+      return exit_code
+    end
+
+    def transfer(remote, local, dest, user = nil, passwd = nil)
+      exit_code = false
+      begin
+        Net::SCP.start(remote, user) do |scp|
+          scp.upload!(local, dest)
+        end
+        exit_code = true
+      rescue
         begin
           if(user.nil?)
             print "Username for remote repo: "
@@ -58,56 +105,43 @@ module Copernicium
             passwd = (STDIN.noecho(&:gets)).strip
             puts
           end
-          Net::SSH.start(remote, user, :password => passwd) do |ssh|
-            yield ssh
-          end
-          exit_code = true;
-        rescue
-          puts "Unable to execute command!"
-        end
-      end
-      return exit_code
-    end
 
-    def transfer(remote, local, dest, user = nil, passwd = nil)
-      exit_code = false
-      if(user.nil?)
-        print "Username for remote repo: "
-        user = (STDIN.readline).strip
-      end
-      if(passwd.nil?)
-        print "Password for #{user}: "
-        passwd = (STDIN.noecho(&:gets)).strip
-        puts
-      end
-      begin
-        Net::SCP.start(remote, user, :password => passwd) do |scp|
-          scp.upload!(local, dest)
+          Net::SCP.start(remote, user, :passwd => passwd) do |scp|
+            scp.upload!(local, dest)
+          end
+          exit_code = true
+        rescue
+          puts "Unable to upload file!"
         end
-        exit_code = true
-      rescue
-        puts "Unable to upload file!"
       end
     end
 
     def fetch(remote, dest, local, user = nil, passwd = nil)
       exit_code = false
-      if(user.nil?)
-        print "Username for remote repo: "
-        user = (STDIN.readline).strip
-      end
-      if(passwd.nil?)
-        print "Password for #{user}: "
-        passwd = (STDIN.noecho(&:gets)).strip
-        puts
-      end
       begin
         Net::SCP.start(remote, user, :password => passwd) do |scp|
           scp.download!(dest, local, :recursive => true)
         end
         exit_code = true
       rescue
-        puts "Unable to fetch file(s)!"
+        begin
+          if(user.nil?)
+            print "Username for remote repo: "
+            user = (STDIN.readline).strip
+          end
+          if(passwd.nil?)
+            print "Password for #{user}: "
+            passwd = (STDIN.noecho(&:gets)).strip
+            puts
+          end
+
+          Net::SCP.start(remote, user, :password => passwd) do |scp|
+            scp.download!(dest, local, :recursive => true)
+          end
+          exit_code = true
+        rescue
+          puts "Unable to fetch file(s)!"
+        end
       end
 
       return exit_code
@@ -159,22 +193,11 @@ module Copernicium
 
     def clone(remote, dir, user = nil, passwd = nil)
       exit_code = false
-      if(user.nil?)
-        print "Username for remote repo: "
-        user = (STDIN.readline).strip
-      end
-      if(passwd.nil?)
-        print "Password for #{user}: "
-        passwd = (STDIN.noecho(&:gets)).strip
-        puts
-      end
       begin
         fetch(remote, dir, ".", user, passwd)
         nd = File.basename(dir)
-        ################ Needs Repos Functionality! #################
         # Initializes the folder as a Repo
-        # Repos::Repos.make_branch(nd)
-        #############################################################
+        Repos::Repos.make_branch(nd)
         exit_code = true;
       rescue
         puts "Failed to clone the remote branch!"
