@@ -12,4 +12,5 @@ push: clean build
 	gem push $(g)-$(v).gem
 
 dev:
-	filewatcher '**/*.rb' 'clear && rake'
+	filewatcher '**/*.rb' 'clear && yes | rake'
+

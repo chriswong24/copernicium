@@ -47,3 +47,6 @@ Note: [optional] <required>
 
 EOS
 
+REPO_WARNING = <<-EOS
+You are not currently in a Copernicium repo... run `cn init` to create one!
+EOS

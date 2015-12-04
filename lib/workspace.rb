@@ -1,5 +1,6 @@
 # workspace module - linfeng and qiguang
 
+
 module Copernicium
   # helper methods for file IO
   def writeFile(path, content)
@@ -14,27 +15,6 @@ module Copernicium
     txt = f.read
     f.close
     txt
-  end
-
-  # find  the root .cn folder
-  def getroot
-    cwd = Dir.pwd
-    max = 0
-    def notroot() Dir.pwd != '/' end
-    def notcn() File.exists? File.join(Dir.pwd, '.cn') end
-    while max < 10 && notroot && notcn
-      Dir.chdir(File.join(Dir.pwd, '..'))
-      max += 1
-    end
-
-    if notcn # return where cn was found
-      cnroot = Dir.pwd
-      Dir.chdir(cwd)
-      cnroot
-    else # directory not found
-      Dir.chdir(cwd)
-      nil
-    end
   end
 
   class FileObj
@@ -85,15 +65,22 @@ module Copernicium
       index
     end
 
+    # check if any snapshots exist, if not exit
+    def has_snapshots?
+      ! @repo.history(@branch).empty?
+    end
+
     # if include all the elements in list_files
     def include?(files)
       files.each { |x| return false if indexOf(x) == -1 }
       true
     end
 
-    # get all files currently in workspace
+    # get all files currently in workspace, except folders and .cn/*
     def ws_files
-      Dir[ File.join(@root, '**', '*') ].reject { |p| File.directory? p || File.join(@root,'.cn').include? p == false }
+      Dir[ File.join(@root, '**', '*') ].reject do |p|
+        File.directory? p || File.join(@root,'.cn').include?(p) == false
+      end
     end
 
     # Clear the current workspace
@@ -177,9 +164,12 @@ module Copernicium
       end
 =end
 
+      # if not snapshots exist, dont checkout
+      return unless has_snapshots?
+
       clear # reset workspace
 
-      # Dec. 3th, 2015 by Linfeng, 
+      # Dec. 3th, 2015 by Linfeng,
       # for this command, the comm.rev should be a string representing the branch name
       @branch = comm.rev
       @repos.update(@branch)

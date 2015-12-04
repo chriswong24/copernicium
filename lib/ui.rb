@@ -10,6 +10,32 @@ module Copernicium
     exit sig
   end
 
+  # find  the root .cn folder
+  def getroot
+    cwd = Dir.pwd
+    max = 0
+    def notroot() Dir.pwd != '/' end
+    def notcn() Dir.exist? File.join(Dir.pwd, '.cn') end
+    while max < 10 && notroot && notcn
+      Dir.chdir(File.join(Dir.pwd, '..'))
+      max += 1
+    end
+
+    if notcn # return where cn was found
+      cnroot = Dir.pwd
+      Dir.chdir(cwd)
+      cnroot
+    else # directory not found
+      Dir.chdir(cwd)
+      nil
+    end
+  end
+
+  # tells us whether we are in a cn project or not
+  def noroot?
+    getroot.nil?
+  end
+
   class Driver
     # Get some info from the user when they dont specify it
     def get(info)
@@ -41,14 +67,17 @@ module Copernicium
       # if -v flag givem show version
       pexit VERSION, 0 if cmd == '-v'
 
+      # if not in a repo, warn them, tell how to create
+      puts REPO_WARNING.yel if noroot? && cmd != 'init'
+
       # Handle standard commands
       case cmd
       when 'init'
         init args
       when 'status'
         status args
-        #when 'log' || 'history'
-        # show list of commits
+      when 'history'
+        history args
       when 'branch'
         branch args
       when 'clean'
@@ -95,8 +124,13 @@ module Copernicium
     end
 
     def branch(args)
-      # todo - switch branches, create branches
-      # if branch does not exist, create it
+      repo = Workspace.new.repo
+      if args.empty?
+        puts "Branches: ".grn + repo.branches.join(' ')
+      elsif args.first == '-c'
+      elsif args.first == '-r'
+      else # if branch does not exist, create it, switch to it
+      end
     end
 
     def push(args)
@@ -106,6 +140,7 @@ module Copernicium
 
     def pull(args)
       UIComm.new(command: 'pull', opts: args)
+      #def pull(remote, branch', remote_dir)
       # todo - make call to pushpull, pull remote
     end
 
@@ -134,8 +169,6 @@ module Copernicium
     end
 
     def clone(args)
-      # todo - optionally check for folder to clone into, instead of cwd
-      # see init for an example
       if args.empty?
         repo = get 'repo url to clone'
       else
@@ -167,6 +200,9 @@ module Copernicium
       ui
     end
 
+    def history(args)
+    end
+
     # TODO - parse whether given arg is a branch name, else assume snap id
     def merge(args)
       if args.empty?
@@ -183,7 +219,9 @@ module Copernicium
     end
   end # Driver
 
+
   # Communication object that will pass commands to backend modules
+  # also used in unit test to make sure command is being parsed ok
   # rev - revision indicator (commit #, branch name, HEAD, etc.)
   # repo - URL/path to a remote repository
   class UIComm
