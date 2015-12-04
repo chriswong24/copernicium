@@ -120,17 +120,42 @@ module Copernicium
       Repos.branches.include? branch
     end
 
+    # create and switch to a new branch
+    def create_branch(branch)
+      new_branch_hash = Repos.make_branch branch
+      Repos.update_branch branch
+      puts "Created new branch '#{branch}' with head #{new_branch_hash}".grn
+    end
+
     def branch(args)
       branch = args.first
       if branch.nil? # show all branches
         puts "Branches: ".grn + branches.join(' ')
       elsif branch == '-c' # try to create a new branch
-        # todo
-      elsif branch == '-r' # rename a branch
-        # todo - feature not yet implemented!
+        # If branch name not specified, get it from the user
+        branch = args[1]
+        branch = get "new branch name" if branch.nil?
+
+        # Create and switch to the new branch
+        create_branch branch
+      elsif branch == '-r' # rename the current branch
+        # If branch name not specified, get it from the user
+        newname = args[1]
+        newname = get "new name for current branch" if newname.nil?
+
+        oldname = Repos.branch
+
+        # Create and switch to a new branch with the given name
+        create_branch newname
+        # Delete the branch with the old name
+        Repos.delete_branch oldname
+        puts "Deleted branch '#{oldname}'"
+
+        puts "Renamed branch '#{oldname}' to '#{newname}'".grn
       elsif isbranch? branch # switch branch
-        Repos.update_branch  brandch
+        Repos.update_branch  branch
       else # branch does not exist, create it, switch to it
+        create_branch branch
       end
     end
 
