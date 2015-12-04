@@ -43,6 +43,8 @@ module Copernicium
   module Workspace
     include Repos # needed for keeping track of history
     def Workspace.setup(bname = 'master')
+      RevLog.setup
+      Repos.setup
       @@files = []
       @@cwd = Dir.pwd
       @@root = (noroot?? @@cwd : getroot)

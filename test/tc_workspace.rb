@@ -15,8 +15,7 @@ class CoperniciumWorkspaceTest < Minitest::Test
       writeFile('2.txt', '2')
       Workspace.create_project
       commInit = UIComm.new(command: 'commit',
-                            files: ['1.txt', '2.txt'],
-                            cmt_msg: message)
+                            files: ['1.txt', '2.txt'])
       Workspace.commit(commInit)
     end
 
@@ -28,9 +27,10 @@ class CoperniciumWorkspaceTest < Minitest::Test
     it 'can commit a entire workspace' do
       writeFile('1.txt','1_1')
       writeFile('2.txt','2_2')
-      comm = runner('commit -m commit entire workspace')
+      commInit = UIComm.new(command: 'commit',
+                            files: ['1.txt', '2.txt'])
       Workspace.commit(comm)
-      comm = runner('checkout master')
+      Workspace.checkout('master')
       checkout(comm)
       content = readFile('1.txt')
       content.must_equal '1_1'
@@ -84,9 +84,9 @@ class CoperniciumWorkspaceTest < Minitest::Test
     # will pass after repos.history works
     it 'can commit a list of files' do
       writeFile('1.txt', '1_1_1')
-      comm = runner('commit 1.txt -m commit one file')
-      commit(comm)
-      comm = runner('checkout master')
+      comm = UIComm.new(command: 'commit', files: ['1.txt'])
+      Workspace.commit(comm)
+      Workspace.checkout('master')
       checkout(comm)
       content = readFile('1.txt')
       content.must_equal '1_1_1'
