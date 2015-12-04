@@ -14,14 +14,14 @@ module Copernicium
   def getroot
     cwd = Dir.pwd
     max = 0
-    def notroot() Dir.pwd != '/' end
-    def notcn() Dir.exist? File.join(Dir.pwd, '.cn') end
-    while max < 10 && notroot && notcn
+    def more_folders() Dir.pwd != '/' end
+    def root_found() Dir.exist? File.join(Dir.pwd, '.cn') end
+    while max < 10 && more_folders && !root_found
       Dir.chdir(File.join(Dir.pwd, '..'))
       max += 1
     end
 
-    if notcn # return where cn was found
+    if root_found # return where cn was found
       cnroot = Dir.pwd
       Dir.chdir(cwd)
       cnroot
