@@ -76,9 +76,11 @@ module Copernicium
       true
     end
 
-    # get all files currently in workspace
+    # get all files currently in workspace, except folders and .cn/*
     def ws_files
-      Dir[ File.join(@root, '**', '*') ].reject { |p| File.directory? p || File.join(@root,'.cn').include? p == false }
+      Dir[ File.join(@root, '**', '*') ].reject do |p|
+        File.directory? p || File.join(@root,'.cn').include?(p) == false
+      end
     end
 
     # Clear the current workspace
@@ -167,7 +169,7 @@ module Copernicium
 
       clear # reset workspace
 
-      # Dec. 3th, 2015 by Linfeng, 
+      # Dec. 3th, 2015 by Linfeng,
       # for this command, the comm.rev should be a string representing the branch name
       @branch = comm.rev
       @repos.update(@branch)
