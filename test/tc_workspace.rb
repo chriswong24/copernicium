@@ -6,19 +6,16 @@ include Copernicium::Workspace
 
 class CoperniciumWorkspaceTest < Minitest::Test
   describe 'WorkspaceModule' do
-    def runner(string)
-      Driver.run string.split
-    end
-
     before 'manipulating the workspace' do
       Workspace.setup
       FileUtils.rm_rf('workspace')
       Dir.mkdir('workspace')
       Dir.chdir('workspace')
-      writeFile('1.txt','1')
+      writeFile('1.txt', '1')
       writeFile('2.txt', '2')
-      commInit = runner('commit -m init commit')
-      commit(commInit)
+      commInit = UIComm.new()
+      ui = UIComm.new(command: 'commit', cmt_msg: message)
+      Workspace.commit(commInit)
     end
 
     after 'manipulating the workspace' do
@@ -30,7 +27,7 @@ class CoperniciumWorkspaceTest < Minitest::Test
       writeFile('1.txt','1_1')
       writeFile('2.txt','2_2')
       comm = runner('commit -m commit entire workspace')
-      commit(comm)
+      Workspace.commit(comm)
       comm = runner('checkout master')
       checkout(comm)
       content = readFile('1.txt')

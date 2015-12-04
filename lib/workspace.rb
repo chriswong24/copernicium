@@ -151,8 +151,8 @@ module Copernicium
 
     # commit a list of files or the entire workspace to make a new snapshot
     def Workspace.commit(comm)
-      unless ws_files.empty?
-        ws_files.each do |x|
+      unless Workspace.ws_files.empty?
+        Workspace.ws_files.each do |x|
           if indexOf(x) == -1
             content = readFile(x)
             hash = RevLog.add_file(x, content)
@@ -170,7 +170,7 @@ module Copernicium
       Repos.make_snapshot(@@files) # return snapshot id
     end
 
-    def Workspace.checkout(comm = UIComm.new(rev: @@branch))
+    def Workspace.checkout(comm)
 =begin
       # just support branches for now
       # if argu is an Array Object, we assume it is a list of files to be added
@@ -223,8 +223,9 @@ module Copernicium
 
     # wrapper for Repos merge_snapshot, update workspace with result
     def Workspace.merge(id)
-      Repos.merge_snapshot(id)
       # returns [{path => content}, [conflicting paths]]
+      Repos.merge_snapshot(id)
+
       # todo update workspace with result
       # todo return any conflicting files
     end
