@@ -15,8 +15,8 @@ class CoperniciumWorkspaceTest < Minitest::Test
 
     before 'manipulating the workspace' do
       FileUtils.rm_rf('workspace')
-      # Dir.mkdir('workspace')
-      # Dir.chdir('workspace')
+      Dir.mkdir('workspace')
+      Dir.chdir('workspace')
       @workspace = Workspace.new
       @workspace.writeFile('1.txt','1')
       @workspace.writeFile('2.txt', '2')
