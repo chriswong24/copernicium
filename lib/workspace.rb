@@ -93,7 +93,7 @@ module Copernicium
 
     # get all files currently in workspace
     def ws_files
-      Dir[ File.join(@root, '**', '*') ].reject { |p| File.directory? p }
+      Dir[ File.join(@root, '**', '*') ].reject { |p| File.directory? p or File.join(@root,'.cn').include? p == false }
     end
 
     # Clear the current workspace
