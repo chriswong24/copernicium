@@ -63,14 +63,6 @@
 
   <ul class="link-list" role="directory">
     
-    <li ><a href="#method-i-getroot">#getroot</a>
-    
-    <li ><a href="#method-i-notcn">#notcn</a>
-    
-    <li ><a href="#method-i-notroot">#notroot</a>
-    
-    <li ><a href="#method-i-pexit">#pexit</a>
-    
     <li ><a href="#method-i-readFile">#readFile</a>
     
     <li ><a href="#method-i-writeFile">#writeFile</a>
@@ -108,14 +100,21 @@ hashed id</p>
 <p>merge: given two files, try to merge them in - file_id_1, file_id_2 out -
 success and merged file name/content, or failure and conflict</p>
 
-<p>Frank Tamburrino CSC 253 <a href="Copernicium/PushPull.html">PushPull</a>
-Module November 6, 2015</p>
-
 <p>make_snapshot: Creates new snapshot from current files and versions</p>
 
 <pre>in - array of file objects. file object = array of all versions:
 {id, content}
 out - hash id of snapshot</pre>
+
+<p>merge_snapshot: merge in a branch’s history into the current branch. if</p>
+
+<pre>in - branch name
+out - [{path =&gt; content}, [conflicting paths]]</pre>
+
+<p>get_snapshot: Return a specific snapshot</p>
+
+<pre>in - snapshot id
+out - snapshot object</pre>
 
 <p>restore_snapshot: Set current file versions to specified snapshot</p>
 
@@ -147,8 +146,6 @@ out - hash id of new branch</pre>
 <pre>in - branch name
 out - exit status code</pre>
 
-<p>Also do a get_snapshot</p>
-
 <p>workspace module - linfeng and qiguang</p>
 
   </section>
@@ -172,151 +169,6 @@ out - exit status code</pre>
        </header>
 
     
-      <div id="method-i-getroot" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">getroot</span><span
-            class="method-args">()</span>
-          
-          <span class="method-click-advice">click to toggle source</span>
-          
-        </div>
-        
-
-        <div class="method-description">
-          
-          <p>find  the root .cn folder</p>
-          
-          
-
-          
-          <div class="method-source-code" id="getroot-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 19</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">getroot</span>
-  <span class="ruby-identifier">cwd</span> = <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>
-  <span class="ruby-identifier">max</span> = <span class="ruby-value">0</span>
-  <span class="ruby-keyword">def</span> <span class="ruby-identifier">notroot</span>() <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span> <span class="ruby-operator">!=</span> <span class="ruby-string">&#39;/&#39;</span> <span class="ruby-keyword">end</span>
-  <span class="ruby-keyword">def</span> <span class="ruby-identifier">notcn</span>() <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>, <span class="ruby-string">&#39;.cn&#39;</span>) <span class="ruby-keyword">end</span>
-  <span class="ruby-keyword">while</span> <span class="ruby-identifier">max</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">10</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">notroot</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">notcn</span>
-    <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">chdir</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>, <span class="ruby-string">&#39;..&#39;</span>))
-    <span class="ruby-identifier">max</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
-  <span class="ruby-keyword">end</span>
-
-  <span class="ruby-keyword">if</span> <span class="ruby-identifier">notcn</span> <span class="ruby-comment"># return where cn was found</span>
-    <span class="ruby-identifier">cnroot</span> = <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>
-    <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">chdir</span>(<span class="ruby-identifier">cwd</span>)
-    <span class="ruby-identifier">cnroot</span>
-  <span class="ruby-keyword">else</span> <span class="ruby-comment"># directory not found</span>
-    <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">chdir</span>(<span class="ruby-identifier">cwd</span>)
-    <span class="ruby-keyword">nil</span>
-  <span class="ruby-keyword">end</span>
-<span class="ruby-keyword">end</span></pre>
-          </div>
-          
-        </div>
-
-        
-
-        
-      </div>
-
-    
-      <div id="method-i-notcn" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">notcn</span><span
-            class="method-args">()</span>
-          
-          <span class="method-click-advice">click to toggle source</span>
-          
-        </div>
-        
-
-        <div class="method-description">
-          
-          
-          
-          
-
-          
-          <div class="method-source-code" id="notcn-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 23</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">notcn</span>() <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>, <span class="ruby-string">&#39;.cn&#39;</span>) <span class="ruby-keyword">end</span></pre>
-          </div>
-          
-        </div>
-
-        
-
-        
-      </div>
-
-    
-      <div id="method-i-notroot" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">notroot</span><span
-            class="method-args">()</span>
-          
-          <span class="method-click-advice">click to toggle source</span>
-          
-        </div>
-        
-
-        <div class="method-description">
-          
-          
-          
-          
-
-          
-          <div class="method-source-code" id="notroot-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 22</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">notroot</span>() <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span> <span class="ruby-operator">!=</span> <span class="ruby-string">&#39;/&#39;</span> <span class="ruby-keyword">end</span></pre>
-          </div>
-          
-        </div>
-
-        
-
-        
-      </div>
-
-    
-      <div id="method-i-pexit" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">pexit</span><span
-            class="method-args">(msg, sig)</span>
-          
-          <span class="method-click-advice">click to toggle source</span>
-          
-        </div>
-        
-
-        <div class="method-description">
-          
-          <p>Print and exit with a specific code</p>
-          
-          
-
-          
-          <div class="method-source-code" id="pexit-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 8</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">pexit</span>(<span class="ruby-identifier">msg</span>, <span class="ruby-identifier">sig</span>)
-  <span class="ruby-identifier">puts</span> <span class="ruby-identifier">msg</span>
-  <span class="ruby-identifier">exit</span> <span class="ruby-identifier">sig</span>
-<span class="ruby-keyword">end</span></pre>
-          </div>
-          
-        </div>
-
-        
-
-        
-      </div>
-
-    
       <div id="method-i-readFile" class="method-detail ">
         
         <div class="method-heading">
@@ -330,13 +182,13 @@ out - exit status code</pre>
 
         <div class="method-description">
           
-          
+          <p>helper methods for file IO</p>
           
           
 
           
           <div class="method-source-code" id="readFile-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 11</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 35</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">readFile</span>(<span class="ruby-identifier">path</span>)
   <span class="ruby-identifier">f</span> = <span class="ruby-identifier">open</span>(<span class="ruby-identifier">path</span>, <span class="ruby-string">&#39;r&#39;</span>)
   <span class="ruby-identifier">txt</span> = <span class="ruby-identifier">f</span>.<span class="ruby-identifier">read</span>
@@ -372,7 +224,7 @@ out - exit status code</pre>
 
           
           <div class="method-source-code" id="writeFile-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 5</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 28</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">writeFile</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">content</span>)
   <span class="ruby-identifier">f</span> = <span class="ruby-identifier">open</span>(<span class="ruby-identifier">path</span>, <span class="ruby-string">&#39;w&#39;</span>)
   <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-identifier">content</span>)

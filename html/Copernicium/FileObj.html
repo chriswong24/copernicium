@@ -74,6 +74,8 @@
     
     <li ><a href="#method-i-3D-3D">#==</a>
     
+    <li ><a href="#method-i-last">#last</a>
+    
   </ul>
 </div>
 
@@ -161,7 +163,7 @@
 
           
           <div class="method-source-code" id="new-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 41</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 7</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">ids</span>)
   <span class="ruby-ivar">@history</span> = <span class="ruby-identifier">ids</span>
   <span class="ruby-ivar">@path</span> = <span class="ruby-identifier">path</span>
@@ -203,13 +205,46 @@
 
           
           <div class="method-source-code" id="3D-3D-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 46</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 12</span>
 <span class="ruby-keyword">def</span> <span class="ruby-operator">==</span>(<span class="ruby-identifier">rhs</span>)
   <span class="ruby-keyword">if</span> <span class="ruby-identifier">rhs</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">String</span>
     <span class="ruby-ivar">@path</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">rhs</span>
   <span class="ruby-keyword">else</span>
     <span class="ruby-ivar">@path</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">rhs</span>.<span class="ruby-identifier">path</span>
   <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-last" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">last</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>returns most recent file id in the snapshot it was saved in</p>
+          
+          
+
+          
+          <div class="method-source-code" id="last-source">
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 21</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">last</span>
+  <span class="ruby-ivar">@history</span>.<span class="ruby-identifier">last</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           

@@ -138,7 +138,7 @@ calls a method based on the command</p>
 
           
           <div class="method-source-code" id="UICommandParser-source">
-            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 13</span>
+            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 15</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">UICommandParser</span>(<span class="ruby-identifier">ui_comm</span>)
   <span class="ruby-keyword">case</span> <span class="ruby-identifier">ui_comm</span>.<span class="ruby-identifier">command</span>
   <span class="ruby-keyword">when</span> <span class="ruby-string">&quot;clone&quot;</span>
@@ -168,7 +168,7 @@ calls a method based on the command</p>
         
         <div class="method-heading">
           <span class="method-name">clone</span><span
-            class="method-args">(remote, dir, user = nil, passwd = nil)</span>
+            class="method-args">(remote, user = nil)</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -177,31 +177,26 @@ calls a method based on the command</p>
 
         <div class="method-description">
           
-          
+          <p>Function: clone()</p>
+
+<p>Description:</p>
+
+<pre class="ruby"><span class="ruby-constant">Grabs</span> <span class="ruby-identifier">a</span> <span class="ruby-identifier">repository</span> <span class="ruby-identifier">from</span> <span class="ruby-identifier">a</span> <span class="ruby-identifier">remote</span> <span class="ruby-identifier">server</span>
+</pre>
+
+<p>remote: the remote server and directory to push to, formatted
+“my.server:/the/location/we/want” user: the user to connect as</p>
           
           
 
           
           <div class="method-source-code" id="clone-source">
-            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 160</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">clone</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">dir</span>, <span class="ruby-identifier">user</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">passwd</span> = <span class="ruby-keyword">nil</span>)
+            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 298</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">clone</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span> = <span class="ruby-keyword">nil</span>)
   <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">false</span>
-  <span class="ruby-keyword">if</span>(<span class="ruby-identifier">user</span>.<span class="ruby-identifier">nil?</span>)
-    <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;Username for remote repo: &quot;</span>
-    <span class="ruby-identifier">user</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">readline</span>).<span class="ruby-identifier">strip</span>
-  <span class="ruby-keyword">end</span>
-  <span class="ruby-keyword">if</span>(<span class="ruby-identifier">passwd</span>.<span class="ruby-identifier">nil?</span>)
-    <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Password for #{user}: &quot;</span>
-    <span class="ruby-identifier">passwd</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">noecho</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:gets</span>)).<span class="ruby-identifier">strip</span>
-    <span class="ruby-identifier">puts</span>
-  <span class="ruby-keyword">end</span>
+  <span class="ruby-identifier">dest</span> = <span class="ruby-identifier">remote</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;:&#39;</span>)
   <span class="ruby-keyword">begin</span>
-    <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">dir</span>, <span class="ruby-string">&quot;.&quot;</span>, <span class="ruby-identifier">user</span>, <span class="ruby-identifier">passwd</span>)
-    <span class="ruby-identifier">nd</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">basename</span>(<span class="ruby-identifier">dir</span>)
-    <span class="ruby-comment">################ Needs Repos Functionality! #################</span>
-    <span class="ruby-comment"># Initializes the folder as a Repo</span>
-    <span class="ruby-comment"># Repos::Repos.make_branch(nd)</span>
-    <span class="ruby-comment">#############################################################</span>
+    <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">dest</span>[<span class="ruby-value">0</span>], <span class="ruby-identifier">dest</span>[<span class="ruby-value">1</span>], <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>, <span class="ruby-identifier">user</span>)
     <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">true</span>;
   <span class="ruby-keyword">rescue</span>
     <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Failed to clone the remote branch!&quot;</span>
@@ -223,7 +218,7 @@ calls a method based on the command</p>
         
         <div class="method-heading">
           <span class="method-name">connect</span><span
-            class="method-args">(remote, user = nil, passwd = nil) { |ssh| ... }</span>
+            class="method-args">(remote, user) { |ssh| ... }</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -232,51 +227,69 @@ calls a method based on the command</p>
 
         <div class="method-description">
           
-          
+          <p>Function: connect()</p>
+
+<p>Description:</p>
+
+<pre>a net/ssh wrapper, if given a block will execute block on server, otherwise tests connection.</pre>
+
+<p>remote: the remote server, formatted “my.server” user: the user to connect
+as</p>
           
           
 
           
           <div class="method-source-code" id="connect-source">
-            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 29</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">passwd</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 38</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
   <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">false</span>
   <span class="ruby-keyword">if</span>(<span class="ruby-identifier">block</span>.<span class="ruby-identifier">nil?</span>)
     <span class="ruby-keyword">begin</span>
-      <span class="ruby-keyword">if</span>(<span class="ruby-identifier">user</span>.<span class="ruby-identifier">nil?</span>)
-        <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;Username for remote repo?: &quot;</span>
-        <span class="ruby-identifier">user</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">readline</span>).<span class="ruby-identifier">strip</span>
-      <span class="ruby-keyword">end</span>
-      <span class="ruby-keyword">if</span>(<span class="ruby-identifier">passwd</span>.<span class="ruby-identifier">nil?</span>)
-        <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Password for #{user}: &quot;</span>
-        <span class="ruby-identifier">passwd</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">noecho</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:gets</span>)).<span class="ruby-identifier">strip</span>
-        <span class="ruby-identifier">puts</span>
-      <span class="ruby-keyword">end</span>
-      <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">SSH</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>, <span class="ruby-value">:password</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">passwd</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ssh</span><span class="ruby-operator">|</span>
+      <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">SSH</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ssh</span><span class="ruby-operator">|</span>
         <span class="ruby-identifier">result</span> = <span class="ruby-identifier">ssh</span>.<span class="ruby-identifier">exec!</span>(<span class="ruby-string">&quot;echo Successful Connection!&quot;</span>)
         <span class="ruby-identifier">puts</span> <span class="ruby-identifier">result</span>
         <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">true</span>;
       <span class="ruby-keyword">end</span>
     <span class="ruby-keyword">rescue</span>
-      <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Connection Unsuccessful&quot;</span>
-    <span class="ruby-keyword">end</span>
-  <span class="ruby-keyword">else</span>
-    <span class="ruby-keyword">begin</span>
-      <span class="ruby-keyword">if</span>(<span class="ruby-identifier">user</span>.<span class="ruby-identifier">nil?</span>)
-        <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;Username for remote repo: &quot;</span>
+      <span class="ruby-keyword">begin</span>
+        <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;Username for remote repo?: &quot;</span>
         <span class="ruby-identifier">user</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">readline</span>).<span class="ruby-identifier">strip</span>
-      <span class="ruby-keyword">end</span>
-      <span class="ruby-keyword">if</span>(<span class="ruby-identifier">passwd</span>.<span class="ruby-identifier">nil?</span>)
+
         <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Password for #{user}: &quot;</span>
         <span class="ruby-identifier">passwd</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">noecho</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:gets</span>)).<span class="ruby-identifier">strip</span>
         <span class="ruby-identifier">puts</span>
+
+        <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">SSH</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>, <span class="ruby-value">:password</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">passwd</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ssh</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">result</span> = <span class="ruby-identifier">ssh</span>.<span class="ruby-identifier">exec!</span>(<span class="ruby-string">&quot;echo Successful Connection!&quot;</span>)
+          <span class="ruby-identifier">puts</span> <span class="ruby-identifier">result</span>
+          <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">true</span>;
+        <span class="ruby-keyword">end</span>
+      <span class="ruby-keyword">rescue</span>
+          <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Unsuccessful Connection&quot;</span>
       <span class="ruby-keyword">end</span>
-      <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">SSH</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>, <span class="ruby-value">:password</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">passwd</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ssh</span><span class="ruby-operator">|</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-keyword">begin</span>
+      <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">SSH</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ssh</span><span class="ruby-operator">|</span>
         <span class="ruby-keyword">yield</span> <span class="ruby-identifier">ssh</span>
       <span class="ruby-keyword">end</span>
       <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">true</span>;
     <span class="ruby-keyword">rescue</span>
-      <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Unable to execute command!&quot;</span>
+      <span class="ruby-keyword">begin</span>
+        <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;Username for remote repo: &quot;</span>
+        <span class="ruby-identifier">user</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">readline</span>).<span class="ruby-identifier">strip</span>
+
+        <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Password for #{user}: &quot;</span>
+        <span class="ruby-identifier">passwd</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">noecho</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:gets</span>)).<span class="ruby-identifier">strip</span>
+        <span class="ruby-identifier">puts</span>
+
+        <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">SSH</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>, <span class="ruby-value">:password</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">passwd</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ssh</span><span class="ruby-operator">|</span>
+          <span class="ruby-keyword">yield</span> <span class="ruby-identifier">ssh</span>
+        <span class="ruby-keyword">end</span>
+        <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">true</span>;
+      <span class="ruby-keyword">rescue</span>
+        <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Unable to execute command!&quot;</span>
+      <span class="ruby-keyword">end</span>
     <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">return</span> <span class="ruby-identifier">exit_code</span>
@@ -295,7 +308,7 @@ calls a method based on the command</p>
         
         <div class="method-heading">
           <span class="method-name">fetch</span><span
-            class="method-args">(remote, dest, local, user = nil, passwd = nil)</span>
+            class="method-args">(remote, dest, local, user) { |scp| ... }</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -304,33 +317,71 @@ calls a method based on the command</p>
 
         <div class="method-description">
           
-          
+          <p>Function: fetch()</p>
+
+<p>Description:</p>
+
+<pre>a net/scp wrapper to copy from server, can take a block or do a one-off copy without one</pre>
+
+<p>remote: the remote server and directory to push to, formatted
+“my.server:/the/location/we/want” dest: what we want of the branch, not
+needed for blocked calls local: where we want to put the file, not needed
+for blocked calls user: the user to connect as</p>
           
           
 
           
           <div class="method-source-code" id="fetch-source">
-            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 93</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">dest</span>, <span class="ruby-identifier">local</span>, <span class="ruby-identifier">user</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">passwd</span> = <span class="ruby-keyword">nil</span>)
+            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 134</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">dest</span>, <span class="ruby-identifier">local</span>, <span class="ruby-identifier">user</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
   <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">false</span>
-  <span class="ruby-keyword">if</span>(<span class="ruby-identifier">user</span>.<span class="ruby-identifier">nil?</span>)
-    <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;Username for remote repo: &quot;</span>
-    <span class="ruby-identifier">user</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">readline</span>).<span class="ruby-identifier">strip</span>
-  <span class="ruby-keyword">end</span>
-  <span class="ruby-keyword">if</span>(<span class="ruby-identifier">passwd</span>.<span class="ruby-identifier">nil?</span>)
-    <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Password for #{user}: &quot;</span>
-    <span class="ruby-identifier">passwd</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">noecho</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:gets</span>)).<span class="ruby-identifier">strip</span>
-    <span class="ruby-identifier">puts</span>
-  <span class="ruby-keyword">end</span>
-  <span class="ruby-keyword">begin</span>
-    <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">SCP</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>, <span class="ruby-value">:password</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">passwd</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">scp</span><span class="ruby-operator">|</span>
-      <span class="ruby-identifier">scp</span>.<span class="ruby-identifier">download!</span>(<span class="ruby-identifier">dest</span>, <span class="ruby-identifier">local</span>, <span class="ruby-value">:recursive</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>)
-    <span class="ruby-keyword">end</span>
-    <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">true</span>
-  <span class="ruby-keyword">rescue</span>
-    <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Unable to fetch file(s)!&quot;</span>
-  <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">if</span>(<span class="ruby-identifier">block</span>.<span class="ruby-identifier">nil?</span>)
+    <span class="ruby-keyword">begin</span>
+      <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">SCP</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>, <span class="ruby-value">:password</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">passwd</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">scp</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">scp</span>.<span class="ruby-identifier">download!</span>(<span class="ruby-identifier">dest</span>, <span class="ruby-identifier">local</span>, <span class="ruby-value">:recursive</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>)
+      <span class="ruby-keyword">end</span>
+      <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">true</span>
+    <span class="ruby-keyword">rescue</span>
+      <span class="ruby-keyword">begin</span>
+        <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;Username for remote repo: &quot;</span>
+        <span class="ruby-identifier">user</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">readline</span>).<span class="ruby-identifier">strip</span>
 
+        <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Password for #{user}: &quot;</span>
+        <span class="ruby-identifier">passwd</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">noecho</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:gets</span>)).<span class="ruby-identifier">strip</span>
+        <span class="ruby-identifier">puts</span>
+
+        <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">SCP</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>, <span class="ruby-value">:password</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">passwd</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">scp</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">scp</span>.<span class="ruby-identifier">download!</span>(<span class="ruby-identifier">dest</span>, <span class="ruby-identifier">local</span>, <span class="ruby-value">:recursive</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>)
+        <span class="ruby-keyword">end</span>
+        <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">true</span>
+      <span class="ruby-keyword">rescue</span>
+        <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Unable to fetch file(s)!&quot;</span>
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-keyword">begin</span>
+      <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">SCP</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>, <span class="ruby-value">:password</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">passwd</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">scp</span><span class="ruby-operator">|</span>
+        <span class="ruby-keyword">yield</span> <span class="ruby-identifier">scp</span>
+      <span class="ruby-keyword">end</span>
+      <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">true</span>
+    <span class="ruby-keyword">rescue</span>
+      <span class="ruby-keyword">begin</span>
+        <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;Username for remote repo: &quot;</span>
+        <span class="ruby-identifier">user</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">readline</span>).<span class="ruby-identifier">strip</span>
+
+        <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Password for #{user}: &quot;</span>
+        <span class="ruby-identifier">passwd</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">noecho</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:gets</span>)).<span class="ruby-identifier">strip</span>
+        <span class="ruby-identifier">puts</span>
+
+        <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">SCP</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>, <span class="ruby-value">:password</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">passwd</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">scp</span><span class="ruby-operator">|</span>
+          <span class="ruby-keyword">yield</span> <span class="ruby-identifier">scp</span>
+        <span class="ruby-keyword">end</span>
+        <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">true</span>
+      <span class="ruby-keyword">rescue</span>
+        <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Unable to fetch file(s)!&quot;</span>
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">return</span> <span class="ruby-identifier">exit_code</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
@@ -347,7 +398,7 @@ calls a method based on the command</p>
         
         <div class="method-heading">
           <span class="method-name">pull</span><span
-            class="method-args">(remote, branch, remote_dir)</span>
+            class="method-args">(remote, branch, user)</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -356,32 +407,66 @@ calls a method based on the command</p>
 
         <div class="method-description">
           
-          
+          <p>Function: pull()</p>
+
+<p>Description:</p>
+
+<pre class="ruby"><span class="ruby-identifier">pulls</span> <span class="ruby-identifier">remote</span> <span class="ruby-identifier">changes</span> <span class="ruby-identifier">to</span> <span class="ruby-identifier">the</span> <span class="ruby-identifier">current</span> <span class="ruby-identifier">branch</span> <span class="ruby-identifier">from</span> <span class="ruby-identifier">remote</span> <span class="ruby-identifier">branch</span>
+</pre>
+
+<p>remote: the remote server and directory to push to, formatted
+“my.server:/the/location/we/want” branch: the branch that we are pushing to
+user: the user to connect as</p>
           
           
 
           
           <div class="method-source-code" id="pull-source">
-            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 139</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">pull</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">branch</span>, <span class="ruby-identifier">remote_dir</span>)
-  <span class="ruby-comment">################ One way we can handle it ###################</span>
-  <span class="ruby-comment">################ Needs Repos and Revlog Functionality! ######</span>
-  <span class="ruby-comment"># snap_id = (Repos::Repo.history(branch)).last</span>
-  <span class="ruby-comment"># snap = RevLog::RevLog.get_file(snap_id)</span>
-  <span class="ruby-comment"># connect(remote) do |x|</span>
-  <span class="ruby-comment">#   result = test.exec!(&quot;&lt;call to Repos to diff the snapshots&gt;&quot;)</span>
-  <span class="ruby-comment"># end</span>
-  <span class="ruby-comment"># print &quot;Username for remote repo: &quot;</span>
-  <span class="ruby-comment"># user = (STDIN.readline).strip</span>
-  <span class="ruby-comment"># print &quot;Password for #{user}: &quot;</span>
-  <span class="ruby-comment"># passwd = (STDIN.noecho(&amp;:gets)).strip</span>
-  <span class="ruby-comment"># puts</span>
-  <span class="ruby-comment"># for result.each do |x|</span>
-  <span class="ruby-comment">#   fetch(remote, remote_dir, &quot;./#{x}&quot;, user, passwd)</span>
-  <span class="ruby-comment">#   RevLog::Revlog.merge(x, local_x)</span>
-  <span class="ruby-comment">#   File.delete(x)</span>
-  <span class="ruby-comment"># end</span>
-  <span class="ruby-comment">#############################################################</span>
+            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 245</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">pull</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">branch</span>, <span class="ruby-identifier">user</span>)
+  <span class="ruby-comment"># check contents of folder for .cn, fail if not present and remove otherwise</span>
+  <span class="ruby-identifier">crbr</span> = <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">current_branch</span>() <span class="ruby-comment"># assumed function</span>
+  <span class="ruby-identifier">dest</span> = <span class="ruby-identifier">remote</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;:&#39;</span>);
+  <span class="ruby-identifier">contents</span> = <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">entries</span>(<span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>)
+  <span class="ruby-keyword">if</span>(<span class="ruby-operator">!</span><span class="ruby-identifier">content</span>.<span class="ruby-identifier">include?</span> <span class="ruby-string">&#39;.cn&#39;</span>)
+    <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;failed to pull from remote, not an initialized Copernicium repo&#39;</span>
+    <span class="ruby-keyword">return</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-identifier">contents</span> = <span class="ruby-identifier">contents</span>.<span class="ruby-identifier">delete_if</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">x</span>.<span class="ruby-identifier">eql?</span> <span class="ruby-string">&#39;.cn&#39;</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">x</span>.<span class="ruby-identifier">eql?</span> <span class="ruby-string">&#39;.&#39;</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">x</span>.<span class="ruby-identifier">eql?</span> <span class="ruby-string">&#39;..&#39;</span>)}
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-comment"># create a new branch and clean it in prep for the incoming files</span>
+  <span class="ruby-identifier">system</span> <span class="ruby-node">&quot;cn branch .temp_pull_#{user}&quot;</span>
+  <span class="ruby-identifier">contents</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">system</span> <span class="ruby-node">&quot;rm -r #{x}&quot;</span>
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-comment"># get the file list from the remote directory</span>
+  <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">dest</span>[<span class="ruby-value">0</span>], <span class="ruby-identifier">user</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">session</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">session</span>.<span class="ruby-identifier">exec!</span>(<span class="ruby-node">&quot;cd #{dest[1]}&quot;</span>)
+    <span class="ruby-identifier">session</span>.<span class="ruby-identifier">exec!</span>(<span class="ruby-node">&quot;cn checkout #{branch}&quot;</span>)
+    <span class="ruby-identifier">collection</span> = <span class="ruby-identifier">session</span>.<span class="ruby-identifier">exec!</span>(<span class="ruby-string">&quot;ls | cat&quot;</span>)
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-identifier">collection</span>  = <span class="ruby-identifier">collection</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;\n&#39;</span>)
+  <span class="ruby-keyword">if</span>(<span class="ruby-operator">!</span><span class="ruby-identifier">collection</span>.<span class="ruby-identifier">include?</span> <span class="ruby-string">&#39;.cn&#39;</span>)
+    <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;failed to pull from remote, remote folder not an initialized Copernicium repo&#39;</span>
+    <span class="ruby-keyword">return</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-identifier">collection</span> = <span class="ruby-identifier">collection</span>.<span class="ruby-identifier">delete_if</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">x</span>.<span class="ruby-identifier">eql?</span> <span class="ruby-string">&#39;.cn&#39;</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">x</span>.<span class="ruby-identifier">eql?</span> <span class="ruby-string">&#39;.&#39;</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">x</span>.<span class="ruby-identifier">eql?</span> <span class="ruby-string">&#39;..&#39;</span>)}
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-comment"># fetch the files from the remote directory and merge them to the branch</span>
+  <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">dest</span>[<span class="ruby-value">0</span>], <span class="ruby-keyword">nil</span>, <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">user</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">scp</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">collection</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">scp</span>.<span class="ruby-identifier">download!</span>(<span class="ruby-identifier">dest</span>[<span class="ruby-value">1</span>]<span class="ruby-operator">+</span><span class="ruby-string">&#39;/&#39;</span><span class="ruby-operator">+</span><span class="ruby-identifier">x</span>, <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>, <span class="ruby-value">:recursive</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>)
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-identifier">system</span> <span class="ruby-string">&quot;cn add .&quot;</span>
+  <span class="ruby-identifier">system</span> <span class="ruby-string">&quot;cn commit -m \&#39;Temp commit for pull\&#39;&quot;</span>
+  <span class="ruby-identifier">system</span> <span class="ruby-node">&quot;cn checkout #{crbr}&quot;</span>
+  <span class="ruby-identifier">system</span> <span class="ruby-node">&quot;cn merge .temp_pull_#{user}&quot;</span>
+  <span class="ruby-identifier">system</span> <span class="ruby-node">&quot;cn branch -r .temp_pull_#{user}&quot;</span>
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Successfully pulled from #{remote}&quot;</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -397,7 +482,7 @@ calls a method based on the command</p>
         
         <div class="method-heading">
           <span class="method-name">push</span><span
-            class="method-args">(remote, branch, remote_dir)</span>
+            class="method-args">(remote, branch, user)</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -406,34 +491,63 @@ calls a method based on the command</p>
 
         <div class="method-description">
           
-          
+          <p>Function: push()</p>
+
+<p>Description:</p>
+
+<pre class="ruby"><span class="ruby-identifier">pushes</span> <span class="ruby-identifier">local</span> <span class="ruby-identifier">changes</span> <span class="ruby-identifier">on</span> <span class="ruby-identifier">the</span> <span class="ruby-identifier">current</span> <span class="ruby-identifier">branch</span> <span class="ruby-identifier">to</span> <span class="ruby-identifier">a</span> <span class="ruby-identifier">remote</span> <span class="ruby-identifier">branch</span>
+</pre>
+
+<p>remote: the remote server and directory to push to, formatted
+“my.server:/the/location/we/want” branch: the branch that we are pushing to
+user: the user to connect as</p>
           
           
 
           
           <div class="method-source-code" id="push-source">
-            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 116</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">push</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">branch</span>, <span class="ruby-identifier">remote_dir</span>)
-  <span class="ruby-comment">################ One way we can handle it ###################</span>
-  <span class="ruby-comment">################ Needs Repos and Revlog Functionality! ######</span>
-  <span class="ruby-comment"># snap_id = (Repos::Repo.history(branch)).last</span>
-  <span class="ruby-comment"># snap = RevLog::RevLog.get_file(snap_id)</span>
-  <span class="ruby-comment"># connect(remote) do |x|</span>
-  <span class="ruby-comment">#   result = test.exec!(&quot;&lt;call to Repos to diff the snapshots&gt;&quot;)</span>
-  <span class="ruby-comment"># end</span>
-  <span class="ruby-comment"># print &quot;Username for remote repo: &quot;</span>
-  <span class="ruby-comment"># user = (STDIN.readline).strip</span>
-  <span class="ruby-comment"># print &quot;Password for #{user}: &quot;</span>
-  <span class="ruby-comment"># passwd = (STDIN.noecho(&amp;:gets)).strip</span>
-  <span class="ruby-comment"># puts</span>
-  <span class="ruby-comment"># for result.each do |x|</span>
-  <span class="ruby-comment">#   transfer(remote, &quot;./#{x}&quot;, remote_dir, user, passwd)</span>
-  <span class="ruby-comment"># end</span>
-  <span class="ruby-comment"># connect(remote) do |x|</span>
-  <span class="ruby-comment">#   test.exec!(&quot;&lt;call to Repos to merge the files&gt;&quot;)</span>
-  <span class="ruby-comment">#   test.exec!(&quot;&lt;clean up the files&gt;&quot;)</span>
-  <span class="ruby-comment"># end</span>
-  <span class="ruby-comment">#############################################################</span>
+            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 194</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">push</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">branch</span>, <span class="ruby-identifier">user</span>)
+  <span class="ruby-comment"># check contents of folder for .cn, fail if not present and remove otherwise</span>
+  <span class="ruby-identifier">dest</span> = <span class="ruby-identifier">remote</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;:&#39;</span>);
+  <span class="ruby-identifier">contents</span> = <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">entries</span>(<span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>)
+  <span class="ruby-keyword">if</span>(<span class="ruby-operator">!</span><span class="ruby-identifier">content</span>.<span class="ruby-identifier">include?</span> <span class="ruby-string">&#39;.cn&#39;</span>)
+    <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;failed to push to remote, not an initialized Copernicium repo&#39;</span>
+    <span class="ruby-keyword">return</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-identifier">contents</span> = <span class="ruby-identifier">contents</span>.<span class="ruby-identifier">delete_if</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">x</span>.<span class="ruby-identifier">eql?</span> <span class="ruby-string">&#39;.cn&#39;</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">x</span>.<span class="ruby-identifier">eql?</span> <span class="ruby-string">&#39;.&#39;</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">x</span>.<span class="ruby-identifier">eql?</span> <span class="ruby-string">&#39;..&#39;</span>)}
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-comment"># todo - check if branch exists on the remote server</span>
+  <span class="ruby-comment"># if so, dump contents and save a new commit saying pushed from user</span>
+  <span class="ruby-comment"># else, create branch and dump files, then make a new commit saying</span>
+  <span class="ruby-comment"># created branch</span>
+  <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">dest</span>[<span class="ruby-value">0</span>], <span class="ruby-identifier">user</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">session</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">session</span>.<span class="ruby-identifier">exec!</span>(<span class="ruby-node">&quot;cd #{dest[1]}&quot;</span>)
+    <span class="ruby-identifier">result</span> = <span class="ruby-identifier">session</span>.<span class="ruby-identifier">exec!</span>(<span class="ruby-string">&#39;ls .cn&#39;</span>)
+    <span class="ruby-keyword">if</span>(<span class="ruby-identifier">result</span>.<span class="ruby-identifier">strip</span>.<span class="ruby-identifier">eql?</span> <span class="ruby-string">&#39;&#39;</span>)
+      <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;remote directory not a Copernicium repo&#39;</span>
+      <span class="ruby-keyword">return</span>
+    <span class="ruby-keyword">end</span>
+    <span class="ruby-identifier">session</span>.<span class="ruby-identifier">exec!</span>(<span class="ruby-node">&quot;cn branch .temp_push_#{user}&quot;</span>)
+    <span class="ruby-identifier">session</span>.<span class="ruby-identifier">exec!</span>(<span class="ruby-string">&quot;find . ! -name \&quot;.cn\&quot; -exec rm -r {} \\;&quot;</span>)
+
+    <span class="ruby-comment"># Move the files over to the remote branch</span>
+    <span class="ruby-identifier">transfer</span>(<span class="ruby-identifier">dest</span>[<span class="ruby-value">0</span>], <span class="ruby-identifier">user</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">scp</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">contents</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">scp</span>.<span class="ruby-identifier">upload!</span>(<span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span><span class="ruby-operator">+</span><span class="ruby-string">&#39;/&#39;</span><span class="ruby-operator">+</span><span class="ruby-identifier">x</span>, <span class="ruby-identifier">dest</span>[<span class="ruby-value">1</span>], <span class="ruby-value">:recursive</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>)
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">end</span>
+
+    <span class="ruby-comment"># Commit the files and merge the branches</span>
+    <span class="ruby-identifier">session</span>.<span class="ruby-identifier">exec!</span>(<span class="ruby-string">&#39;cn add .&#39;</span>)
+    <span class="ruby-identifier">session</span>.<span class="ruby-identifier">exec!</span>(<span class="ruby-string">&#39;cn commit -m \Temp commit for push\&#39;</span>)
+    <span class="ruby-identifier">session</span>.<span class="ruby-identifier">exec!</span>(<span class="ruby-node">&quot;cn checkout #{branch}&quot;</span>)
+    <span class="ruby-identifier">session</span>.<span class="ruby-identifier">exec!</span>(<span class="ruby-node">&quot;cn merge .temp_push_#{user}&quot;</span>)
+    <span class="ruby-identifier">session</span>.<span class="ruby-identifier">exec!</span>(<span class="ruby-node">&quot;cn branch -r temp_push_#{user}&quot;</span>)
+  <span class="ruby-keyword">end</span>
+
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Successfully pushed to #{remote}&quot;</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -449,7 +563,7 @@ calls a method based on the command</p>
         
         <div class="method-heading">
           <span class="method-name">transfer</span><span
-            class="method-args">(remote, local, dest, user = nil, passwd = nil)</span>
+            class="method-args">(remote, user) { |scp| ... }</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -458,31 +572,43 @@ calls a method based on the command</p>
 
         <div class="method-description">
           
-          
+          <p>Function: transfer()</p>
+
+<p>Description:</p>
+
+<pre>a net/scp wrapper to copy to server</pre>
+
+<p>remote: the remote server and directory to pull from, formatted
+“my.server:/the/location/we/want” user: the user to connect as</p>
           
           
 
           
           <div class="method-source-code" id="transfer-source">
-            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 72</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">transfer</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">local</span>, <span class="ruby-identifier">dest</span>, <span class="ruby-identifier">user</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">passwd</span> = <span class="ruby-keyword">nil</span>)
+            <pre><span class="ruby-comment"># File lib/pushpull.rb, line 99</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">transfer</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
   <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">false</span>
-  <span class="ruby-keyword">if</span>(<span class="ruby-identifier">user</span>.<span class="ruby-identifier">nil?</span>)
-    <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;Username for remote repo: &quot;</span>
-    <span class="ruby-identifier">user</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">readline</span>).<span class="ruby-identifier">strip</span>
-  <span class="ruby-keyword">end</span>
-  <span class="ruby-keyword">if</span>(<span class="ruby-identifier">passwd</span>.<span class="ruby-identifier">nil?</span>)
-    <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Password for #{user}: &quot;</span>
-    <span class="ruby-identifier">passwd</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">noecho</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:gets</span>)).<span class="ruby-identifier">strip</span>
-    <span class="ruby-identifier">puts</span>
-  <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">begin</span>
-    <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">SCP</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>, <span class="ruby-value">:password</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">passwd</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">scp</span><span class="ruby-operator">|</span>
-      <span class="ruby-identifier">scp</span>.<span class="ruby-identifier">upload!</span>(<span class="ruby-identifier">local</span>, <span class="ruby-identifier">dest</span>)
+    <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">SCP</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">scp</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword">yield</span> <span class="ruby-identifier">scp</span>
     <span class="ruby-keyword">end</span>
     <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">true</span>
   <span class="ruby-keyword">rescue</span>
-    <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Unable to upload file!&quot;</span>
+    <span class="ruby-keyword">begin</span>
+      <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;Username for remote repo: &quot;</span>
+      <span class="ruby-identifier">user</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">readline</span>).<span class="ruby-identifier">strip</span>
+
+      <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Password for #{user}: &quot;</span>
+      <span class="ruby-identifier">passwd</span> = (<span class="ruby-constant">STDIN</span>.<span class="ruby-identifier">noecho</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:gets</span>)).<span class="ruby-identifier">strip</span>
+      <span class="ruby-identifier">puts</span>
+
+      <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">SCP</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">remote</span>, <span class="ruby-identifier">user</span>, <span class="ruby-value">:passwd</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">passwd</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">scp</span><span class="ruby-operator">|</span>
+        <span class="ruby-keyword">yield</span> <span class="ruby-identifier">scp</span>
+      <span class="ruby-keyword">end</span>
+      <span class="ruby-identifier">exit_code</span> = <span class="ruby-keyword">true</span>
+    <span class="ruby-keyword">rescue</span>
+      <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Unable to upload file!&quot;</span>
+    <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
           </div>

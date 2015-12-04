@@ -85,9 +85,10 @@
 
   <section class="description">
     
-<p>Communication object that will pass commands to backend modules rev -
-revision indicator (commit #, branch name, HEAD, etc.) repo - URL/path to a
-remote repository</p>
+<p>Communication object that will pass commands to backend modules also used
+in unit test to make sure command is being parsed ok rev - revision
+indicator (commit #, branch name, HEAD, etc.) repo - URL/path to a remote
+repository</p>
 
   </section>
 
@@ -215,7 +216,7 @@ remote repository</p>
 
           
           <div class="method-source-code" id="new-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 187</span>
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 13</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">command</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">files</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">rev</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>,
                <span class="ruby-identifier">cmt_msg</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">repo</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>)
   <span class="ruby-ivar">@cmt_msg</span> = <span class="ruby-identifier">cmt_msg</span>

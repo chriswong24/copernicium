@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 
-<title>class Copernicium::Driver - RDoc Documentation</title>
+<title>module Copernicium::Driver - RDoc Documentation</title>
 
 <script type="text/javascript">
   var rdoc_rel_prefix = "../";
@@ -18,7 +18,7 @@
 
 
 
-<body id="top" role="document" class="class">
+<body id="top" role="document" class="module">
 <nav role="navigation">
   <div id="project-navigation">
     <div id="home-section" role="region" title="Quick navigation" class="nav-section">
@@ -54,15 +54,23 @@
 
   <div id="class-metadata">
     
-    <div id="parent-class-section" class="nav-section">
-  <h3>Parent</h3>
+    
+    <div id="includes-section" class="nav-section">
+  <h3>Included Modules</h3>
 
+  <ul class="link-list">
   
-  <p class="link"><a href="../Object.html">Object</a>
   
+    <li><a class="include" href="Repos.html">Copernicium::Repos</a>
+  
+  
+  
+    <li><a class="include" href="Workspace.html">Copernicium::Workspace</a>
+  
+  
+  </ul>
 </div>
 
-    
     
     <!-- Method Quickref -->
 <div id="method-list-section" class="nav-section">
@@ -80,17 +88,27 @@
     
     <li ><a href="#method-i-commit">#commit</a>
     
+    <li ><a href="#method-i-create_branch">#create_branch</a>
+    
     <li ><a href="#method-i-get">#get</a>
+    
+    <li ><a href="#method-i-history">#history</a>
     
     <li ><a href="#method-i-init">#init</a>
     
+    <li ><a href="#method-i-isbranch-3F">#isbranch?</a>
+    
     <li ><a href="#method-i-merge">#merge</a>
+    
+    <li ><a href="#method-i-pexit">#pexit</a>
     
     <li ><a href="#method-i-pull">#pull</a>
     
     <li ><a href="#method-i-push">#push</a>
     
     <li ><a href="#method-i-run">#run</a>
+    
+    <li ><a href="#method-i-setup">#setup</a>
     
     <li ><a href="#method-i-status">#status</a>
     
@@ -100,13 +118,15 @@
   </div>
 </nav>
 
-<main role="main" aria-labelledby="class-Copernicium::Driver">
-  <h1 id="class-Copernicium::Driver" class="class">
-    class Copernicium::Driver
+<main role="main" aria-labelledby="module-Copernicium::Driver">
+  <h1 id="module-Copernicium::Driver" class="module">
+    module Copernicium::Driver
   </h1>
 
   <section class="description">
     
+<p>main driver for the command line user interface</p>
+
   </section>
 
   
@@ -147,10 +167,50 @@
 
           
           <div class="method-source-code" id="branch-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 95</span>
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 135</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">branch</span>(<span class="ruby-identifier">args</span>)
-  <span class="ruby-comment"># todo - switch branches, create branches</span>
-  <span class="ruby-comment"># if branch does not exist, create it</span>
+  <span class="ruby-identifier">branch</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">first</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">branch</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-comment"># show all branches</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Branches: &quot;</span>.<span class="ruby-identifier">grn</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">branches</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&#39; &#39;</span>)
+  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">branch</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;-c&#39;</span> <span class="ruby-comment"># try to create a new branch</span>
+    <span class="ruby-comment"># If branch name not specified, get it from the user</span>
+    <span class="ruby-identifier">branch</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>]
+    <span class="ruby-identifier">branch</span> = <span class="ruby-identifier">get</span> <span class="ruby-string">&quot;new branch name&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">branch</span>.<span class="ruby-identifier">nil?</span>
+
+    <span class="ruby-comment"># Create and switch to the new branch</span>
+    <span class="ruby-identifier">create_branch</span> <span class="ruby-identifier">branch</span>
+  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">branch</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;-r&#39;</span> <span class="ruby-comment"># rename the current branch</span>
+    <span class="ruby-comment"># If branch name not specified, get it from the user</span>
+    <span class="ruby-identifier">newname</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>]
+    <span class="ruby-identifier">newname</span> = <span class="ruby-identifier">get</span> <span class="ruby-string">&quot;new name for current branch&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">newname</span>.<span class="ruby-identifier">nil?</span>
+
+    <span class="ruby-identifier">oldname</span> = <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">branch</span>
+
+    <span class="ruby-comment"># Create and switch to a new branch with the given name</span>
+    <span class="ruby-identifier">create_branch</span> <span class="ruby-identifier">newname</span>
+
+    <span class="ruby-comment"># Delete the branch with the old name</span>
+    <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">delete_branch</span> <span class="ruby-identifier">oldname</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Deleted branch &#39;#{oldname}&#39;&quot;</span>.<span class="ruby-identifier">grn</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Renamed branch &#39;#{oldname}&#39; to &#39;#{newname}&#39;&quot;</span>.<span class="ruby-identifier">grn</span>
+  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">branch</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;-d&#39;</span> <span class="ruby-comment"># Delete the specified branch</span>
+    <span class="ruby-comment"># If branch name not specified, get it from the user</span>
+    <span class="ruby-identifier">branch</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>]
+    <span class="ruby-identifier">branch</span> = <span class="ruby-identifier">get</span> <span class="ruby-string">&quot;branch to delete&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">branch</span>.<span class="ruby-identifier">nil?</span>
+
+    <span class="ruby-comment"># Do not delete the current branch</span>
+    <span class="ruby-keyword">if</span> <span class="ruby-identifier">branch</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">branch</span>
+      <span class="ruby-identifier">pexit</span> <span class="ruby-string">&quot;Cannot delete the current branch!&quot;</span>.<span class="ruby-identifier">red</span>, <span class="ruby-value">1</span>
+    <span class="ruby-keyword">end</span>
+
+    <span class="ruby-comment"># Delete the specified branch</span>
+    <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">delete_branch</span> <span class="ruby-identifier">branch</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Deleted branch &#39;#{branch}&#39;&quot;</span>.<span class="ruby-identifier">grn</span>
+  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">isbranch?</span> <span class="ruby-identifier">branch</span> <span class="ruby-comment"># switch branch</span>
+    <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">update_branch</span>  <span class="ruby-identifier">branch</span>
+  <span class="ruby-keyword">else</span> <span class="ruby-comment"># branch does not exist, create it, switch to it</span>
+    <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">create_branch</span> <span class="ruby-identifier">branch</span>
+  <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -181,7 +241,7 @@
 
           
           <div class="method-source-code" id="checkout-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 110</span>
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 191</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">checkout</span>(<span class="ruby-identifier">args</span>)
   <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>
     <span class="ruby-identifier">rev</span> = <span class="ruby-identifier">get</span> <span class="ruby-string">&#39;branch or revision&#39;</span>
@@ -190,13 +250,12 @@
     <span class="ruby-identifier">files</span> = <span class="ruby-identifier">args</span>
   <span class="ruby-keyword">end</span>
 
-  <span class="ruby-comment"># todo - also, figure out if is branch or rev id</span>
-  <span class="ruby-comment"># this can be done by checking if it is a branch, and if not, then just</span>
-  <span class="ruby-comment"># assume it is a rev id. if it isnt, then something will break :/</span>
+  <span class="ruby-comment"># if it is a branch, get the last head of it</span>
+  <span class="ruby-identifier">rev</span> = <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">history</span>(<span class="ruby-identifier">rev</span>).<span class="ruby-identifier">last</span>.<span class="ruby-identifier">id</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">isbranch?</span> <span class="ruby-identifier">rev</span>
 
   <span class="ruby-comment"># call workspace checkout the given / branch</span>
   <span class="ruby-identifier">ui</span> = <span class="ruby-constant">UIComm</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">command</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;checkout&#39;</span>, <span class="ruby-identifier">rev</span><span class="ruby-operator">:</span> <span class="ruby-identifier">rev</span>, <span class="ruby-identifier">files</span><span class="ruby-operator">:</span> <span class="ruby-identifier">files</span>)
-  <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">checkout</span>(<span class="ruby-identifier">ui</span>)
+  <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">checkout</span>(<span class="ruby-identifier">ui</span>)
   <span class="ruby-identifier">ui</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
@@ -228,10 +287,10 @@
 
           
           <div class="method-source-code" id="clean-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 128</span>
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 208</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">clean</span>(<span class="ruby-identifier">args</span> = [])
   <span class="ruby-identifier">ui</span> = <span class="ruby-constant">UIComm</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">command</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;clean&#39;</span>, <span class="ruby-identifier">files</span><span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>)
-  <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">clean</span>(<span class="ruby-identifier">ui</span>)
+  <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">clean</span>(<span class="ruby-identifier">ui</span>)
   <span class="ruby-identifier">ui</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
@@ -263,10 +322,8 @@
 
           
           <div class="method-source-code" id="clone-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 134</span>
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 214</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">clone</span>(<span class="ruby-identifier">args</span>)
-  <span class="ruby-comment"># todo - optionally check for folder to clone into, instead of cwd</span>
-  <span class="ruby-comment"># see init for an example</span>
   <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>
     <span class="ruby-identifier">repo</span> = <span class="ruby-identifier">get</span> <span class="ruby-string">&#39;repo url to clone&#39;</span>
   <span class="ruby-keyword">else</span>
@@ -306,7 +363,7 @@
 
           
           <div class="method-source-code" id="commit-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 148</span>
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 226</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">commit</span>(<span class="ruby-identifier">args</span>)
   <span class="ruby-identifier">messflag</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">find_index</span>(<span class="ruby-string">&#39;-m&#39;</span>)
   <span class="ruby-keyword">if</span> <span class="ruby-identifier">messflag</span>.<span class="ruby-identifier">nil?</span>
@@ -323,8 +380,43 @@
 
   <span class="ruby-comment"># perform the commit, with workspace</span>
   <span class="ruby-identifier">ui</span> = <span class="ruby-constant">UIComm</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">command</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;commit&#39;</span>, <span class="ruby-identifier">files</span><span class="ruby-operator">:</span> <span class="ruby-identifier">files</span>, <span class="ruby-identifier">cmt_msg</span><span class="ruby-operator">:</span> <span class="ruby-identifier">message</span>)
-  <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">commit</span>(<span class="ruby-identifier">ui</span>)
+  <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">commit</span>(<span class="ruby-identifier">ui</span>)
   <span class="ruby-identifier">ui</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-create_branch" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">create_branch</span><span
+            class="method-args">(branch)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>create and switch to a new branch</p>
+          
+          
+
+          
+          <div class="method-source-code" id="create_branch-source">
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 129</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">create_branch</span>(<span class="ruby-identifier">branch</span>)
+  <span class="ruby-identifier">new_branch_hash</span> = <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">make_branch</span> <span class="ruby-identifier">branch</span>
+  <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">update_branch</span> <span class="ruby-identifier">branch</span>
+  <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Created new branch &#39;#{branch}&#39; with head #{new_branch_hash}&quot;</span>.<span class="ruby-identifier">grn</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -355,10 +447,43 @@
 
           
           <div class="method-source-code" id="get-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 15</span>
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 97</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">get</span>(<span class="ruby-identifier">info</span>)
   <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Note: #{info} not specified. Enter #{info} to continue.&quot;</span>
   <span class="ruby-identifier">gets</span>.<span class="ruby-identifier">chomp</span> <span class="ruby-comment"># read a line from user, and return it</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-history" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">history</span><span
+            class="method-args">(args)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="history-source">
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 246</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">history</span>(<span class="ruby-identifier">args</span>)
+  <span class="ruby-identifier">puts</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">history</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -389,18 +514,48 @@
 
           
           <div class="method-source-code" id="init-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 72</span>
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 103</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">init</span>(<span class="ruby-identifier">args</span>)
-  <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">nil?</span>
-    <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">new</span>
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>
+    <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">create_project</span>
   <span class="ruby-keyword">else</span> <span class="ruby-comment"># init into a folder</span>
-    <span class="ruby-identifier">target</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>, <span class="ruby-identifier">args</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&#39; &#39;</span>)
-    <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">mkdir</span> <span class="ruby-identifier">target</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span> <span class="ruby-identifier">target</span>
-    <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">chdir</span> <span class="ruby-identifier">target</span>
-    <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">new</span>
+    <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">create_project</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">first</span>
   <span class="ruby-keyword">end</span>
   <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Created Copernicium repo in &quot;</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>.<span class="ruby-identifier">grn</span>
   <span class="ruby-constant">UIComm</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">command</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;init&#39;</span>, <span class="ruby-identifier">opts</span><span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-isbranch-3F" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">isbranch?</span><span
+            class="method-args">(branch)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>check whether a specific branch exists</p>
+          
+          
+
+          
+          <div class="method-source-code" id="isbranch-3F-source">
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 124</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">isbranch?</span>(<span class="ruby-identifier">branch</span>)
+  <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">branches</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">branch</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -431,18 +586,54 @@
 
           
           <div class="method-source-code" id="merge-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 168</span>
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 250</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">merge</span>(<span class="ruby-identifier">args</span>)
   <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>
     <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;I need a commit or branch to merge.&#39;</span>
     <span class="ruby-identifier">rev</span> = <span class="ruby-identifier">get</span> <span class="ruby-string">&#39;single commit or branch to merge&#39;</span>
   <span class="ruby-keyword">else</span> <span class="ruby-comment"># use given</span>
     <span class="ruby-identifier">rev</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">first</span>
+    <span class="ruby-comment"># get all branchs, see if arg is in it.</span>
+    <span class="ruby-comment"># if so, look up snapshot of &lt;branch&gt; head</span>
+    <span class="ruby-comment"># TODO - parse whether given arg is a branch name, else assume snap id</span>
+    <span class="ruby-comment"># todo - call repos merge command</span>
+    <span class="ruby-comment"># todo show conflicting files</span>
+    <span class="ruby-constant">UIComm</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">command</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;merge&#39;</span>, <span class="ruby-identifier">rev</span><span class="ruby-operator">:</span> <span class="ruby-identifier">rev</span>)
   <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
 
-  <span class="ruby-comment"># todo - call repos merge command</span>
+        
 
-  <span class="ruby-constant">UIComm</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">command</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;merge&#39;</span>, <span class="ruby-identifier">rev</span><span class="ruby-operator">:</span> <span class="ruby-identifier">rev</span>)
+        
+      </div>
+
+    
+      <div id="method-i-pexit" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">pexit</span><span
+            class="method-args">(msg, sig)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Print and exit with a specific code</p>
+          
+          
+
+          
+          <div class="method-source-code" id="pexit-source">
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 91</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">pexit</span>(<span class="ruby-identifier">msg</span>, <span class="ruby-identifier">sig</span>)
+  <span class="ruby-identifier">puts</span> <span class="ruby-identifier">msg</span>
+  <span class="ruby-identifier">exit</span> <span class="ruby-identifier">sig</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -473,9 +664,10 @@
 
           
           <div class="method-source-code" id="pull-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 105</span>
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 185</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">pull</span>(<span class="ruby-identifier">args</span>)
   <span class="ruby-constant">UIComm</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">command</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;pull&#39;</span>, <span class="ruby-identifier">opts</span><span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>)
+  <span class="ruby-comment">#def pull(remote, branch&#39;, remote_dir)</span>
   <span class="ruby-comment"># todo - make call to pushpull, pull remote</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
@@ -507,7 +699,7 @@
 
           
           <div class="method-source-code" id="push-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 100</span>
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 180</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">push</span>(<span class="ruby-identifier">args</span>)
   <span class="ruby-constant">UIComm</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">command</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;push&#39;</span>, <span class="ruby-identifier">opts</span><span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>)
   <span class="ruby-comment"># todo - make call to pushpull, push remote</span>
@@ -551,7 +743,7 @@ executed by the respective backend module.</pre>
 
           
           <div class="method-source-code" id="run-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 30</span>
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 44</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">run</span>(<span class="ruby-identifier">args</span>)
 
   <span class="ruby-comment"># if no arguments given show help information</span>
@@ -560,11 +752,14 @@ executed by the respective backend module.</pre>
   <span class="ruby-comment"># get first command</span>
   <span class="ruby-identifier">cmd</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span>
 
+  <span class="ruby-comment"># if -v flag givem show version</span>
+  <span class="ruby-identifier">pexit</span> <span class="ruby-constant">VERSION</span>, <span class="ruby-value">0</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">cmd</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;-v&#39;</span>
+
   <span class="ruby-comment"># if no arguments given show help information</span>
   <span class="ruby-identifier">pexit</span> <span class="ruby-constant">COMMAND_BANNER</span>, <span class="ruby-value">0</span> <span class="ruby-keyword">if</span> (<span class="ruby-identifier">cmd</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;-h&#39;</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">cmd</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;help&#39;</span>)
 
-  <span class="ruby-comment"># if -v flag givem show version</span>
-  <span class="ruby-identifier">pexit</span> <span class="ruby-constant">VERSION</span>, <span class="ruby-value">0</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">cmd</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;-v&#39;</span>
+  <span class="ruby-comment"># if not in a repo, warn them, tell how to create</span>
+  <span class="ruby-identifier">puts</span> <span class="ruby-constant">REPO_WARNING</span>.<span class="ruby-identifier">yel</span> <span class="ruby-keyword">if</span> (<span class="ruby-identifier">noroot?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">cmd</span> <span class="ruby-operator">!=</span> <span class="ruby-string">&#39;init&#39;</span>)
 
   <span class="ruby-comment"># Handle standard commands</span>
   <span class="ruby-keyword">case</span> <span class="ruby-identifier">cmd</span>
@@ -572,6 +767,8 @@ executed by the respective backend module.</pre>
     <span class="ruby-identifier">init</span> <span class="ruby-identifier">args</span>
   <span class="ruby-keyword">when</span> <span class="ruby-string">&#39;status&#39;</span>
     <span class="ruby-identifier">status</span> <span class="ruby-identifier">args</span>
+  <span class="ruby-keyword">when</span> <span class="ruby-string">&#39;history&#39;</span>
+    <span class="ruby-identifier">history</span> <span class="ruby-identifier">args</span>
   <span class="ruby-keyword">when</span> <span class="ruby-string">&#39;branch&#39;</span>
     <span class="ruby-identifier">branch</span> <span class="ruby-identifier">args</span>
   <span class="ruby-keyword">when</span> <span class="ruby-string">&#39;clean&#39;</span>
@@ -602,6 +799,41 @@ executed by the respective backend module.</pre>
       </div>
 
     
+      <div id="method-i-setup" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">setup</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="setup-source">
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 28</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">setup</span>
+  <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">setup</span>
+  <span class="ruby-constant">RevLog</span>.<span class="ruby-identifier">setup</span>
+  <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">setup</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
       <div id="method-i-status" class="method-detail ">
         
         <div class="method-heading">
@@ -621,13 +853,13 @@ executed by the respective backend module.</pre>
 
           
           <div class="method-source-code" id="status-source">
-            <pre><span class="ruby-comment"># File lib/ui.rb, line 86</span>
+            <pre><span class="ruby-comment"># File lib/ui.rb, line 114</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">status</span>(<span class="ruby-identifier">args</span>)
   <span class="ruby-identifier">ui</span> = <span class="ruby-constant">UIComm</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">command</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;status&#39;</span>, <span class="ruby-identifier">opts</span><span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>)
-  <span class="ruby-identifier">st</span> = <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">status</span>(<span class="ruby-identifier">ui</span>)
-  <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Added:\t&quot;</span>.<span class="ruby-identifier">grn</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">st</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">join</span>(<span class="ruby-string">&#39;, &#39;</span>)   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">st</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">empty?</span>
-  <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Edited:\t&quot;</span>.<span class="ruby-identifier">yel</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">st</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">join</span>(<span class="ruby-string">&#39;, &#39;</span>)  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">st</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">empty?</span>
-  <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Removed:\t&quot;</span>.<span class="ruby-identifier">red</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">st</span>[<span class="ruby-value">2</span>].<span class="ruby-identifier">join</span>(<span class="ruby-string">&#39;, &#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">st</span>[<span class="ruby-value">2</span>].<span class="ruby-identifier">empty?</span>
+  <span class="ruby-identifier">st</span> = <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">status</span>
+  <span class="ruby-identifier">st</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Added:\t&quot;</span>.<span class="ruby-identifier">grn</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">f</span> }
+  <span class="ruby-identifier">st</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Edited:\t&quot;</span>.<span class="ruby-identifier">yel</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">f</span> }
+  <span class="ruby-identifier">st</span>[<span class="ruby-value">2</span>].<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Removed:\t&quot;</span>.<span class="ruby-identifier">red</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">f</span> }
   <span class="ruby-identifier">ui</span>
 <span class="ruby-keyword">end</span></pre>
           </div>

@@ -58,6 +58,7 @@
     <li><a href="#label-copernicium"><a href="https://en.wikipedia.org/wiki/Copernicium">copernicium</a></a>
     <li><a href="#label-installation">installation</a>
     <li><a href="#label-development">development</a>
+    <li><a href="#label-Setting+up+SSH+keys">Setting up SSH keys</a>
     <li><a href="#label-relevant+links-3A">relevant links:</a>
   </ul>
 </div>
@@ -81,12 +82,14 @@
 
 <h1 id="label-copernicium"><a href="https://en.wikipedia.org/wiki/Copernicium">copernicium</a><span><a href="#label-copernicium">&para;</a> <a href="#top">&uarr;</a></span></h1>
 
-<p><a href="https://badge.fury.io/rb/copernicium"><img
+<p><a href="http://jeremywrnr.com/mit-license"><img
+src="https://img.shields.io/npm/l/alt.svg?style=flat"></a> <a
+href="https://badge.fury.io/rb/copernicium"><img
 src="https://badge.fury.io/rb/copernicium.svg"></a> <a
 href="https://travis-ci.org/jeremywrnr/copernicium"><img
 src="https://travis-ci.org/jeremywrnr/copernicium.svg"></a> <a
-href="http://jeremywrnr.com/mit-license"><img
-src="https://img.shields.io/npm/l/alt.svg?style=flat"></a></p>
+href="https://codeclimate.com/github/jeremywrnr/copernicium"><img
+src="https://codeclimate.com/github/jeremywrnr/copernicium/badges/gpa.svg"></a></p>
 
 <p>Repository for Team Copernicium&#39;s DVCS.</p>
 
@@ -115,10 +118,32 @@ run:</p>
 
 <pre>$ rake info</pre>
 
-<p>To show information about each module&#39;s tests, and branches commits,
-run:</p>
+<h3 id="label-Setting+up+SSH+keys">Setting up SSH keys<span><a href="#label-Setting+up+SSH+keys">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<pre>$ rake info</pre>
+<p>If SSH keys are not setup, you will be required to provide a user and
+password for each use of the push, pull and clone methods. In order to
+avoid this, SSH keys can be used, which allow the user to only supply a
+password. First, change to the .ssh folder in the home directory of the
+user:</p>
+
+<pre>    $ cd ~/.ssh</pre>
+
+<p>To generate an ssh key on the local machine, use the command:</p>
+
+<pre>    $ ssh-keygen -t dsa</pre>
+
+<p>Use the provided configurations from the program and do not enter a
+password. Once this is done, you will have the files id_dsa and id_dsa.pub
+in the .ssh folder. You will need to move the contents of the public key to
+your remote server. Copy the contents of the id_dsa.pub file and log onto
+the remote server. Navigate to the .ssh folder and open the authorized_keys
+file and add the contents of the public key to a line:</p>
+
+<pre>    $ cd ~/.ssh
+    $ echo [public key info] &gt; authorized_keys</pre>
+
+<p>You should now be able to use the push, pull, and origin functions using
+only the username.</p>
 
 <h3 id="label-relevant+links-3A">relevant links:<span><a href="#label-relevant+links-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
