@@ -2,13 +2,20 @@
 
 require_relative 'test_helper'
 
+include Copernicium::Repos
+
 # Note on these tests: rather than merely checking that they are not empty
 # values, check that they are equal to what you would expect them to be.
 
 class TestCnReposModule < Minitest::Test
   describe 'ReposModule' do
-    before 'create repo instance' do
-      @repo = Repos.new Dir.pwd
+    before 'mixin repo module' do
+      Copernicium::RevLog.setup
+      Copernicium::Repos.setup
+    end
+
+    after "clean up repo dir" do
+      FileUtils.rm_rf(File.join(Dir.pwd, ".cn"))
     end
 
     it 'can create snapshots' do
