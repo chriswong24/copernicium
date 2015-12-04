@@ -15,7 +15,7 @@ module Copernicium
     cwd = Dir.pwd
     max = 0
     def notroot() Dir.pwd != '/' end
-    def notcn() File.exists? File.join(Dir.pwd, '.cn') end
+    def notcn() Dir.exist? File.join(Dir.pwd, '.cn') end
     while max < 10 && notroot && notcn
       Dir.chdir(File.join(Dir.pwd, '..'))
       max += 1
@@ -68,7 +68,7 @@ module Copernicium
       pexit VERSION, 0 if cmd == '-v'
 
       # if not in a repo, warn them, tell how to create
-      puts REPO_WARNING.yel if noroot?
+      puts REPO_WARNING.yel if noroot? && cmd != 'init'
 
       # Handle standard commands
       case cmd
@@ -76,8 +76,8 @@ module Copernicium
         init args
       when 'status'
         status args
-        #when 'log' || 'history'
-        # show list of commits
+      when 'history'
+        history args
       when 'branch'
         branch args
       when 'clean'
@@ -200,6 +200,9 @@ module Copernicium
       ui
     end
 
+    def history(args)
+    end
+
     # TODO - parse whether given arg is a branch name, else assume snap id
     def merge(args)
       if args.empty?
@@ -216,7 +219,9 @@ module Copernicium
     end
   end # Driver
 
+
   # Communication object that will pass commands to backend modules
+  # also used in unit test to make sure command is being parsed ok
   # rev - revision indicator (commit #, branch name, HEAD, etc.)
   # repo - URL/path to a remote repository
   class UIComm

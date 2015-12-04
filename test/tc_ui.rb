@@ -13,9 +13,8 @@ require_relative 'test_helper'
 
 class TestUI < Minitest::Test
   describe "UIModule" do
-    before "checking ui performance, create driver" do
+    before "checking ui performance, create repo and driver" do
       @driver = Driver.new
-      Workspace.new
     end
 
     def ui_test_helper(comm, cmd, files=nil, rev=nil, msg=nil, repo=nil)
