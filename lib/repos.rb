@@ -95,30 +95,25 @@ module Copernicium
       snap.id
     end
 
-
+    # todo - Check to make sure id is from a different branch?
     # Merge the target snapshot into HEAD snapshot of the current branch
     # returns [{path => content}, [conflicting paths]]
     def merge_snapshot(id)
+      curr_snap = @snaps[@branch].last
       diff_ret = []
-      curr_snap = @snaps[@branch][-1]
-      # todo - Check to make sure id is from a different branch?
 
       # run diff to get conflicts
-      diff_ret = diff_snapshots(curr_snap.id, id)
+      difference = diff_snapshots(curr_snap.id, id)
 
-      # if there are conflicts, no snapshot
-      # Double check this equality
-      if diff_ret[1] != []
-        diff_ret
-      else
-        # if no conflicts, add new snapshot to head of current branch
+      # if no conflicts, add new snapshot to head of current branch
+      if difference[1].empty?
+        difference
+      else # if there are conflicts, no snapshot
         in_snap = get_snapshot(id)
         make_snap( curr_snap.files + (in_snap.files - curr_snap.files) )
-        # Do I have to return ID of new snap?
       end
     end
 
-    # TODO - search all branches instead of just the current one
     # Find snapshot, return snapshot (or just contents) given id
     def get_snapshot(id)
       found_index = nil
