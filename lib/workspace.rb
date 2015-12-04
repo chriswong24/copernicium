@@ -25,11 +25,6 @@ module Copernicium
       @path = path
     end
 
-    # returns most recent file id in the snapshot it was saved in
-    def last
-      @history.last
-    end
-
     def ==(rhs)
       if rhs.is_a? String
         @path == rhs
@@ -37,13 +32,17 @@ module Copernicium
         @path == rhs.path
       end
     end
+
+    # returns most recent file id in the snapshot it was saved in
+    def last
+      @history.last
+    end
   end
 
 
   module Workspace
-    include RevLog
-    include Repos
-
+    extend RevLog
+    extend Repos
     def setup(bname = 'master')
       @@files = []
       @@cwd = Dir.pwd

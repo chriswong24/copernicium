@@ -95,11 +95,11 @@ module Copernicium
 
     # create a new copernicium repository
     def init(args)
-      Workspace.create args
+      Workspace.setup
       if args.nil?
-        Workspace.create
+        Workspace.create_project
       else # init into a folder
-        Workspace.create args
+        Workspace.create_project
       end
       puts "Created Copernicium repo in " + Dir.pwd.grn
       UIComm.new(command: 'init', opts: args)
