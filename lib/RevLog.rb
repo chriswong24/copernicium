@@ -29,7 +29,7 @@ module Copernicium
     def RevLog.setup(root = Dir.pwd)
       @@root = root
       @@cop_path = File.join(@@root, '.cn')
-      @@rev_path = File.join(@@cop_path, 'revlog')
+      @@rev_path = File.join(@@cop_path, 'revs')
       @@log_path = File.join(@@rev_path, 'logmap.yaml')
       @@hash_path = File.join(@@rev_path, 'hashmap.yaml')
       Dir.mkdir(@@cop_path) unless Dir.exist?(@@cop_path)
@@ -54,7 +54,7 @@ module Copernicium
                                                     :hash => hash}
       @@hashmap[hash] = @@hashmap[hash] << {:time => Time.now,
                                             :filename => file_name}
-      update_log_file
+      Revlog.update
       return hash
     end
 
@@ -64,7 +64,7 @@ module Copernicium
         file_name = @@hashmap[file_id][0][:filename]
         @@hashmap[file_id].delete_if { |e| e[:filename] == file_name }
         @@logmap[file_name].delete_if { |e| e[:hash] == file_id }
-        update_log_file
+        Revlog.update
         File.delete(File.join(@@cop_path, file_id))
         return 1
       rescue Exception
@@ -104,8 +104,8 @@ module Copernicium
       hashs
     end
 
-    def RevLog.update_log_file
-      # writeFile defined in workspace.rb
+    # writeFile defined in workspace.rb
+    def RevLog.update
       writeFile(File.join(@@cop_path, 'logmap.yaml'), @@logmap.to_yaml)
       writeFile(File.join(@@cop_path, 'hashmap.yaml'), @@hashmap.to_yaml)
     end
