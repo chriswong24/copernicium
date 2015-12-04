@@ -105,8 +105,8 @@ module Copernicium
     end
 
     def RevLog.updatelog
-      File.open(File.join(@@cop_path, 'logmap.yaml'), 'w') { |f| f.write(@@logmap.to_yaml) }
-      File.open(File.join(@@cop_path, 'hashmap.yaml'), 'w') { |f| f.write(@@hashmap.to_yaml) }
+      File.open(File.join(@@rev_path, 'logmap.yaml'), 'w') { |f| f.write(@@logmap.to_yaml) }
+      File.open(File.join(@@rev_path, 'hashmap.yaml'), 'w') { |f| f.write(@@hashmap.to_yaml) }
     end
 
     # def RevLog.alterFile(fileObject, fileReferenceString, versionReferenceString)
