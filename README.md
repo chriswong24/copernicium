@@ -35,30 +35,32 @@ To show information about each module's tests, and branches commits, run:
 
     $ rake info
 
-To show information about each module's tests, and branches commits, run:
-
-    $ rake info
 
 ### Setting up SSH keys
 
-If SSH keys are not setup, you will be required to provide a user and password for each use of the push, pull and clone methods.  In order
-to avoid this, SSH keys can be used, which allow the user to only supply a password.  First, change to the .ssh folder in the home directory
-of the user:
-	
+If SSH keys are not setup, you will be required to provide a user and password
+for each use of the push, pull and clone methods.  In order to avoid this, SSH
+keys can be used, which allow the user to only supply a password.  First,
+change to the .ssh folder in the home directory of the user:
+
 	$ cd ~/.ssh
 
 To generate an ssh key on the local machine, use the command:
 
 	$ ssh-keygen -t dsa
 
-Use the provided configurations from the program and do not enter a password.  Once this is done, you will have the files id_dsa and id_dsa.pub
-in the .ssh folder.  You will need to move the contents of the public key to your remote server.  Copy the contents of the id_dsa.pub file and
-log onto the remote server.  Navigate to the .ssh folder and open the authorized_keys file and add the contents of the public key to a line:
+Use the provided configurations from the program and do not enter a password.
+Once this is done, you will have the files id_dsa and id_dsa.pub in the .ssh
+folder. You will need to move the contents of the public key to your remote
+server. Copy the contents of the id_dsa.pub file and log onto the remote
+server. Navigate to the .ssh folder and open the authorized_keys file and add
+the contents of the public key to a line:
 
 	$ cd ~/.ssh
 	$ echo [public key info] > authorized_keys
 
 You should now be able to use the push, pull, and origin functions using only the username.
+
 
 ### relevant links:
 
