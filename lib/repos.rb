@@ -41,7 +41,7 @@ module Copernicium
   end
 
   class Repos
-    attr_reader :snaps
+    attr_reader :snaps, :branch
     # read in file of snapshots (.cn/history)
     # check the current branch (.cn/branch)
     def initialize(root, branch = 'master')
@@ -83,10 +83,6 @@ module Copernicium
 
     def update_snap
       writeFile(@spath, Marshal.dump(@snaps))
-    end
-
-    def update_branch
-      writeFile(@bpath, @branch)
     end
 
     # Create snapshot, and return hash ID of snapshot
@@ -203,14 +199,22 @@ module Copernicium
       [diffed, conflicts]
     end
 
+    # BRANCHING
+
     # Return hash ID of new branch
     def make_branch(branch)
       @snaps[branch] = @snaps[@branch]
       @branch = branch
-      hasher 1
+      # todo - make this actually hash the entire @snaps[branch]
+      # eg: hasher @snaps[branch]
+      hasher @branch
     end
 
-    # Exit status code
+    def update_branch(branch)
+      writeFile(@bpath, branch)
+      @branch = branch
+    end
+
     def delete_branch(branch)
       @snaps.delete(branch)
     end
