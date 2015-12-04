@@ -10,7 +10,7 @@ include Copernicium::Repos
 class TestCnReposModule < Minitest::Test
   describe 'ReposModule' do
     before 'mixin repo module' do
-      Copernicium::Repos.setup
+      Repos.setup
       @file1 = FileObj.new('file1', [1, 2])
       @file2 = FileObj.new('file2', [3, 4])
       @file3 = FileObj.new('file3', [5, 6])
@@ -21,74 +21,75 @@ class TestCnReposModule < Minitest::Test
     end
 
     it 'can create snapshots' do
-      make_snapshot([@file1, @file2]).wont_be_nil
-      history.wont_be_empty
+      Repos.make_snapshot([@file1, @file2]).wont_be_nil
+      Repos.history.wont_be_empty
     end
 
+    # todo - fix this, important
     it 'can get a snapshot from an id' do
       @files = [@file1, @file2]
-      snapid = make_snapshot @files
-      snap = get_snapshot snapid
+      snapid = Repos.make_snapshot @files
+      snap = Repos.get_snapshot snapid
       snap.id.must_equal snapid
       snap.files.must_equal @files
     end
 
     it 'can parse history' do
-      snap1 = make_snapshot [@file1, @file2]
-      snap2 = make_snapshot [@file1, @file2, @file3]
-      snap3 = make_snapshot [@file1, @file3]
-      history.must_equal [snap1, snap2, snap3]
+      snap1 = Repos.make_snapshot [@file1, @file2]
+      snap2 = Repos.make_snapshot [@file1, @file2, @file3]
+      snap3 = Repos.make_snapshot [@file1, @file3]
+      Repos.history.must_equal [snap1, snap2, snap3]
     end
 
     it 'can delete snapshots' do
-      snap1 = make_snapshot [@file1, @file2]
-      snap2 = make_snapshot [@file1, @file2, @file3]
-      snap3 = make_snapshot [@file1, @file3]
-      history.must_equal [snap1, snap2, snap3]
-      delete_snapshot snap1
-      history.must_equal [snap2, snap3]
+      snap1 = Repos.make_snapshot [@file1, @file2]
+      snap2 = Repos.make_snapshot [@file1, @file2, @file3]
+      snap3 = Repos.make_snapshot [@file1, @file3]
+      Repos.history.must_equal [snap1, snap2, snap3]
+      Repos.delete_snapshot snap1
+      Repos.history.must_equal [snap2, snap3]
     end
 
     it 'can diff snapshots' do
-      snap1 = make_snapshot [@file1, @file2, @file3]
-      snap2 = make_snapshot [@file1, @file3]
-      diff_snapshots(snap1, snap1) #todo - fix
+      snap1 = Repos.make_snapshot [@file1, @file2, @file3]
+      snap2 = Repos.make_snapshot [@file1, @file3]
+      Repos.diff_snapshots(snap1, snap1) #todo - fix
     end
 
     it 'can create branches' do
-      make_branch 'hello'
-      make_branch 'world'
+      Repos.make_branch 'hello'
+      Repos.make_branch 'world'
     end
 
     it 'can create and show off branches' do
       tester = ['master', 'hello', 'world']
-      make_branch 'hello'
-      make_branch 'world'
-      branches.must_equal tester
+      Repos.make_branch 'hello'
+      Repos.make_branch 'world'
+      Repos.branches.must_equal tester
     end
 
     it 'can switch between branches' do
       current = @@branch
       current.must_equal 'master'
-      make_branch 'hello'
-      update_branch 'hello'
+      Repos.make_branch 'hello'
+      Repos.update_branch 'hello'
       newer = @@branch
       newer.must_equal 'hello'
     end
 
     it 'can delete branchs' do
       tester = ['hello', 'world']
-      make_branch 'hello'
-      make_branch 'world'
-      delete_branch 'master'
-      branches.must_equal tester
+      Repos.make_branch 'hello'
+      Repos.make_branch 'world'
+      Repos.delete_branch 'master'
+      Repos.branches.must_equal tester
     end
 
     it 'can merge branches' do
       current = @@branch
       current.must_equal 'master'
-      make_branch 'hello'
-      update_branch 'hello'
+      Repos.make_branch 'hello'
+      Repos.update_branch 'hello'
       newer = @@branch
       newer.must_equal 'hello'
     end

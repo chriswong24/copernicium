@@ -39,12 +39,12 @@ module Copernicium
     end
   end
 
-  extend RevLog # needs diffing and merging
   module Repos
     attr_reader :snaps, :branch
+    include RevLog # needs diffing and merging
     # check the current branch (.cn/branch)
     # read in file of snapshots (.cn/history)
-    def setup(root = Dir.pwd, branch = 'master')
+    def Repos.setup(root = Dir.pwd, branch = 'master')
       @@root = root
       @@copn = File.join(@@root, '.cn')
       @@repo = File.join(@@copn, 'repo')
@@ -72,22 +72,22 @@ module Copernicium
       end
     end
 
-    def hash_array
+    def Repos.hash_array
       Hash.new {[]}
     end
 
     # returns the hash of an object
-    def hasher(obj)
+    def Repos.hasher(obj)
       Digest::SHA256.hexdigest Marshal.dump(obj)
     end
 
     # Return string array of what branches we have
-    def branches
+    def Repos.branches
       @@branches.keys
     end
 
     # Create and return snapshot
-    def make_snapshot(files = [])
+    def Repos.make_snapshot(files = [])
       snap = Snapshot.new(files)
       snap.id = hasher snap
       @@branches[@@branch] << snap
@@ -98,13 +98,13 @@ module Copernicium
     end
 
     # helper to write a snapshot, saving a new commit
-    def update_snap
+    def Repos.update_snap
       writeFile @@spath, Marshal.dump(@@branches)
     end
 
     # todo - Check to make sure id is from a different branch
     # Merge the target snapshot into HEAD snapshot of the current branch
-    def merge_snapshot(id)
+    def Repos.merge_snapshot(id)
       # run diff to get conflicts
       current = @@branches[@@branch].last
       difference = diff_snapshots(current.id, id)
@@ -119,7 +119,7 @@ module Copernicium
     end
 
     # Find snapshot and return snapshot from id
-    def get_snapshot(id)
+    def Repos.get_snapshot(id)
       @@branches.keys.each do |br|
         @@branches[br].each do |sn|
           return sn if sn.id == id
@@ -130,7 +130,7 @@ module Copernicium
     end
 
     # Return array of snapshot IDs
-    def history(branch = nil)
+    def Repos.history(branch = nil)
       snapids = []
       if branch.nil?
         @@branches[@@branch].each { |x| snapids << x.id }
@@ -141,7 +141,7 @@ module Copernicium
     end
 
     # Find snapshot, delete from snaps/memory
-    def delete_snapshot(id)
+    def Repos.delete_snapshot(id)
       @@branches[@@branch].delete_if { |x| x.id == id }
       update_snap
     end
@@ -149,7 +149,7 @@ module Copernicium
     #diff_snapshots needs to catch both files in snap1 that aren’t and snap2 and
     #find individual differences in between the files by calling RevLogs diffy.
     # Return same thing as merge # note: id1 gets priority for history
-    def diff_snapshots(id1, id2)
+    def Repos.diff_snapshots(id1, id2)
       new_files = []
       conflicts = []
       diffed = {}
@@ -191,25 +191,25 @@ module Copernicium
     end
 
     # Select all elements of array1 that are not in array2
-    def diffset(array1, array2)
+    def Repos.diffset(array1, array2)
       array1.select { |x| !array2.any? { |y| x == y } }
     end
 
     # BRANCHING
 
     # Return hash ID of new branch
-    def make_branch(branch)
+    def Repos.make_branch(branch)
       @@branches[branch] = @@branches[@@branch]
       @@branch = branch
       hasher @@branches[branch]
     end
 
-    def update_branch(branch)
+    def Repos.update_branch(branch)
       writeFile(@@bpath, branch)
       @@branch = branch
     end
 
-    def delete_branch(branch)
+    def Repos.delete_branch(branch)
       @@branches.delete(branch)
     end
   end # Repos
