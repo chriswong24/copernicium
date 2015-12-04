@@ -2,19 +2,23 @@
 
 require_relative 'test_helper'
 
-class Workspace
+include Copernicium::Driver
+
+module Workspace
   attr_reader :repos, :files
 end
 
 class CoperniciumIntegrationTests < Minitest::Test
   describe "IntegrationTesting" do
     def runner(string)
-      Copernicium::Driver.new.run string.split
+      Driver.setup
+      Driver.run string.split
     end
 
     before "Calling basic copernicium commands" do
       @pushpull = Copernicium::PushPull.new
-      @ws = Copernicium::Workspace.new
+
+      Workspace.setup
 
       #initial commit?
       Dir.mkdir('workspace')
@@ -33,14 +37,12 @@ class CoperniciumIntegrationTests < Minitest::Test
       @ws.repos.snaps["master"].size.must_equal 1
       @ws.writeFile("workspace/1.txt", "1_1")
       @ws.writeFile("workspace/2.txt", "2_2")
-
-      comm = runner("commit -m Test Commit")
-      @ws.commit(comm)
-
+      runner("commit -m Test Commit")
       @ws.readFile("workspace/1.txt").must_equal "1_1"
       @ws.readFile("workspace/2.txt").must_equal "2_2"
       @ws.repos.snaps["master"].size.must_equal 2
     end
+
 =begin
     # Won't work because clean not handled by UI yet
     it "can revert back to the last commit" do

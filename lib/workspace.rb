@@ -164,6 +164,7 @@ module Copernicium
           end
         end
       else # just commit certain files
+        # todo - just commit certain files
       end
       Repos.make_snapshot(@@files) # return snapshot id
     end

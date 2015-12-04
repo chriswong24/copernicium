@@ -47,8 +47,8 @@ module Copernicium
       @@root = root
       @@copn = File.join(@@root, '.cn')
       @@repo = File.join(@@copn, 'repo')
-      @@bpath = File.join(@@repo, 'branch')
-      @@spath = File.join(@@repo, 'history')
+      @@bpath = File.join(@@copn, 'branch')
+      @@spath = File.join(@@repo, branch)
       Dir.mkdir(@@copn) unless Dir.exist?(@@copn)
       Dir.mkdir(@@repo) unless Dir.exist?(@@repo)
 
