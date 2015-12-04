@@ -1,6 +1,7 @@
 # including coperniciums requirements
 
 require_relative '../lib/required.rb'
+
 include Copernicium
 
 # mute output, overwrite puts

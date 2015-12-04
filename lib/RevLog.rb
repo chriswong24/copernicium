@@ -54,7 +54,7 @@ module Copernicium
                                                     :hash => hash}
       @@hashmap[hash] = @@hashmap[hash] << {:time => Time.now,
                                             :filename => file_name}
-      Revlog.update
+      updatelog
       return hash
     end
 
@@ -64,7 +64,7 @@ module Copernicium
         file_name = @@hashmap[file_id][0][:filename]
         @@hashmap[file_id].delete_if { |e| e[:filename] == file_name }
         @@logmap[file_name].delete_if { |e| e[:hash] == file_id }
-        Revlog.update
+        updatelog
         File.delete(File.join(@@cop_path, file_id))
         return 1
       rescue Exception
@@ -104,10 +104,9 @@ module Copernicium
       hashs
     end
 
-    # writeFile defined in workspace.rb
-    def RevLog.update
-      writeFile(File.join(@@cop_path, 'logmap.yaml'), @@logmap.to_yaml)
-      writeFile(File.join(@@cop_path, 'hashmap.yaml'), @@hashmap.to_yaml)
+    def RevLog.updatelog
+      File.open(File.join(@@cop_path, 'logmap.yaml'), 'w') { |f| f.write(@@logmap.to_yaml) }
+      File.open(File.join(@@cop_path, 'hashmap.yaml'), 'w') { |f| f.write(@@hashmap.to_yaml) }
     end
 
     # def RevLog.alterFile(fileObject, fileReferenceString, versionReferenceString)
