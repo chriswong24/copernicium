@@ -45,9 +45,7 @@ module Copernicium
     include Repos
     def setup(bname = 'master')
       @@files = []
-      @@cwd = Dir.pwd
       @@root = getroot
-      Dir.chdir(@@cwd)
       @@root = @@cwd if @@root.nil?
       @@cwd.sub!(@@root, '.')
       @@branch = bname
