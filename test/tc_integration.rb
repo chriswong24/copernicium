@@ -7,7 +7,7 @@ class Workspace
 end
 
 class CoperniciumIntegrationTests < Minitest::Test
-  describe "CoperniciumDVCS" do
+  describe "IntegrationTesting" do
     def runner(string)
       Copernicium::Driver.new.run string.split
     end
@@ -17,12 +17,18 @@ class CoperniciumIntegrationTests < Minitest::Test
       @ws = Copernicium::Workspace.new
 
       #initial commit?
+      Dir.mkdir('workspace')
       @ws.writeFile("workspace/1.txt", "1")
       @ws.writeFile("workspace/2.txt", "2")
       comm = runner("commit -m Test Commit")
       @ws.commit(comm)
       @ws.repos.make_branch("dev")
     end
+
+    after "running integration tests" do
+      FileUtils.rm_rf('workspace')
+    end
+
     it "can commit changes" do
       @ws.repos.snaps["master"].size.must_equal 1
       @ws.writeFile("workspace/1.txt", "1_1")
