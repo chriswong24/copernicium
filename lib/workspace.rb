@@ -21,7 +21,8 @@ module Copernicium
     def last
       @history.last
     end
-  end
+  end # FileObj
+
 
   # helper methods for file IO
   def writeFile(path, content)
@@ -37,6 +38,7 @@ module Copernicium
     f.close
     txt
   end
+
 
   module Workspace
     include Repos # needed for keeping track of history
@@ -106,8 +108,8 @@ module Copernicium
 
     # get all files currently in workspace, except folders and .cn/*
     def Workspace.ws_files
-      Dir[ File.join(@root, '**', '*') ].reject do |p|
-        File.directory? p || p.include?(File.join(@root,'.cn')) == true
+      Dir[ File.join(@@root, '**', '*') ].reject do |p|
+        File.directory? p || p.include?(File.join(@@root, '.cn'))
       end
     end
 
@@ -234,7 +236,7 @@ module Copernicium
       added = []
       edits = []
       remov = []
-      ws_files.each do |f|
+      Workspace.ws_files.each do |f|
         idx = indexOf(f)
         if idx == -1 # new file
           added << f
