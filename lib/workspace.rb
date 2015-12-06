@@ -164,8 +164,6 @@ module Copernicium
           end
         end
       else # just commit certain files
-        # todo - just commit certain files
-        # Linfeng
         # iterate through each file path specified in comm.files
         # check whether that file exist in the disk first
         comm.files.each do |x|
