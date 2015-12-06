@@ -167,7 +167,7 @@ module Copernicium
         # iterate through each file path specified in comm.files
         # check whether that file exist in the disk first
         comm.files.each do |x|
-          if File.exists? x == false && Dir.exists? x == false
+          if File.exists? x == false
             next
           end
           if indexOf(x) == -1
