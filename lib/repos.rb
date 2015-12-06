@@ -53,6 +53,7 @@ module Copernicium
       @@repo_path = File.join(@@repo, branch)
       Dir.mkdir(@@copn) unless Dir.exist?(@@copn)
       Dir.mkdir(@@repo) unless Dir.exist?(@@repo)
+      Dir.mkdir(@@snap) unless Dir.exist?(@@snap)
 
       # check if files exist, read them
       if File.exist?(@@repo_path) && File.exist?(@@branchhead)
