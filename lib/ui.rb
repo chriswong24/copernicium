@@ -178,14 +178,53 @@ module Copernicium
     end
 
     def push(args)
-      UIComm.new(command: 'push', opts: args)
-      # todo - make call to pushpull, push remote
+      # Command usage is:
+      #   cn push <user> <repo.host:/dir/of/repo> <branch-name>
+
+      # If username not given, get it from the user.
+      user = args[0]
+      if user.nil?
+        user = get "username for push"
+        # Make sure username is the first arg, since PushPull is expecting this.
+        args << user
+      end
+
+      remote = args[1]
+      remote = get "remote path to push to (format: <repo.host:/dir/of/repo>)" if remote.nil?
+
+      branchname = args[2]
+      branchname = get "remote branch to push to" if branchname.nil?
+
+      comm = UIComm.new(command: 'push', opts: args, repo: remote, rev: branchname)
+      # Do the push
+      PushPull.UICommandParser(comm)
+
+      comm
     end
 
     def pull(args)
-      UIComm.new(command: 'pull', opts: args)
-      #def pull(remote, branch', remote_dir)
-      # todo - make call to pushpull, pull remote
+      # Command usage is:
+      #   cn pull <user> <repo.host:/dir/of/repo> <branch-name>
+
+      # If username not given, get it from the user.
+      user = args[0]
+      if user.nil?
+        user = get "username for pull"
+        # Make sure username is the first arg, since PushPull is expecting this.
+        args << user
+      end
+
+      remote = args[1]
+      remote = get "remote path to pull from (format: <repo.host:/dir/of/repo>)" if remote.nil?
+
+      branchname = args[2]
+      branchname = get "remote branch to pull from" if branchname.nil?
+
+      comm = UIComm.new(command: 'pull', opts: args, repo: remote, rev: branchname)
+      # Do the pull
+      PushPull.UICommandParser(comm)
+
+      comm
     end
 
     def checkout(args)
@@ -212,15 +251,24 @@ module Copernicium
     end
 
     def clone(args)
-      if args.empty?
-        repo = get 'repo url to clone'
-      else
-        repo = args.first
+      # Command usage is:
+      #   cn clone <user> <repo.host:/dir/of/repo>
+
+      user = args[0]
+      if user.nil?
+        user = get "username for clone"
+        # Make sure username is first arg, since PushPull is expecting this.
+        args << user
       end
 
-      # todo - actually clone remote locally
+      repo = args[1]
+      repo = get "repo url to clone (format: <repo.host:/dir/of/repo>)" if repo.nil?
 
-      UIComm.new(command: 'clone', repo: repo)
+      comm = UIComm.new(command: 'clone', opts: args, repo: repo)
+      # Do the clone
+      PushPull.UICommandParser(comm)
+
+      comm
     end
 
     def commit(args)
