@@ -34,11 +34,11 @@ module PushPull
   def self.UICommandParser(ui_comm)
     case ui_comm.command
     when "clone"
-      clone(ui_comm.repo, ui_comm.opts)
+      clone(ui_comm.repo, ui_comm.opts.first)
     when "push"
-      push(ui_comm.repo, ui_comm.rev, ui_comm.opts)
+      push(ui_comm.repo, ui_comm.rev, ui_comm.opts.first)
     when "pull"
-      pull(ui_comm.repo, ui_comm.rev, ui_comm.opts)
+      pull(ui_comm.repo, ui_comm.rev, ui_comm.opts.first)
     else
       print "Error: Invalid command supplied to PushPull!" # Bad error handling, will fix later
       return nil
@@ -245,7 +245,7 @@ module PushPull
       session.exec!('cn commit -m \'Temp commit for push\'')
       session.exec!("cn checkout #{branch}")
       session.exec!("cn merge .temp_push_#{user}")
-      session.exec!("cn branch -r temp_push_#{user}")
+      session.exec!("cn branch -d .temp_push_#{user}")
     end
 
     puts "Successfully pushed to #{remote}"
@@ -301,7 +301,7 @@ module PushPull
     system "cn commit -m \'Temp commit for pull\'"
     system "cn checkout #{crbr}"
     system "cn merge .temp_pull_#{user}"
-    system "cn branch -r .temp_pull_#{user}"
+    system "cn branch -d .temp_pull_#{user}"
     puts "Successfully pulled from #{remote}"
   end
 
