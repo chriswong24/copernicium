@@ -7,19 +7,38 @@ require 'net/scp'
 
 
 module PushPull
+  # How to use for Push, Pull and Clone:
+  #   Push - cn push <user> <repo.host:/dir/of/repo> <branch-name>
+  #   Pull - cn pull <user> <repo.host:/dir/of/repo> <branch-name>
+  #   Clone - cn clone <user> <repo.host:/dir/of/repo>
+  class UIComm
+    attr_reader :command, :files, :rev, :cmt_msg, :repo, :opts
+      def initialize(command: nil, files: nil, rev: nil, cmt_msg: nil, repo: nil, opts: nil)
+      @cmt_msg = cmt_msg
+      @command = command
+      @files = files
+      @opts = opts
+      @repo = repo
+      @rev = rev
+    end
+  end
+
   # Chris's edit
   # Takes in Ethan's UICommandCommunicator object and calls
   # a method based on the command
+  #
+  # Fields in UIComm and what they are for me:
+  #   @opts - user
+  #   @repo - repo.host:/path/to/repo
+  #   @rev - branch name
   def self.UICommandParser(ui_comm)
     case ui_comm.command
     when "clone"
-      #clone()
-    when "merge"
-      # do merge stuff
+      clone(ui_comm.repo, ui_comm.opts)
     when "push"
-      #push(ui_comm.)
+      push(ui_comm.repo, ui_comm.rev, ui_comm.opts)
     when "pull"
-      #pull(ui_comm.branchname,)
+      pull(ui_comm.repo, ui_comm.rev, ui_comm.opts)
     else
       print "Error: Invalid command supplied to PushPull!" # Bad error handling, will fix later
       return nil
