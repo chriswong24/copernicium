@@ -175,6 +175,9 @@ module Copernicium
       else # branch does not exist, create it, switch to it
         Repos.create_branch branch
       end
+
+      # Don't return a UIComm object, since we didn't use one for any of the
+      # backend calls.
     end
 
     def push(args)
@@ -299,15 +302,28 @@ module Copernicium
       if args.empty?
         puts 'I need a commit or branch to merge.'
         rev = get 'single commit or branch to merge'
-      else # use given
+      else
         rev = args.first
-        # get all branchs, see if arg is in it.
-        # if so, look up snapshot of <branch> head
-        # TODO - parse whether given arg is a branch name, else assume snap id
-        # todo - call repos merge command
-        # todo show conflicting files
-        UIComm.new(command: 'merge', rev: rev)
       end
+
+      # If rev is a branch name, resolve it to a rev ID.
+      if isbranch? rev
+        rev = (Repos.history rev).last
+      end
+
+      conflicts = Workspace.merge(rev)
+
+      # If there were any conflicts, display them to the user.
+      if not conflicts.nil?
+        puts "Merge completed with conflicts:"
+
+        conflicts.each do |conflict|
+          puts "   #{conflict}".red
+        end
+      end
+
+      # Don't return a UIComm object, since we didn't use one for any of the
+      # backend calls.
     end
   end # Driver
 end
