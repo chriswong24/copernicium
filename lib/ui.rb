@@ -148,7 +148,7 @@ module Copernicium
         newname = args[1]
         newname = get "new name for current branch" if newname.nil?
 
-        oldname = Repos.branch
+        oldname = Repos.current
 
         # Create and switch to a new branch with the given name
         create_branch newname
@@ -163,7 +163,7 @@ module Copernicium
         branch = get "branch to delete" if branch.nil?
 
         # Do not delete the current branch
-        if branch == Repos.branch
+        if branch == Repos.current
           pexit "Cannot delete the current branch!".red, 1
         end
 
@@ -295,7 +295,7 @@ module Copernicium
     end
 
     def history(args)
-      puts Repos.history(Repos.branch)
+      puts Repos.history(Repos.current)
     end
 
     def merge(args)
