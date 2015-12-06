@@ -39,7 +39,6 @@ class CoperniciumIntegrationTests < Minitest::Test
       Copernicium.writeFile("workspace/1.txt", "1")
       Copernicium.writeFile("workspace/2.txt", "2")
       comm = runner("commit -m Test Commit")
-      Workspace.commit(comm)
       Repos.make_branch("dev")
     end
 
@@ -49,27 +48,22 @@ class CoperniciumIntegrationTests < Minitest::Test
     end
 
     it "can commit changes" do
-      Repos.get_branch("master").size.must_equal 
+      Repos.get_branch("master").size.must_equal 1
       Copernicium.writeFile("workspace/1.txt", "1_1")
       Copernicium.writeFile("workspace/2.txt", "2_2")
-      runner("commit -m Test Commit")
-      Repos.get_branch("master").size.must_equal 3
+      comm = runner("commit -m Test Commit")
+      Workspace.commit(comm)
+      Repos.get_branch("master").size.must_equal 2
 
       #todo : make sure commit written to disk
     end
-=begin
+
     it "can make and delete a branch" do
       comm = runner("branch test")
-      @ws.repos.make_branch("test")
-      @ws.repos.manifest["test"].wont_be_nil
-      @ws.repos.manifest.size.must_equal 3
-      @ws.repos.manifest["master"].wont_be_nil
+      Repos.get_branch("test").wont_be_nil
 
       comm = runner("branch -d test")
-      @ws.repos.delete_branch("test")
-      @ws.repos.manifest["test"].must_be_nil
-      @ws.repos.manifest["master"].wont_be_nil
-      @ws.repos.manifest.size.must_equal 2
+      Repos.get_branch("test").must_be_nil
     end
 =begin
     # Won't work because clean not handled by UI yet
