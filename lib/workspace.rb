@@ -164,9 +164,10 @@ module Copernicium
           end
         end
       else # just commit certain files
-        # todo - just commit certain files
+        # iterate through each file path specified in comm.files
+        # check whether that file exist in the disk first
         comm.files.each do |x|
-          if File.exist? x == false
+          if File.exists? x == false
             next
           end
           if indexOf(x) == -1
@@ -183,7 +184,7 @@ module Copernicium
           end
         end
       end
-      Repos.make_snapshot(@@files) # return snapshot id
+      Repos.make_snapshot(@@files, comm.cmt_msg) # return snapshot id
     end
 
     def Workspace.checkout(comm)
