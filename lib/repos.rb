@@ -49,20 +49,11 @@ module Copernicium
       @@copn = File.join(@@root, '.cn')
       @@repo = File.join(@@copn, 'repo')
       @@snap = File.join(@@copn, 'snap')
-      @@branchhead = File.join(@@copn, 'branch')
       @@repo_path = File.join(@@repo, branch)
+      @@branchhead = File.join(@@copn, 'branch')
       Dir.mkdir(@@copn) unless Dir.exist?(@@copn)
       Dir.mkdir(@@repo) unless Dir.exist?(@@repo)
       Dir.mkdir(@@snap) unless Dir.exist?(@@snap)
-
-      # check if files exist, read them
-      if File.exist?(@@repo_path) && File.exist?(@@branchhead)
-        @@branches = Marshal.load readFile(@@repo_path)
-        @@branch = readFile(@@branchhead)
-      else # use defaults
-        @@branches = {branch => []}
-        @@branch = branch
-      end
 
       # check if files exist, read them
       if File.exist?(@@repo_path) && File.exist?(@@branchhead)
