@@ -295,7 +295,7 @@ module Copernicium
     end
 
     def history(args)
-      puts Repos.history
+      puts Repos.history(Repos.branch)
     end
 
     def merge(args)
