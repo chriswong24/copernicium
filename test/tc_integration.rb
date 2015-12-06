@@ -1,12 +1,26 @@
 # integration tests for copernicium modules
 
-require_relative 'test_helper'
+## TESTS NEEDED:
+#  - Commit
+#  - Checkout
+#  - Making/Deleting Branches
+#  - Merging
+#  - Status
+#  - Push
+
+
+require_relative "test_helper"
+require 'byebug'
 
 include Copernicium::Driver
 
-module Workspace
-  attr_reader :repos, :files
+# For testing purposes?  Perhaps implement in Repos later
+module Repos
+  def get_branch(bname)
+    @@branches[bname]
+  end
 end
+
 
 class CoperniciumIntegrationTests < Minitest::Test
   describe "IntegrationTesting" do
@@ -16,61 +30,34 @@ class CoperniciumIntegrationTests < Minitest::Test
     end
 
     before "Calling basic copernicium commands" do
-      @pushpull = Copernicium::PushPull.new
+      #@pushpull = Copernicium::PushPull.new
 
       Workspace.setup
 
+      Dir.mkdir("workspace")
       #initial commit?
-      Dir.mkdir('workspace')
-      @ws.writeFile("workspace/1.txt", "1")
-      @ws.writeFile("workspace/2.txt", "2")
+      Copernicium.writeFile("workspace/1.txt", "1")
+      Copernicium.writeFile("workspace/2.txt", "2")
       comm = runner("commit -m Test Commit")
-      @ws.commit(comm)
-      @ws.repos.make_branch("dev")
+      Workspace.commit(comm)
+      Repos.make_branch("dev")
     end
 
     after "running integration tests" do
       FileUtils.rm_rf('workspace')
+      FileUtils.rm_rf('.cn')
     end
 
     it "can commit changes" do
-      @ws.repos.snaps["master"].size.must_equal 1
-      @ws.writeFile("workspace/1.txt", "1_1")
-      @ws.writeFile("workspace/2.txt", "2_2")
+      Repos.get_branch("master").size.must_equal 
+      Copernicium.writeFile("workspace/1.txt", "1_1")
+      Copernicium.writeFile("workspace/2.txt", "2_2")
       runner("commit -m Test Commit")
-      @ws.readFile("workspace/1.txt").must_equal "1_1"
-      @ws.readFile("workspace/2.txt").must_equal "2_2"
-      @ws.repos.snaps["master"].size.must_equal 2
-    end
+      Repos.get_branch("master").size.must_equal 3
 
+      #todo : make sure commit written to disk
+    end
 =begin
-    # Won't work because clean not handled by UI yet
-    it "can revert back to the last commit" do
-      @ws.writeFile("workspace/1.txt", "1_1")
-      @ws.writeFile("workspace/2.txt", "2_2")
-
-      comm = runner("clean")
-      @ws.clean(comm)
-
-      content = @ws.readFile("workspace/1.txt")
-      content.must_equal "1"
-      content = @ws.readFile("workspace/2.txt")
-      content.must_equal "2"
-    end
-
-    # Won't work because clean not handled by UI yet
-    it "can clean specific files in the workspace" do
-      @ws.writeFile("workspace/1.txt", "1_1")
-      @ws.writeFile("workspace/2.txt", "2_2")
-
-      comm = runner("clean workspace/1.txt")
-      @ws.clean(comm)
-
-      @ws.readFile("workspace/1.txt").must_equal "1"
-      @ws.readFile("workspace/2.txt").must_equal "2_2"
-    end
-
-    # Tests don't work because branch handling not complete
     it "can make and delete a branch" do
       comm = runner("branch test")
       @ws.repos.make_branch("test")
@@ -83,6 +70,32 @@ class CoperniciumIntegrationTests < Minitest::Test
       @ws.repos.manifest["test"].must_be_nil
       @ws.repos.manifest["master"].wont_be_nil
       @ws.repos.manifest.size.must_equal 2
+    end
+=begin
+    # Won't work because clean not handled by UI yet
+    it "can revert back to the last commit" do
+      Copernicium.writeFile("workspace/1.txt", "1_1")
+      Copernicium.writeFile("workspace/2.txt", "2_2")
+
+      comm = runner("clean")
+      Workspace.clean(comm)
+
+      content = Copernicium.readFile("workspace/1.txt")
+      content.must_equal "1"
+      content = Copernicium.readFile("workspace/2.txt")
+      content.must_equal "2"
+    end
+
+    # Won't work because clean not handled by UI yet
+    it "can clean specific files in the workspace" do
+      Copernicium.writeFile("workspace/1.txt", "1_1")
+      Copernicium.writeFile("workspace/2.txt", "2_2")
+
+      comm = runner("clean workspace/1.txt")
+      Workspace.clean(comm)
+
+      Workspace.readFile("workspace/1.txt").must_equal "1"
+      Workspace.readFile("workspace/2.txt").must_equal "2_2"
     end
 
     it "can check the status of the repository" do
