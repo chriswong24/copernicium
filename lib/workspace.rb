@@ -146,41 +146,36 @@ module Copernicium
       end
     end
 
+    def Workspace.commit_file(x)
+      if indexOf(x) == -1
+        content = readFile(x)
+        hash = RevLog.add_file(x, content)
+        fobj = FileObj.new(x, [hash,])
+        @@files.push(fobj)
+      else # file exists
+        content = readFile(x)
+        hash = RevLog.add_file(x, content)
+        if @@files[indexOf(x)].history[-1] != hash
+          @@files[indexOf(x)].history << hash
+        end
+      end
+    end
+
     # commit a list of files or the entire workspace to make a new snapshot
     def Workspace.commit(comm)
       if comm.files.nil? # commit everything
         Workspace.ws_files.each do |x|
-          if indexOf(x) == -1
-            content = readFile(x)
-            hash = RevLog.add_file(x, content)
-            fobj = FileObj.new(x, [hash,])
-            @@files.push(fobj)
-          else # file exists
-            content = readFile(x)
-            hash = RevLog.add_file(x, content)
-            if @@files[indexOf(x)].history[-1] != hash
-              @@files[indexOf(x)].history << hash
-            end
-          end
+          Workspace.commit_file(x)
         end
       else # just commit certain files
         # iterate through each file path specified in comm.files
         # check whether that file exist in the disk first
         comm.files.each do |x|
-          if File.exists? x == false
-            next
-          end
-          if indexOf(x) == -1
-            content = readFile(x)
-            hash = RevLog.add_file(x, content)
-            fobj = FileObj.new(x, [hash,])
-            @@files.push(fobj)
+          if File.exists? x
+            Workspace.commit_file(x)
           else
-            content = readFile(x)
-            hash = RevLog.add_file(x, content)
-            if @@files[indexOf(x)].history[-1] != hash
-              @@files[indexOf(x)].history << hash
-            end
+            errmsg = 'File does not exist: '.red + x
+            puts errmsg
           end
         end
       end
