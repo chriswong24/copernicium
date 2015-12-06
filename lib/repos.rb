@@ -48,24 +48,25 @@ module Copernicium
       @@root = root
       @@copn = File.join(@@root, '.cn')
       @@repo = File.join(@@copn, 'repo')
-      @@bpath = File.join(@@repo, 'branch')
-      @@spath = File.join(@@repo, 'history')
+      @@snap = File.join(@@copn, 'snap')
+      @@branchhead = File.join(@@copn, 'branch')
+      @@repo_path = File.join(@@repo, branch)
       Dir.mkdir(@@copn) unless Dir.exist?(@@copn)
       Dir.mkdir(@@repo) unless Dir.exist?(@@repo)
 
       # check if files exist, read them
-      if File.exist?(@@spath) && File.exist?(@@bpath)
-        @@branches = Marshal.load readFile(@@spath)
-        @@branch = readFile(@@bpath)
+      if File.exist?(@@repo_path) && File.exist?(@@branchhead)
+        @@branches = Marshal.load readFile(@@repo_path)
+        @@branch = readFile(@@branchhead)
       else # use defaults
         @@branches = {branch => []}
         @@branch = branch
       end
 
       # check if files exist, read them
-      if File.exist?(@@spath) && File.exist?(@@bpath)
-        @@branches = Marshal.load readFile(@@spath)
-        @@branch = readFile(@@bpath)
+      if File.exist?(@@repo_path) && File.exist?(@@branchhead)
+        @@branches = Marshal.load readFile(@@repo_path)
+        @@branch = readFile(@@branchhead)
       else # use defaults
         @@branches = {branch => []}
         @@branch = branch
@@ -113,13 +114,19 @@ module Copernicium
       @@branches[@@branch] << snap
 
       # Update snaps file
-      update_snap
+      update_snap snap
+      update_history
       snap.id
     end
 
     # helper to write a snapshot, saving a new commit
-    def Repos.update_snap
-      writeFile @@spath, Marshal.dump(@@branches)
+    def Repos.update_snap(snap)
+      writeFile File.join(@@snap, snap.id), Marshal.dump(snap) # write snapshot
+    end
+    
+    # helper to add snap to history
+    def Repos.update_history
+      writeFile @@repo_path, Marshal.dump(@@branches) # write history
     end
 
     # todo - Check to make sure id is from a different branch
@@ -141,8 +148,11 @@ module Copernicium
     # Find snapshot and return snapshot from id
     def Repos.get_snapshot(id)
       @@branches.keys.each do |br|
-        @@branches[br].each do |sn|
-          return sn if sn.id == id
+        @@branches[br].each do |snap_id|
+          # If found, read from disk and return
+          if snap_id == id
+            return Marhsall.load(File.join(@@snap, snap_id))
+          end
         end
       end
 
@@ -226,7 +236,7 @@ module Copernicium
     end
 
     def Repos.update_branch(branch)
-      writeFile(@@bpath, branch)
+      writeFile(@@branchhead, branch)
       @@branch = branch
     end
 
