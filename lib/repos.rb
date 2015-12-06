@@ -31,10 +31,11 @@
 
 module Copernicium
   class Snapshot
-    attr_accessor :id, :files
+    attr_accessor :id, :files, :msg
     # id is computed after creation
-    def initialize(files = [])
+    def initialize(files = [], msg)
       @@files = files
+      @@msg = msg
       @@id = id
     end
   end
@@ -47,8 +48,8 @@ module Copernicium
       @@root = root
       @@copn = File.join(@@root, '.cn')
       @@repo = File.join(@@copn, 'repo')
-      @@bpath = File.join(@@copn, 'branch')
-      @@spath = File.join(@@repo, branch)
+      @@bpath = File.join(@@repo, 'branch')
+      @@spath = File.join(@@repo, 'history')
       Dir.mkdir(@@copn) unless Dir.exist?(@@copn)
       Dir.mkdir(@@repo) unless Dir.exist?(@@repo)
 
@@ -106,8 +107,8 @@ module Copernicium
     end
 
     # Create and return snapshot
-    def Repos.make_snapshot(files = [])
-      snap = Snapshot.new(files)
+    def Repos.make_snapshot(files = [], msg = '')
+      snap = Snapshot.new(files, msg)
       snap.id = hasher snap
       @@branches[@@branch] << snap
 
