@@ -77,12 +77,7 @@ class TestUI < Minitest::Test
       ui_test_helper(comm, "push")
     end
 
-    it "supports 'merge' command" do # Merge some_revision into current branch
-      comm = Driver.run %w{merge some_revision}
-      ui_test_helper(comm, "merge", nil, "some_revision")
-    end
-
-    # Format: cn clone path-to-remote-repository
+    # Format: cn clone <user> <repo.host:/dir/of/repo>
     it "supports 'clone' command" do
       # todo make cloning work haha
       #host = "ssh://user@some-host.com/some/repo/path"
