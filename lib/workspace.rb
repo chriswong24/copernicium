@@ -165,6 +165,23 @@ module Copernicium
         end
       else # just commit certain files
         # todo - just commit certain files
+        comm.files.each do |x|
+          if File.exist? x == false
+            next
+          end
+          if indexOf(x) == -1
+            content = readFile(x)
+            hash = RevLog.add_file(x, content)
+            fobj = FileObj.new(x, [hash,])
+            @@files.push(fobj)
+          else
+            content = readFile(x)
+            hash = RevLog.add_file(x, content)
+            if @@files[indexOf(x)].history[-1] != hash
+              @@files[indexOf(x)].history << hash
+            end
+          end
+        end
       end
       Repos.make_snapshot(@@files) # return snapshot id
     end
