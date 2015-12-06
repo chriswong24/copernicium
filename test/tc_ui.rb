@@ -39,6 +39,32 @@ class TestUI < Minitest::Test
       ui_test_helper(comm, "status")
     end
 
+    it "supports 'history' command" do
+      Driver.run ["history"]
+    end
+
+    it "supports 'branch' command" do
+      Driver.run ["branch"]
+
+      Driver.run %w{branch -c newbranch}
+
+      Driver.run %w{branch -r renamedbranch}
+
+      Driver.run %w{branch -d renamedbranch}
+
+      Driver.run %w{branch -d nonexistentbranch}
+
+      Driver.run %w{branch -c branch1}
+      Driver.run %w{branch -c branch2}
+      Driver.run %w{branch branch1} # Switch branch
+
+      Driver.run %w{branch thirdbranch} # Create new branch without -c
+    end
+
+    it "supports 'clean' command" do
+      Driver.run ["clean"]
+    end
+
     # -m is optional, but if the user doesn't give it, the UI will prompt for
     # a message from command line. Thus, the UICommandCommunicator will always
     # include a commit message.
@@ -65,6 +91,12 @@ class TestUI < Minitest::Test
 
       comm = Driver.run %w{checkout revID file.txt foo.c}
       ui_test_helper(comm, "checkout", ["file.txt", "foo.c"], "revID")
+    end
+
+    it "supports 'merge' command" do
+      Driver.run %w{branch -c branch1}
+      Driver.run %w{branch -c branch2}
+      Driver.run %w{merge branch1}
     end
 
     it "supports 'pull' command" do
