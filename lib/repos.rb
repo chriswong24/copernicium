@@ -34,9 +34,9 @@ module Copernicium
     attr_accessor :id, :files, :msg
     # id is computed after creation
     def initialize(files = [], msg)
-      @@files = files
-      @@msg = msg
-      @@id = id
+      @files = files
+      @msg = msg
+      @id = id
     end
   end
 
@@ -123,7 +123,7 @@ module Copernicium
     def Repos.update_snap(snap)
       writeFile File.join(@@snap, snap.id), Marshal.dump(snap) # write snapshot
     end
-    
+
     # helper to add snap to history
     def Repos.update_history
       writeFile @@repo_path, Marshal.dump(@@branches) # write history
