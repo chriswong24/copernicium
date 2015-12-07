@@ -24,42 +24,55 @@ module Copernicium
   end # FileObj
 
 
-  # helper methods for file IO
-  def writeFile(path, content)
-    f = open(path, 'w')
-    f.write(content)
-    f.close
-  end
-
-  # helper methods for file IO
-  def readFile(path)
-    f = open(path, 'r')
-    txt = f.read
-    f.close
-    txt
-  end
-
-
   module Workspace
     include Repos # needed for keeping track of history
-    def Workspace.setup(bname = 'master')
-      @@files = []
+    def Workspace.setup(branch = 'master')
       @@cwd = Dir.pwd
       @@root = (noroot?? @@cwd : getroot)
+      @@root.sub!(@@cwd, '.')
       @@copn = File.join(@@root, '.cn')
-      Dir.mkdir(@@copn) unless Dir.exist?(@@copn)
-      @@cwd.sub!(@@root, '.')
-      @@branch = bname
+      @@snap = File.join(@@copn, 'snap')
+      @@revs = File.join(@@copn, 'revs')
+
+      # todo - actually read this stuff from repos
+      @@branch = branch
+      @@files = []
+
       RevLog.setup @@root
       Repos.setup @@root
+      begin # pass modules project root - they assume we are in a repo
+      rescue
+        puts 'Warning: you are not yet in a Copernicium repo.'.yel
+      end
+      @@root # return to notify where the project was created
     end
 
     # create a new copernicium project
-    def Workspace.create_project(location = Dir.pwd)
-      Dir.mkdir location if !File.exists? location
+    def Workspace.create_project(location = Dir.pwd, branch = 'master')
+      Dir.mkdir location unless Dir.exist? location
       Dir.chdir location
-      errmsg = 'Copernicium folder (.cn) not found, could not create.'.red
-      pexit errmsg, 1 if noroot?
+
+      # create our copernicium folders
+      @@copn = File.join('.', '.cn')
+      @@snap = File.join(@@copn, 'snap')
+      @@revs = File.join(@@copn, 'revs')
+      @@head = File.join(@@copn, 'branch')
+      @@hist = File.join(@@copn, 'history')
+      Dir.mkdir(@@copn) unless Dir.exist?(@@copn)
+      Dir.mkdir(@@snap) unless Dir.exist?(@@snap)
+      Dir.mkdir(@@revs) unless Dir.exist?(@@revs)
+
+      # make default branch, history
+      hist = YAML.dump({branch => []})
+      File.write @@head, branch
+      File.write @@hist, hist
+
+      if Dir.exist?(@@copn)
+        location # return where we made the repo
+      else # something has gone horribly wrong
+        badinit = 'Could not create or find a Copernicium folder (.cn).'
+        raise badinit.red
+      end
     end
 
     # find  the root .cn folder
@@ -131,7 +144,7 @@ module Copernicium
       else # files are not nil
 
         # exit if the specified file is not in the workspace
-        return -1 if (self.include? comm.files) == false
+        return -1 unless (self.include? comm.files)
 
         # the actual action, delete all of them from the workspace first
         comm.files.each do |x|
@@ -148,12 +161,12 @@ module Copernicium
 
     def Workspace.commit_file(x)
       if indexOf(x) == -1
-        content = readFile(x)
+        content = File.read(x)
         hash = RevLog.add_file(x, content)
         fobj = FileObj.new(x, [hash,])
         @@files.push(fobj)
       else # file exists
-        content = readFile(x)
+        content = File.read(x)
         hash = RevLog.add_file(x, content)
         if @@files[indexOf(x)].history[-1] != hash
           @@files[indexOf(x)].history << hash
@@ -182,39 +195,9 @@ module Copernicium
       Repos.make_snapshot(@@files, comm.cmt_msg) # return snapshot id
     end
 
+    # takes in a snapshot id, returns workspace to that snapshot
     def Workspace.checkout(comm)
-=begin
-      # just support revisions for now
-      # if argu is an Array Object, we assume it is a list of files to be added
-      # # to the workspace # we add the list of files to @@files regardless
-      # whether it has been in # it. that means there may be multiple versions
-      # of a file.
-      unless comm.files.nil?
-        list_files = comm.files
-        returned_snapshot = Repos.get_snapshot(Repos.history.last)
-        list_files_last_commit = returned_snapshot.files
-        list_files_last_commit.each do |x|
-          if list_files.include? x.path
-            content = RevLog.get_file(x.history.last)
-            idx = indexOf(x.path)
-            if  idx == -1
-              @@files << x
-            else
-              @@files[idx] = x
-            end
-            writeFile(x.path, content)
-          end
-        end
-      else # if argu is not an Array, we assume it is a String, representing the
-      end
-=end
-
-      clear # reset workspace
-
-      # Dec. 3th, 2015 by Linfeng,
-      # for this command, the comm.rev should be a string representing the branch name
       @@branch = comm.rev
-      Repos.update_branch(@@branch)
 
       # if not snapshots exist, dont checkout
       return -1 unless Repos.has_snapshots?
@@ -233,13 +216,13 @@ module Copernicium
           @@files[idx] = file
         end
         content = RevLog.get_file(file.history.last)
-        writeFile(file.path, content)
+        File.write(file.path, content)
       end
     end
 
     # wrapper for Repos merge_snapshot, update workspace with result
+    # returns [{path => content}, [conflicting paths]]
     def Workspace.merge(id)
-      # returns [{path => content}, [conflicting paths]]
       Repos.merge_snapshot(id)
 
       # todo update workspace with result
@@ -255,7 +238,7 @@ module Copernicium
         if idx == -1 # new file
           added << f
         else # changed file?
-          x2 = readFile(f) # get the current version
+          x2 = File.read(f) # get the current version
           x1 = RevLog.get_file(@@files[idx].history.last)
           edits << f if x1 != x2
         end

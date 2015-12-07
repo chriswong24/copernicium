@@ -48,6 +48,13 @@ Note: [optional] <required>
 
 EOS
 
-REPO_WARNING = <<-EOS
+
+IN_REPO_WARNING = <<-EOS
+You are currently in a Copernicium repo... `cn init` is not valid here!
+EOS
+
+
+NO_REPO_WARNING = <<-EOS
 You are not currently in a Copernicium repo... run `cn init` to create one!
 EOS
+

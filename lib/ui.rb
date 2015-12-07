@@ -25,12 +25,6 @@ module Copernicium
   module Driver
     include Repos # needed to get branch and history info
     include Workspace # needed for most high level commands
-    def setup
-      Repos.setup
-      RevLog.setup
-      Workspace.setup
-    end
-
     # Executes the required action for a given user command.
     #
     # Parameters:
@@ -55,36 +49,41 @@ module Copernicium
       # if no arguments given show help information
       pexit COMMAND_BANNER, 0 if (cmd == '-h' || cmd == 'help')
 
-      # if not in a repo, warn them, tell how to create
-      puts REPO_WARNING.yel if (noroot? && cmd != 'init')
+      # create the cn project, else already in one
+      if cmd == 'init'
+        noroot?? init(args) : puts(IN_REPO_WARNING.yel)
+      else # if not in a repo, warn them, tell how to create
+        raise NO_REPO_WARNING.yel if noroot?
 
-      # Handle standard commands
-      case cmd
-      when 'init'
-        init args
-      when 'status'
-        status args
-      when 'history'
-        history args
-      when 'branch'
-        branch args
-      when 'clean'
-        clean args
-      when 'clone'
-        clone args
-      when 'commit'
-        commit args
-      when 'checkout'
-        checkout args
-      when 'merge'
-        merge args
-      when 'push'
-        push args
-      when 'pull'
-        pull args
-      else # handle an unrecognized argument, show help and exit
-        pexit "Unrecognized command #{cmd}\n" + COMMAND_BANNER, 1
-      end
+        # now, assume we are in a copernicum project
+        Workspace.setup
+
+        # Handle all other commands
+        case cmd
+        when 'status'
+          status args
+        when 'history'
+          history args
+        when 'branch'
+          branch args
+        when 'clean'
+          clean args
+        when 'clone'
+          clone args
+        when 'commit'
+          commit args
+        when 'checkout'
+          checkout args
+        when 'merge'
+          merge args
+        when 'push'
+          push args
+        when 'pull'
+          pull args
+        else # handle an unrecognized argument, show help and exit
+          pexit "Unrecognized command #{cmd}\n" + COMMAND_BANNER, 1
+        end
+      end # case
     end # run
 
     # Print and exit with a specific code
@@ -102,11 +101,11 @@ module Copernicium
     # create a new copernicium repository
     def init(args)
       if args.empty?
-        Workspace.create_project
+        root = Workspace.create_project
       else # init into a folder
-        Workspace.create_project args.first
+        root = Workspace.create_project args.first
       end
-      puts "Created Copernicium repo in " + Dir.pwd.grn
+      puts "Created Copernicium repo: ".grn + root
       UIComm.new(command: 'init', opts: args)
     end
 

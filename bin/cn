@@ -6,6 +6,5 @@ require_relative "../lib/required.rb"
 
 include Copernicium::Driver
 
-Copernicium::Driver.setup
 Copernicium::Driver.run(ARGV)
 
