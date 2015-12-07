@@ -108,11 +108,13 @@ module Copernicium
       files.any? { |x| indexOf(x) != -1 }
     end
 
-    # get all files currently in workspace, except folders and .cn/*
-    # todo - include files that start with a dot (.)
+    # get array of filenamess currently in workspace, except folders and .cn/*
+    # todo - include files and files that start with a dot (.)
     def Workspace.working_files
-      Dir[ File.join(@@root, '**', '*') ].reject do |p|
+      (Dir[ File.join(@@root, '**', '*') ].reject do |p|
         File.directory? p || p.include?(@@copn)
+      end).map do |p|
+        p.sub!(/^\.\//, '') # delete leading ./
       end
     end
 
@@ -139,17 +141,39 @@ module Copernicium
       Workspace.checkout # cleanse state
     end
 
+    # takes in a snapshot id, returns workspace to that snapshot
+    def Workspace.checkout(comm = UIComm.new(rev: Repos.current_head))
+      if !Repos.has_snapshots? # dont checkout
+        raise 'No snapshots yet! Commit something before checkout.'.red
+      elsif comm.rev.nil? # assume last
+        comm.rev = Repos.current_head
+      end # now assume its a revision id
+      snap = Repos.get_snapshot(comm.rev)
+      snap.files.each do |file|
+        idx = indexOf(file.path)
+        if idx == -1
+          @@files << file
+        else
+          @@files[idx] = file
+        end
+        content = RevLog.get_file(file.last)
+        File.write(file.path, content)
+      end
+    end
+
     def Workspace.commit_file(x)
       puts 'Committing: '.grn + x
-      if indexOf(x) == -1
+      added, edits, remov = Workspace.status
+      if added.include? x
         hash = RevLog.add_file(x, File.read(x))
-        fobj = FileObj.new File.join('.', x), [hash,]
-        @@files.push(fobj)
-      else # file exists
+        @@files.push(FileObj.new x, [hash])
+      elsif edits.include? x
         hash = RevLog.add_file(x, File.read(x))
-        if @@files[indexOf(x)].last != hash
-          @@files[indexOf(x)].history << hash
-        end
+        @@files[indexOf x].history << hash
+      elsif remov.include? x
+        @@files.delete_at(indexOf x)
+      else
+        puts 'Failed, no changes: '.yel + x
       end
     end
 
@@ -157,8 +181,7 @@ module Copernicium
     def Workspace.commit(comm = UIComm.new)
       if comm.files.nil? # commit everything
         Workspace.working_files.each { |x| Workspace.commit_file(x) }
-      else # else just commit certain files
-        comm.files.each do |x|
+      else comm.files.each do |x|
           if File.exist? x
             Workspace.commit_file(x)
           else
@@ -167,27 +190,6 @@ module Copernicium
         end
       end
       Repos.make_snapshot(@@files, comm.cmt_msg) # return snapshot id
-    end
-
-    # takes in a snapshot id, returns workspace to that snapshot
-    def Workspace.checkout(comm = UIComm.new(rev: Repos.current_head))
-      if !Repos.has_snapshots? # dont checkout
-        raise 'No snapshots yet! Commit something before checkout.'.red
-      elsif comm.rev.nil? # assume last
-        comm.rev = Repos.current_head
-      else # assume its a revision id
-        snap = Repos.get_snapshot(comm.rev)
-        snap.files.each do |file|
-          idx = indexOf(file.path)
-          if idx == -1
-            @@files << file
-          else
-            @@files[idx] = file
-          end
-          content = RevLog.get_file(file.last)
-          File.write(file.path, content)
-        end
-      end
     end
 
     # wrapper for Repos merge_snapshot, update workspace with result
@@ -202,9 +204,9 @@ module Copernicium
       added = []
       edits = []
       remov = []
-      Workspace.working_files.each do |f|
+      working_files.each do |f|
         idx = indexOf(f)
-        if idx < 0 # new file
+        if idx == -1 # new file
           added << f
         else # changed file
           edits << f if File.read(f) != RevLog.get_file(@@files[idx].last)
@@ -212,7 +214,7 @@ module Copernicium
       end
 
       # any deleted files from the last commit?
-      @@files.each { |f| remov << f.path unless working_files.include? f.path }
+      remov = @@files.map(&:path) - working_files
 
       [added, edits, remov]
     end
