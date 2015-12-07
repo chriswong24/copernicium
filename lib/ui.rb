@@ -95,7 +95,7 @@ module Copernicium
 
     # Get some info from the user when they dont specify it
     def get(info)
-      puts "Note: #{info} not specified. Enter #{info} to continue."
+      puts "Note: #{info} not specified. Enter #{info} to continue.".yel
       gets.chomp # read a line from user, and return it
     end
 
@@ -292,7 +292,7 @@ module Copernicium
     def history(args)
       Repos.current_snaps.each do |snap|
         time = snap.date.strftime("%m/%d/%Y %I:%M%p")
-        puts (time + ' | ') .grn + snap.msg.yel + ' | ' + snap.id
+        puts (time + ' | ') .grn + (snap.id + ' | ').yel + snap.msg
       end
     end
 
