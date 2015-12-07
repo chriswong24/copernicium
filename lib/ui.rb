@@ -293,7 +293,7 @@ module Copernicium
     def history(args)
       Repos.current_snaps.each do |snap|
         time = snap.date.strftime("%m/%d/%Y %I:%M%p")
-        puts (time + ' | ') .grn + snap.msg
+        puts (time + ' | ') .grn + snap.msg.yel + ' | ' + snap.id
       end
     end
 

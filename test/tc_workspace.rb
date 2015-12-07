@@ -9,8 +9,8 @@ class CoperniciumWorkspaceTest < Minitest::Test
     before 'manipulating the workspace' do
       Dir.mkdir('workspace')
       Dir.chdir('workspace')
-      writeFile('1.txt', '1')
-      writeFile('2.txt', '2')
+      File.write('1.txt', '1')
+      File.write('2.txt', '2')
 
       Workspace.setup
       Workspace.create_project
@@ -24,20 +24,20 @@ class CoperniciumWorkspaceTest < Minitest::Test
     end
 
     it 'can commit a entire workspace' do
-      writeFile('1.txt','1_1')
-      writeFile('2.txt','2_2')
+      File.write('1.txt','1_1')
+      File.write('2.txt','2_2')
       comm = UIComm.new(command: 'commit', files: ['1.txt', '2.txt'])
       Workspace.commit(comm)
 
-      content = readFile('1.txt')
+      content = File.read('1.txt')
       content.must_equal '1_1'
-      content = readFile('2.txt')
+      content = File.read('2.txt')
       content.must_equal '2_2'
     end
 
     it 'can checkout a entire branch' do
-      writeFile('1.txt', '1_1_1_1')
-      writeFile('2.txt', '2_2_2_2')
+      File.write('1.txt', '1_1_1_1')
+      File.write('2.txt', '2_2_2_2')
       comm = UIComm.new(command: 'commit', files: ['1.txt', '2.txt'])
       Workspace.commit(comm)
       comm = UIComm.new(rev: 'master')
@@ -45,45 +45,45 @@ class CoperniciumWorkspaceTest < Minitest::Test
 
       # todo - actually switch branches
 
-      content = readFile('1.txt')
+      content = File.read('1.txt')
       content.must_equal '1_1_1_1'
-      content = readFile('2.txt')
+      content = File.read('2.txt')
       content.must_equal '2_2_2_2'
     end
 
     it 'can check the status of the workspace' do
       File.delete('2.txt')
-      writeFile('1.txt', 'edit')
-      writeFile('3.txt', '3')
+      File.write('1.txt', 'edit')
+      File.write('3.txt', '3')
       changedFiles = Workspace.status
       changedFiles.must_equal([['./3.txt'], ['./1.txt'],['./2.txt']])
     end
 
     it 'can clean the workspace to last commit' do
-      writeFile('1.txt', '1_1')
-      writeFile('2.txt', '2_2')
+      File.write('1.txt', '1_1')
+      File.write('2.txt', '2_2')
       comm = UIComm.new(files: ['1.txt', '2.txt'])
       Workspace.clean(comm)
-      content = readFile('1.txt')
+      content = File.read('1.txt')
       content.must_equal '1'
-      content = readFile('2.txt')
+      content = File.read('2.txt')
       content.must_equal '2'
     end
 
     it 'can clean specific files in the workspace' do
-      writeFile('1.txt', '1_1')
+      File.write('1.txt', '1_1')
       comm = UIComm.new(command: 'clean', files: ['1.txt'])
       Workspace.clean(comm)
-      content = readFile('1.txt')
+      content = File.read('1.txt')
       content.must_equal '1'
     end
 
     # will pass after repos.history works
     it 'can commit a list of files' do
-      writeFile('1.txt', '1_1_1')
+      File.write('1.txt', '1_1_1')
       comm = UIComm.new(command: 'commit', files: ['1.txt'])
       Workspace.commit(comm)
-      content = readFile('1.txt')
+      content = File.read('1.txt')
       content.must_equal '1_1_1'
     end
 
@@ -95,11 +95,11 @@ class CoperniciumWorkspaceTest < Minitest::Test
 =begin
     # this feature currently disabled
     it 'can checkout a list of files' do
-      writeFile('1.txt','none')
+      File.write('1.txt','none')
       comm = runner('checkout master.txt')
       checkout(comm)
 
-      content = readFile('1.txt')
+      content = File.read('1.txt')
       content.must_equal '1'
     end
 =end
