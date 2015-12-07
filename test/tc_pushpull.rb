@@ -5,55 +5,62 @@
 
 require_relative 'test_helper'
 
+include Copernicium::PushPull
+
 class TestPushPullModule < Minitest::Test
-  describe Copernicium::PushPull do
-    it "is able to connect to a remote computer" do	# test for a good connection and a bad connection
-      conn = PushPull::connect("cycle2.csug.rochester.edu", @user)
+  describe 'Copernicium PushPull' do
+    before 'connecting to host, define constants' do
+      @host = 'cycle2.csug.rochester.edu'
+    end
+
+    # test for a good connection and a bad connection
+    it 'is able to connect to a remote computer' do
+      conn = PushPull.connect(@host, @user)
       conn.must_equal true
 
-      conn = PushPull::connect("null@cif.rochester.edu", @user)
+      conn = PushPull.connect('null@cif.rochester.edu', @user)
       conn.must_equal false
     end
 
-    it "can yield a remote connection to a block" do
+    it 'can yield a remote connection to a block' do
       test = Object.new
-      conn = PushPull::connect("cycle2.csug.rochester.edu", @user) do |x|
-        test = (x.exec!("echo Blocks Working!")).strip;
+      conn = PushPull.connect(@host, @user) do |x|
+        test = (x.exec!('echo Blocks Working!')).strip;
       end
-      test.must_equal "Blocks Working!"
+      test.must_equal 'Blocks Working!'
     end
 
-    it "can move files to remote servers for push" do
-      tfile = File.new("comm_t.copernicium", 'w')
+    it 'can move files to remote servers for push' do
+      tfile = File.new('comm_t.copernicium', 'w')
       tfile.close
-      test = PushPull::transfer("cycle2.csug.rochester.edu", "./comm_t.copernicium", "/localdisk/comm_t.copernicium", @user) do |scp|
-        scp.upload!("./comm_t.copernicium", "/localdisk/comm_t.copernicium", :recursive => true)
+      test = PushPull.transfer(@host, './comm_t.copernicium', '/localdisk/comm_t.copernicium', @user) do |scp|
+        scp.upload!('./comm_t.copernicium', '/localdisk/comm_t.copernicium', :recursive => true)
       end
-      File.delete("comm_t.copernicium")
-      PushPull::connect("cycle2.csug.rochester.edu", @user) do |x|
-        x.exec!("ls /localdisk/comm_t.copernicium")
-        x.exec!("rm /localdisk/comm_t.copernicium")
+      File.delete('comm_t.copernicium')
+      PushPull.connect(@host, @user) do |x|
+        x.exec!('ls /localdisk/comm_t.copernicium')
+        x.exec!('rm /localdisk/comm_t.copernicium')
       end
       test.must_equal true
     end
 
-    it "can fetch files from a server for pull" do
-      PushPull::connect("cycle2.csug.rochester.edu", @user) do |x|
-        x.exec!("touch /localdisk/comm_t.copernicium")
+    it 'can fetch files from a server for pull' do
+      PushPull.connect(@host, @user) do |x|
+        x.exec!('touch /localdisk/comm_t.copernicium')
       end
-      result = PushPull::fetch("cycle2.csug.rochester.edu", "/localdisk/comm_t.copernicium", "./", @user)
-      File.delete("./comm_t.copernicium")
+      result = PushPull.fetch(@host, '/localdisk/comm_t.copernicium', './', @user)
+      File.delete('./comm_t.copernicium')
       result.must_equal true
     end
 
-    it "can clone a repository from a server" do
-      conn = PushPull::connect("cycle2.csug.rochester.edu", @user) do |x|
-        x.exec!("mkdir /localdisk/.t_copernicium")
-        x.exec!("touch /localdisk/.t_copernicium/comm_t.copernicium");
+    it 'can clone a repository from a server' do
+      conn = PushPull.connect(@host, @user) do |x|
+        x.exec!('mkdir /localdisk/.t_copernicium')
+        x.exec!('touch /localdisk/.t_copernicium/comm_t.copernicium');
       end
-      result = PushPull::clone("cycle2.csug.rochester.edu:/localdisk/.t_copernicium", @user)
-      conn = PushPull::connect("cycle2.csug.rochester.edu", @user) do |x|
-        x.exec!("rm -r .t_copernicium")
+      result = PushPull.clone('cycle2.csug.rochester.edu:/localdisk/.t_copernicium', @user)
+      conn = PushPull.connect(@host, @user) do |x|
+        x.exec!('rm -r .t_copernicium')
       end
       result.must_equal true
     end

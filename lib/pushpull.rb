@@ -315,7 +315,7 @@ module Copernicium
       dest = remote.split(':')
       begin
         fetch(dest[0], dest[1], Dir.pwd, user)
-        exit_code = true;
+        exit_code = true
       rescue
         puts "Failed to clone the remote branch!".red
       end
