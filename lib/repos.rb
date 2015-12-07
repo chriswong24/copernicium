@@ -33,13 +33,13 @@
 
 module Copernicium
   class Snapshot
-    attr_accessor :id, :files, :msg
-    def initialize(files = [], msg)
-      @date = DateTime.now
+    attr_accessor :id, :files, :msg, :date
+    def initialize(files = [], msg = 'null', date = nil)
+      @date = (date.nil?? DateTime.now : date)
       @files = files
       @msg = msg
 
-      # hash self, and return the value
+      # hash self and assign as the id value
       @id = Digest::SHA256.hexdigest Marshal.dump(self)
     end
   end
@@ -56,23 +56,26 @@ module Copernicium
 
       # read history from disk
       @@branch = File.read(@@head)
-      @@history = Marshal.load File.read(@@hist)
+      @@history = YAML.load File.read(@@hist)
     end
 
     # unit testing version - create folders for this code
     def Repos.setup_tester(root = Dir.pwd, branch = 'master')
       @@copn = File.join(root, '.cn')
       @@snap = File.join(@@copn, 'snap')
+      @@revs = File.join(@@copn, 'revs')
       @@head = File.join(@@copn, 'branch')
       @@hist = File.join(@@copn, 'history')
 
       # create folders for testing this module
       Dir.mkdir(@@copn) unless Dir.exist?(@@copn)
       Dir.mkdir(@@snap) unless Dir.exist?(@@snap)
+      Dir.mkdir(@@revs) unless Dir.exist?(@@revs)
 
       # default new
       @@branch = branch
       @@history = {branch => []}
+      RevLog.setup
     end
 
     # check if any snapshots exist for the current branch
@@ -80,9 +83,13 @@ module Copernicium
       not Repos.history(@@branch).empty?
     end
 
-    # Return hash an object
+    # Return hash of an object
     def Repos.hasher(obj)
       Digest::SHA256.hexdigest Marshal.dump(obj)
+    end
+
+    def hash_array
+      Hash.new {[]}
     end
 
     # Create and return snapshot id
@@ -99,12 +106,12 @@ module Copernicium
     # helper to write a snapshot, saving a new commit
     # marshal serializes the class instance to a string
     def Repos.update_snap(snap)
-      File.write File.join(@@snap, snap.id), Marshal.dump(snap)
+      File.write File.join(@@snap, snap.id), YAML.dump(snap)
     end
 
     # helper to add snap to history
     def Repos.update_history
-      File.write @@hist, Marshal.dump(@@history) # write history
+      File.write @@hist, YAML.dump(@@history) # write history
     end
 
     # Merge the target snapshot into HEAD snapshot of the current branch
@@ -127,7 +134,7 @@ module Copernicium
     def Repos.get_snapshot(id)
       @@history.each do |branch, snapids|
         snapids.each do |snapid|
-          return Marshal.load(File.join(@@snap, snapid)) if snapid == id
+          return YAML.load_file(File.join(@@snap, id)) if snapid == id
         end
       end
 
@@ -175,8 +182,8 @@ module Copernicium
           id2 = files2[f2_index].last
 
           # get file contents
-          content1 = get_file(id1)
-          content2 = get_file(id2)
+          content1 = RevLog.get_file(id1)
+          content2 = RevLog.get_file(id2)
 
           # check if the file content for each path is the same
           if content1 == content2
@@ -198,7 +205,6 @@ module Copernicium
     def Repos.diffset(array1, array2)
       array1.select { |x| !array2.any? { |y| x == y } }
     end
-
 
     # BRANCHING
 

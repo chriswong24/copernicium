@@ -54,6 +54,7 @@ class TestCoperniciumRevLog < Minitest::Test
       content.must_equal "testfilecontent1"
     end
 
+    # todo - this is the same test as add a file...
     it "can hash a file" do
       hash = RevLog.hash_file("testfilename", "testfilecontent")
       hash.must_equal "dc198016e4d7dcace98d5843a3e6fd506c1c790110091e6748a15c79fefc02ca"

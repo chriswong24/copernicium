@@ -91,11 +91,11 @@ module Copernicium
 
 
     def RevLog.get_file(id)
-      file_path = File.join(@@rev_path, id)
+      file_path = File.join(@@rev_path, id.to_s)
       if File.exist? file_path
         File.open(file_path, 'r') { |f| return f.read }
       else
-        raise Exception, 'RevLog: invalid file revision id!'
+        raise Exception, 'RevLog: invalid file revision id!'.red
       end
     end
 

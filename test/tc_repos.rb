@@ -22,11 +22,9 @@ class TestCnReposModule < Minitest::Test
       Repos.history.wont_be_empty
     end
 
-    # todo - fix this, important
     it 'can get a snapshot from an id' do
       @files = [@file1, @file2]
       snapid = Repos.make_snapshot @files
-      puts snapid
       snap = Repos.get_snapshot snapid
       snap.id.must_equal snapid
       snap.files.must_equal @files
@@ -48,10 +46,13 @@ class TestCnReposModule < Minitest::Test
       Repos.history.must_equal [snap2, snap3]
     end
 
-    it 'can diff snapshots' do
-      snap1 = Repos.make_snapshot [@file1, @file2, @file3]
-      snap2 = Repos.make_snapshot [@file1, @file3]
-      Repos.diff_snapshots(snap1, snap1) #todo - fix
+    it 'can diff snapshots that are equivalent' do
+      RevLog.add_file("testfilename", "testfilecontent")
+      diff1 = FileObj.new('testfilename', ["dc198016e4d7dcace98d5843a3e6fd506c1c790110091e6748a15c79fefc02ca"])
+      diff2 = FileObj.new('testfilename', ["dc198016e4d7dcace98d5843a3e6fd506c1c790110091e6748a15c79fefc02ca"])
+      snap1 = Repos.make_snapshot [diff1]
+      snap2 = Repos.make_snapshot [diff2]
+      Repos.diff_snapshots(snap1, snap1)
     end
 
     it 'can create branches' do
