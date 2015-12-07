@@ -1,5 +1,5 @@
 g=copernicium
-v=0.0.3
+v=0.1
 
 build:
 	gem build $(g).gemspec
