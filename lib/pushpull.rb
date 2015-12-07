@@ -13,6 +13,7 @@ module Copernicium
   end
 
   module PushPull
+    include Repos # needed for calling their methods
     # Chris's edit
     # Takes in Ethan's UICommandCommunicator object and calls
     # a method based on the command
