@@ -26,9 +26,26 @@
 
 module Copernicium
   module RevLog
+    # called when including RevLog
+    # dont make any new folders
     def RevLog.setup(root = Dir.pwd)
-      @@root = root
-      @@cop_path = File.join(@@root, '.cn')
+      @@cop_path = File.join(root, '.cn')
+      @@rev_path = File.join(@@cop_path, 'revs')
+      @@log_path = File.join(@@cop_path, 'logmap.yaml')
+      @@hash_path = File.join(@@cop_path, 'hashmap.yaml')
+      if File.exist?(@@log_path) && File.exist?(@@hash_path)
+        @@logmap = hash_array.merge(YAML.load_file(@@log_path))
+        @@hashmap = hash_array.merge(YAML.load_file(@@hash_path))
+      else
+        @@logmap = hash_array
+        @@hashmap = hash_array
+      end
+    end
+
+    # called when running the unit tests
+    # create a new folder for testing
+    def RevLog.setup_tester(root = Dir.pwd)
+      @@cop_path = File.join(root, '.cn')
       @@rev_path = File.join(@@cop_path, 'revs')
       @@log_path = File.join(@@cop_path, 'logmap.yaml')
       @@hash_path = File.join(@@cop_path, 'hashmap.yaml')
@@ -78,7 +95,7 @@ module Copernicium
       if File.exist? file_path
         File.open(file_path, 'r') { |f| return f.read }
       else
-        raise Exception, 'Invalid id!'
+        raise Exception, 'RevLog: invalid file revision id!'
       end
     end
 

@@ -7,7 +7,7 @@ include Copernicium::RevLog
 class TestCoperniciumRevLog < Minitest::Test
   describe "RevLogModule" do
     before "manipulating the log" do
-      Copernicium::RevLog.setup
+      Copernicium::RevLog.setup_tester
     end
 
     after "manipulating the log" do
