@@ -34,6 +34,7 @@
 module Copernicium
   class Snapshot
     attr_accessor :id, :files, :msg, :date
+    # todo - doesnt support merging. consider adding parents field
     def initialize(files = [], msg = 'null', date = nil)
       @date = (date.nil?? DateTime.now : date)
       @files = files
@@ -57,6 +58,7 @@ module Copernicium
       # read history from disk
       @@branch = File.read(@@head)
       @@history = YAML.load File.read(@@hist)
+      @@brsnaps = Repos.get_branch @@branch
     end
 
     # unit testing version - create folders for this code
@@ -76,6 +78,11 @@ module Copernicium
       @@branch = branch
       @@history = {branch => []}
       RevLog.setup
+    end
+
+    # check whether a specific branch exists
+    def Repos.has_branch?(branch)
+      Repos.branches.include? branch
     end
 
     # check if any snapshots exist for the current branch
@@ -145,8 +152,10 @@ module Copernicium
     def Repos.history(branch = nil)
       if branch.nil? # return a list of unique all commits
         (@@history.inject([]) { |o, x| o + x.last }).uniq
-      elsif # just return the stored history
+      elsif Repos.has_branch? branch # just return the stored history
         @@history[branch]
+      else # no commits yet
+        []
       end
     end
 
@@ -211,12 +220,15 @@ module Copernicium
     # return the current branch we are on now
     def current() @@branch end
 
+    # return the array of our branches snapshots
+    def current_snaps() @@brsnaps end
+
     # Return string array of what branches we have
     def Repos.branches() @@history.keys end
 
     # Create and return hash ID of new branch
     def Repos.make_branch(branch)
-      @@history[branch] = @@history[@@branch]
+      @@history[branch] =  (@@history[@@branch].nil?? [] : @@history[@@branch])
       @@branch = branch
       update_history
       hasher @@history[branch]
@@ -225,6 +237,14 @@ module Copernicium
     def Repos.update_branch(branch)
       File.write(@@head, branch)
       @@branch = branch
+    end
+
+    # From the branch names, get the history, ant build the array of snapshots
+    # This is different than the history branch which just contains ids
+    def Repos.get_branch(branch)
+      Repos.history(branch).inject([]) do |hist, snapid|
+        hist << Repos.get_snapshot(snapid)
+      end
     end
 
     # todo - also delete snapshots unique to this branch

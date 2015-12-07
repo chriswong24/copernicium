@@ -20,7 +20,7 @@ TOP_BANNER = 'Copernicium (cn) - simple DVCS'.ugn
 
 HELP_BANNER = <<-EOS
 #{TOP_BANNER}
-#
+
 Starting out:
     init - create a new repository
     status - check repo status
@@ -55,8 +55,6 @@ EOS
 IN_REPO_WARNING = <<-EOS
 You are currently in a Copernicium repo... `cn init` is not valid here!
 EOS
-
-#Project root: #{Copernicium::Workspace.setup && getroot}
 
 NO_REPO_WARNING = <<-EOS
 You are not currently in a Copernicium repo... run `cn init` to create one!

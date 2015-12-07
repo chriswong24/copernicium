@@ -51,7 +51,7 @@ module Copernicium
 
       # create the cn project, else already in one
       if cmd == 'init'
-        noroot?? init(args) : puts(IN_REPO_WARNING.yel)
+        noroot?? init(args) : puts(IN_REPO_WARNING.yel, getroot)
       else # if not in a repo, warn them, tell how to create
         raise NO_REPO_WARNING.yel if noroot?
 
@@ -121,11 +121,6 @@ module Copernicium
       ui
     end
 
-    # check whether a specific branch exists
-    def isbranch?(branch)
-      Repos.branches.include? branch
-    end
-
     # create and switch to a new branch
     def create_branch(branch)
       new_branch_hash = Repos.make_branch branch
@@ -139,14 +134,14 @@ module Copernicium
         puts "Branches: ".grn + Repos.branches.join(' ')
       elsif branch == '-c' # try to create a new branch
         # If branch name not specified, get it from the user
-        branch = args[1]
+        branch = args.first
         branch = get "new branch name" if branch.nil?
 
         # Create and switch to the new branch
         create_branch branch
       elsif branch == '-r' # rename the current branch
         # If branch name not specified, get it from the user
-        newname = args[1]
+        newname = args.first
         newname = get "new name for current branch" if newname.nil?
 
         oldname = Repos.current
@@ -160,18 +155,18 @@ module Copernicium
         puts "Renamed branch '#{oldname}' to '#{newname}'".grn
       elsif branch == '-d' # Delete the specified branch
         # If branch name not specified, get it from the user
-        branch = args[1]
+        branch = args.first
         branch = get "branch to delete" if branch.nil?
 
         # Do not delete the current branch
         if branch == Repos.current
-          pexit "Cannot delete the current branch!".red, 1
+          raise "Cannot delete the current branch!".red
         end
 
         # Delete the specified branch
         Repos.delete_branch branch
         puts "Deleted branch '#{branch}'".grn
-      elsif isbranch? branch # switch branch
+      elsif Repos.has_branch? branch # switch branch
         Repos.update_branch  branch
       else # branch does not exist, create it, switch to it
         Repos.create_branch branch
@@ -240,7 +235,7 @@ module Copernicium
       end
 
       # if it is a branch, get the last head of it
-      rev = Repos.history(rev).last.id if isbranch? rev
+      rev = Repos.history(rev).last.id if Repos.has_branch? rev
 
       # call workspace checkout the given / branch
       ui = UIComm.new(command: 'checkout', rev: rev, files: files)
@@ -296,9 +291,10 @@ module Copernicium
     end
 
     def history(args)
-      puts "using the right driver method"
-      puts 'curren branch: ' + Repos.current
-      puts Repos.history(Repos.current)
+      Repos.current_snaps.each do |snap|
+        time = snap.date.strftime("%m/%d/%Y %I:%M%p")
+        puts (time + ' | ') .grn + snap.msg
+      end
     end
 
     def merge(args)
@@ -310,7 +306,7 @@ module Copernicium
       end
 
       # If rev is a branch name, resolve it to a rev ID.
-      if isbranch? rev
+      if Repos.has_branch? rev
         rev = (Repos.history rev).last
       end
 
@@ -318,7 +314,6 @@ module Copernicium
 
       # If there were any conflicts, display them to the user.
       if not conflicts.nil?
-        puts "Merge completed with conflicts:"
 
         conflicts.each do |conflict|
           puts "   #{conflict}".red
