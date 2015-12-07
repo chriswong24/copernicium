@@ -119,6 +119,13 @@ module Copernicium
       @@files = []
     end
 
+    # take in file object, restore
+    def Workspace.checkout_file(file)
+      idx = indexOf(file.path)
+      idx.nil?? @@files << file : @@files[idx] = file
+      File.write(file.path, RevLog.get_file(file.last))
+    end
+
     def Workspace.clean(comm = UIComm.new)
       if comm.files.nil? # reset everything
         Workspace.clear
@@ -136,23 +143,20 @@ module Copernicium
       Workspace.checkout comm # cleanse state
     end
 
-    # takes in a snapshot id, returns workspace to that snapshot
+    # takes in a snapshot id, sets workspace to that snapshot
     def Workspace.checkout(comm = UIComm.new)
+      comm.rev = Repos.current_head if comm.rev.nil?
       if ! Repos.has_snapshots? # dont checkout
-        raise 'No snapshots yet! Commit something before checkout.'.red
-      elsif comm.rev.nil? # assume last
-        comm.rev = Repos.current_head
-      end # now assume its a revision id
-      snap = Repos.get_snapshot(comm.rev)
-      snap.files.each do |file|
-        idx = indexOf(file.path)
-        if idx.nil?
-          @@files << file
-        else
-          @@files[idx] = file
+        puts 'No snapshots yet! Commit something before checkout.'.red
+      elsif comm.files.nil? # checkout everything
+        Repos.get_snapshot(comm.rev).files.each do |file|
+          Workspace.checkout_file file
         end
-        content = RevLog.get_file(file.last)
-        File.write(file.path, content)
+      else # just checkout given files
+        Repos.get_snapshot(comm.rev).files.select { |f|
+          comm.files.include? f.path }.each do |file|
+          Workspace.checkout_file file
+        end
       end
     end
 
@@ -168,14 +172,16 @@ module Copernicium
       elsif remov.include? x
         @@files.delete_at(indexOf x)
       else
-        #puts 'Failed, no changes: '.yel + x
+        puts 'Failed, no changes: '.yel + x
       end
     end
 
     # commit a list of files or the entire workspace to make a new snapshot
     def Workspace.commit(comm = UIComm.new)
       if comm.files.nil? # commit everything
-        Workspace.working_files.each { |x| Workspace.commit_file(x) }
+        Workspace.status.each do |st|
+          st.each { |x| Workspace.commit_file x }
+        end
       else comm.files.each do |x|
           if File.exist? x
             Workspace.commit_file(x)

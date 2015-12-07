@@ -230,6 +230,8 @@ module Copernicium
       comm
     end
 
+    # Take in a revision (snaptshot) id or branch
+    # Doesnt support file checkouts at this time
     def checkout(args)
       if args.empty?
         rev = get 'branch or commit id'
@@ -242,6 +244,7 @@ module Copernicium
       if rev == 'head'
         rev = Repos.current_head
       elsif Repos.has_branch? rev
+        Repos.update_branch rev
         rev = Repos.history(rev).last
       end
 
