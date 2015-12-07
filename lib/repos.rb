@@ -43,6 +43,10 @@ module Copernicium
       # hash self and assign as the id value
       @id = Digest::SHA256.hexdigest Marshal.dump(self)
     end
+
+    def time
+      @date.strftime("%m/%d/%Y %I:%M%p")
+    end
   end
 
   module Repos

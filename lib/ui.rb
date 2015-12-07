@@ -115,12 +115,11 @@ module Copernicium
       ui = UIComm.new(command: 'status', opts: args)
       st = Workspace.status
       if st.all?(&:empty?)
-        "No changes since last commit: ".grn + Repos.current_snaps.msg
+        "No changes since last commit: ".grn + Repos.current_head.msg
       else
-        def based(s) s.sub(/^\.\//, '') end
-        st[0].each { |f| puts "Added:   ".grn + based(f) }
-        st[1].each { |f| puts "Edited:  ".yel + based(f) }
-        st[2].each { |f| puts "Removed: ".red + based(f) }
+        st[0].each { |f| puts "Added:   ".grn + f }
+        st[1].each { |f| puts "Edited:  ".yel + f }
+        st[2].each { |f| puts "Removed: ".red + f }
       end
       ui
     end
@@ -296,8 +295,7 @@ module Copernicium
 
     def history(args)
       Repos.current_snaps.each do |snap|
-        time = snap.date.strftime("%m/%d/%Y %I:%M%p")
-        puts (time + ' | ') .grn + (snap.id + ' | ').yel + snap.msg
+        puts (snap.time + ' | ') .grn + (snap.id + ' | ').yel + snap.msg
       end
     end
 
