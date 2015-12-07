@@ -116,7 +116,7 @@ module Copernicium
       ui = UIComm.new(command: 'status', opts: args)
       st = Workspace.status
       if st.all?(&:empty?)
-        "No changes since last commit: ".grn + Repos.current_head.msg
+        "No changes since last commit: ".grn + Repos.get_snapshot(Repos.current_head).msg
       else
         st[0].each { |f| puts "Added:   ".grn + f }
         st[1].each { |f| puts "Edited:  ".yel + f }
