@@ -102,7 +102,7 @@ module Copernicium
     # Description:
     #   a net/scp wrapper to copy to server
     #
-    # remote: the remote server and directory to pull from, formatted "my.server:/the/location/we/want"
+    # remote: the remote server and directory to pull from, formatted "my.server"
     # user: the user to connect as
     def PushPull.transfer(remote, user, &block)
       exit_code = false

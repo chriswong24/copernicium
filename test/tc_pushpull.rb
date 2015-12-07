@@ -11,6 +11,8 @@ class TestPushPullModule < Minitest::Test
   describe 'Copernicium PushPull' do
     before 'connecting to host, define constants' do
       @host = 'cycle2.csug.rochester.edu'
+      @user = nil
+      puts
     end
 
     # todo - add testing for UI parser
@@ -20,9 +22,6 @@ class TestPushPullModule < Minitest::Test
       puts 'testing connection'.yel
       conn = PushPull.connect(@host, @user)
       conn.must_equal true
-
-      conn = PushPull.connect('null@cif.rochester.edu', @user)
-      conn.must_equal false
     end
 
     it 'can yield a remote connection to a block' do
@@ -36,7 +35,7 @@ class TestPushPullModule < Minitest::Test
     it 'can move files to remote servers for push' do
       tfile = File.new('comm_t.copernicium', 'w')
       tfile.close
-      test = PushPull.transfer(@host, './comm_t.copernicium', '/localdisk/comm_t.copernicium', @user) do |scp|
+      test = PushPull.transfer(@host, @user) do |scp|
         scp.upload!('./comm_t.copernicium', '/localdisk/comm_t.copernicium', :recursive => true)
       end
       File.delete('comm_t.copernicium')

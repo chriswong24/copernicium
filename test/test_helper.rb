@@ -11,7 +11,7 @@ include Copernicium
 
 # universal place for test requirements
 
-require 'byebug'                 # needed for stepping through code
+#require 'byebug'                 # needed for stepping through code
 require 'fileutils'              # needed for rm_rf'ing in cleanup
 require 'minitest/spec'
 require 'minitest/autorun'
