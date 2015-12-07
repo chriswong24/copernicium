@@ -35,6 +35,7 @@ module Copernicium
       Repos.setup @@root
       @@files = Repos.current_files
       @@branch = Repos.current
+
     end
 
     # create a new copernicium project
@@ -112,7 +113,7 @@ module Copernicium
       end
     end
 
-    # Clear the current workspace
+    # Clear the workspace
     def Workspace.clear
       @@files.each{ |x| File.delete(x.path) }
       @@files = []
@@ -123,14 +124,13 @@ module Copernicium
     # or it is the initial state, no commit and no checkout
     # if list_files is nil, then rollback the list of files from the branch
     # or rollback to the entire branch head pointed
-    def Workspace.clean(comm)
-      if comm.files.empty? # reset, checkout last commit
+    def Workspace.clean(comm = UIComm.new(rev: Repos.current_head))
+      if comm.files.nil? # reset, checkout last commit
         Workspace.clear
         Workspace.checkout
       else # files are not nil
-
         # exit if the specified file is not in the workspace
-        return -1 unless (self.include? comm.files)
+        return unless (self.include? comm.files)
 
         # the actual action, delete all of them from the workspace first
         comm.files.each do |x|
@@ -147,13 +147,11 @@ module Copernicium
 
     def Workspace.commit_file(x)
       if indexOf(x) == -1
-        content = File.read(x)
-        hash = RevLog.add_file(x, content)
+        hash = RevLog.add_file(x, File.read(x))
         fobj = FileObj.new(x, [hash,])
         @@files.push(fobj)
       else # file exists
-        content = File.read(x)
-        hash = RevLog.add_file(x, content)
+        hash = RevLog.add_file(x, File.read(x))
         if @@files[indexOf(x)].last != hash
           @@files[indexOf(x)].history << hash
         end
@@ -179,7 +177,7 @@ module Copernicium
     end
 
     # takes in a snapshot id, returns workspace to that snapshot
-    def Workspace.checkout(comm = Repos.current)
+    def Workspace.checkout(comm = UIComm.new(rev: Repos.current_head))
       # if not snapshots exist, dont checkout
       return -1 unless Repos.has_snapshots?
 

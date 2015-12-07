@@ -145,7 +145,7 @@ module Copernicium
         end
       end
 
-      raise "Repos: snapshot not found in this repo.".red
+      raise "Repos: snapshot #{id} not found in this repo.".red
     end
 
     # Return array of snapshot IDs
@@ -219,6 +219,9 @@ module Copernicium
 
     # return the current branch we are on now
     def current() @@branch end
+
+    # return the snap id of branch head
+    def current_head() @@history[@@branch].last end
 
     # return the array of our branches snapshots
     def current_snaps() @@brsnaps end
