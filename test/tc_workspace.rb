@@ -53,7 +53,6 @@ class CoperniciumWorkspaceTest < Minitest::Test
     end
 =end
 
-    # will pass when repos branch works better
     it 'can checkout a entire branch' do
       drive "branch -c new"
       drive "branch new"
@@ -63,8 +62,9 @@ class CoperniciumWorkspaceTest < Minitest::Test
       File.read('1.txt').must_equal '1_1_1_1'
       File.read('2.txt').must_equal '2_2_2_2'
       drive "branch master"
-      File.read('1.txt').must_equal '1'
-      File.read('2.txt').must_equal '2'
+      Workspace.checkout
+      File.read('1.txt').must_equal '1_2'
+      File.read('2.txt').must_equal '2_1'
     end
 
     it 'can check the status of the workspace' do

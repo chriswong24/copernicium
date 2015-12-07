@@ -126,23 +126,6 @@ module Copernicium
       File.write(file.path, RevLog.get_file(file.last))
     end
 
-    def Workspace.clean(comm = UIComm.new)
-      if comm.files.nil? # reset everything
-        Workspace.clear
-      else # files are not nil
-        comm.files.each do |x|
-          idx = indexOf(x)
-          if idx.nil?
-            puts "Cannot clean #{x}:".yel + " does not exist in snapshot"
-          else
-            @@files.delete_at(idx)
-            File.delete(x)
-          end
-        end
-      end
-      Workspace.checkout comm # cleanse state
-    end
-
     # takes in a snapshot id, sets workspace to that snapshot
     def Workspace.checkout(comm = UIComm.new)
       comm.rev = Repos.current_head if comm.rev.nil?
@@ -158,6 +141,24 @@ module Copernicium
           Workspace.checkout_file file
         end
       end
+    end
+
+    # reset repo back to a given state
+    def Workspace.clean(comm = UIComm.new)
+      if comm.files.nil? # reset everything
+        Workspace.clear
+      else # files are not nil
+        comm.files.each do |x|
+          idx = indexOf(x)
+          if idx.nil?
+            puts "Cannot clean #{x}:".yel + " does not exist in snapshot"
+          else
+            @@files.delete_at(idx)
+            File.delete(x)
+          end
+        end
+      end
+      Workspace.checkout comm # cleanse state
     end
 
     def Workspace.commit_file(x)
@@ -190,6 +191,7 @@ module Copernicium
           end
         end
       end
+      # todo - handle case of no changes, dont make a snapshot
       Repos.make_snapshot(@@files, comm.cmt_msg) # return snapshot id
     end
 

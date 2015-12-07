@@ -133,53 +133,42 @@ module Copernicium
     end
 
     def branch(args)
-      branch = args.first
+      branch = args.shift
       if branch.nil? # show all branches
         puts "Current: ".grn + Repos.current
         puts "Branches: ".grn + Repos.branches.join(' ')
-      elsif branch == '-c' # try to create a new branch
-        # If branch name not specified, get it from the user
-        branch = args[1]
-        branch = get "new branch name" if branch.nil?
 
-        # Create and switch to the new branch
+      elsif branch == '-c' # try to create a new branch
+        branch = args.first # get from the user
+        branch = get "new branch name" if branch.nil?
         create_branch branch
+
       elsif branch == '-r' # rename the current branch
-        # If branch name not specified, get it from the user
-        newname = args[1]
+        newname = args.first # get if not specified
         newname = get "new name for current branch" if newname.nil?
         oldname = Repos.current
-
-        # Create and switch to a new branch with the given name
         create_branch newname
-
-        # Delete the branch with the old name
         Repos.delete_branch oldname
         puts "Deleted branch '#{oldname}'".grn
         puts "Renamed branch '#{oldname}' to '#{newname}'".grn
-      elsif branch == '-d' # Delete the specified branch
-        # If branch name not specified, get it from the user
-        branch = args[1]
-        branch = get "branch to delete" if branch.nil?
 
-        # Do not delete the current branch
+      elsif branch == '-d' # Delete the specified branch
+        branch = args.first # If not specified, get
+        branch = get "branch to delete" if branch.nil?
         if branch == Repos.current
-          raise "Cannot delete the current branch!".red
+          puts "Cannot delete the current branch!".red
+        else # Delete the specified branch
+          Repos.delete_branch branch
+          puts "Deleted branch '#{branch}'".grn
         end
 
-        # Delete the specified branch
-        Repos.delete_branch branch
-        puts "Deleted branch '#{branch}'".grn
-      elsif Repos.has_branch? branch # switch branch
-        Repos.update_branch  branch
+      elsif Repos.has_branch? branch # switch branch (branch <branch name>)
+        Repos.update_branch branch
         puts "Current: ".grn + Repos.current
-      else # branch does not exist, create it, switch to it
-        Repos.create_branch branch
-        checkout branch # driver
-      end
 
-      # Don't return a UIComm object, since we didn't use one for any of the
-      # backend calls.
+      else # create it, switch to it
+        Repos.create_branch branch
+      end
     end
 
     def push(args)
