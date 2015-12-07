@@ -28,7 +28,6 @@ class CoperniciumIntegrationTests < Minitest::Test
     end
 
     before "create a cn new repo to test" do
-      Driver.setup
       Dir.mkdir("workspace")
       Copernicium.writeFile("workspace/1.txt", "1")
       Copernicium.writeFile("workspace/2.txt", "2")
