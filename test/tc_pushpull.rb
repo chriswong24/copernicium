@@ -13,8 +13,11 @@ class TestPushPullModule < Minitest::Test
       @host = 'cycle2.csug.rochester.edu'
     end
 
+    # todo - add testing for UI parser
+
     # test for a good connection and a bad connection
     it 'is able to connect to a remote computer' do
+      puts 'testing connection'.yel
       conn = PushPull.connect(@host, @user)
       conn.must_equal true
 

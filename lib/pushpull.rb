@@ -10,15 +10,6 @@ module Copernicium
   #   Pull - cn pull <user> <repo.host:/dir/of/repo> <branch-name>
   #   Clone - cn clone <user> <repo.host:/dir/of/repo>
   class UIComm
-    attr_reader :command, :files, :rev, :cmt_msg, :repo, :opts
-    def initialize(command: nil, files: nil, rev: nil, cmt_msg: nil, repo: nil, opts: nil)
-      @cmt_msg = cmt_msg
-      @command = command
-      @files = files
-      @opts = opts
-      @repo = repo
-      @rev = rev
-    end
   end
 
   module PushPull
@@ -39,25 +30,27 @@ module Copernicium
       when "pull"
         pull(ui_comm.repo, ui_comm.rev, ui_comm.opts.first)
       else
-        raise "Error: Invalid command supplied to PushPull!".red
+        raise "Error: Invalid command supplied to PushPull".red
       end
     end
 
     # Function: connect()
     #
     # Description:
-    #   a net/ssh wrapper, if given a block will execute block on server, otherwise tests connection.
+    #   a net/ssh wrapper, if given a block will execute block on server,
+    #   otherwise tests connection.
     #
     # remote: the remote server, formatted "my.server"
     # user: the user to connect as
     def PushPull.connect(remote, user, &block)
       exit_code = false
+      puts 'inside PushPull connect'.blu
       if(block.nil?)
         begin
+          puts 'inside PushPull connect nil block path'.grn
           Net::SSH.start(remote, user) do |ssh|
-            result = ssh.exec!("echo Successful Connection!")
-            puts result
-            exit_code = true;
+            puts ssh.exec!("echo Successful Connection!")
+            exit_code = true
           end
         rescue
           begin
@@ -69,12 +62,11 @@ module Copernicium
             puts
 
             Net::SSH.start(remote, user, :password => passwd) do |ssh|
-              result = ssh.exec!("echo Successful Connection!")
-              puts result
-              exit_code = true;
+              puts ssh.exec!("echo Successful Connection!")
+              exit_code = true
             end
           rescue
-            puts "Unsuccessful Connection"
+            raise "Unsuccessful Connection".red
           end
         end
       else
@@ -82,7 +74,7 @@ module Copernicium
           Net::SSH.start(remote, user) do |ssh|
             yield ssh
           end
-          exit_code = true;
+          exit_code = true
         rescue
           begin
             print "Username for remote repo: "
@@ -95,9 +87,9 @@ module Copernicium
             Net::SSH.start(remote, user, :password => passwd) do |ssh|
               yield ssh
             end
-            exit_code = true;
+            exit_code = true
           rescue
-            puts "Unable to execute command!"
+            raise "Unable to execute command!".red
           end
         end
       end
@@ -132,7 +124,7 @@ module Copernicium
           end
           exit_code = true
         rescue
-          puts "Unable to upload file!"
+          raise "Unable to upload file!".red
         end
       end
     end
@@ -168,7 +160,7 @@ module Copernicium
             end
             exit_code = true
           rescue
-            puts "Unable to fetch file(s)!"
+            raise "Unable to fetch file(s)!".red
           end
         end
       else
@@ -191,7 +183,7 @@ module Copernicium
             end
             exit_code = true
           rescue
-            puts "Unable to fetch file(s)!"
+            raise "Unable to fetch file(s)!".red
           end
         end
       end
@@ -208,7 +200,7 @@ module Copernicium
     # user: the user to connect as
     def PushPull.push(remote, branch, user)
       # check contents of folder for .cn, fail if not present and remove otherwise
-      dest = remote.split(':');
+      dest = remote.split(':')
       contents = Dir.entries(Dir.pwd)
       if(!content.include? '.cn')
         puts 'failed to push to remote, not an initialized Copernicium repo'
@@ -260,7 +252,7 @@ module Copernicium
     def PushPull.pull(remote, branch, user)
       # check contents of folder for .cn, fail if not present and remove otherwise
       crbr = Repos.new.current_branch() # assumed function
-      dest = remote.split(':');
+      dest = remote.split(':')
       contents = Dir.entries(Dir.pwd)
       if(!content.include? '.cn')
         puts 'failed to pull from remote, not an initialized Copernicium repo'
@@ -281,6 +273,7 @@ module Copernicium
         session.exec!("cn checkout #{branch}")
         collection = session.exec!("ls | cat")
       end
+
       collection  = collection.split('\n')
       if(!collection.include? '.cn')
         puts 'failed to pull from remote, remote folder not an initialized Copernicium repo'
