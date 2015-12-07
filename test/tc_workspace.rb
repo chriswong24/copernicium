@@ -2,10 +2,12 @@
 
 require_relative 'test_helper'
 
+include Copernicium::Driver
 include Copernicium::Workspace
 
 class CoperniciumWorkspaceTest < Minitest::Test
   describe 'WorkspaceModule' do
+    def drive(str) Driver.run str.split end
     before 'manipulating the workspace, make a cn repo' do
       Dir.mkdir('workspace')
       Dir.chdir('workspace')
@@ -27,6 +29,7 @@ class CoperniciumWorkspaceTest < Minitest::Test
       File.read('1.txt').must_equal '1_1_1'
     end
 
+    # todo this test is not robust. fix
     it 'can commit a entire workspace' do
       File.write('1.txt','1_1')
       File.write('2.txt','2_2')
@@ -35,23 +38,37 @@ class CoperniciumWorkspaceTest < Minitest::Test
       File.read('2.txt').must_equal '2_2'
     end
 
+    it 'can checkout a list of files' do
+      File.write('1.txt','none')
+      Workspace.checkout UIComm.new(files: ['1.txt'])
+      File.read('1.txt').must_equal '1'
+    end
+
     it 'can checkout a entire branch' do
+      drive "branch -b new"
       File.write('1.txt', '1_1_1_1')
       File.write('2.txt', '2_2_2_2')
+      drive "checkout new"
       Workspace.commit(UIComm.new(files: ['1.txt', '2.txt']))
-
-      # todo - actually switch branches
-      Workspace.checkout(UIComm.new(rev: 'master'))
-
       File.read('1.txt').must_equal '1_1_1_1'
       File.read('2.txt').must_equal '2_2_2_2'
+      drive "checkout master"
+      File.read('1.txt').must_equal '1'
+      File.read('2.txt').must_equal '2'
     end
 
     it 'can check the status of the workspace' do
       File.delete('2.txt')
       File.write('1.txt', 'edit')
       File.write('3.txt', '3')
-      Workspace.status.must_equal([['./3.txt'], ['./1.txt'],['./2.txt']])
+      Workspace.status.must_equal([['./3.txt'], ['./1.txt'], ['./2.txt']])
+    end
+
+    it 'can check the status of the workspace after a commit' do
+      File.delete('2.txt')
+      Workspace.status.must_equal([[], [], ['./2.txt']])
+      Workspace.commit
+      Workspace.status.must_equal([[], [], []])
     end
 
     it 'can clean the workspace to last commit' do
@@ -73,12 +90,6 @@ class CoperniciumWorkspaceTest < Minitest::Test
     it 'can clean specific files in the workspace' do
       File.write('1.txt', '1_1')
       Workspace.clean(UIComm.new(files: ['1.txt']))
-      File.read('1.txt').must_equal '1'
-    end
-
-    it 'can checkout a list of files' do
-      File.write('1.txt','none')
-      Workspace.checkout UIComm.new(files: ['1.txt'])
       File.read('1.txt').must_equal '1'
     end
   end

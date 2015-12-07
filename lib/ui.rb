@@ -21,6 +21,7 @@ module Copernicium
     end
   end
 
+  # todo - consider refactoring some UIComm usage
   # main driver for the command line user interface
   module Driver
     include Repos # needed to get branch and history info
@@ -237,6 +238,9 @@ module Copernicium
         files = args
       end
 
+      # if it 'head' keyword, grab the head
+      rev = Repos.current_head if rev == 'head'
+
       # if it is a branch, get the last head of it
       rev = Repos.history(rev).last.id if Repos.has_branch? rev
 
@@ -255,8 +259,7 @@ module Copernicium
     def clone(args)
       # Command usage is:
       #   cn clone <user> <repo.host:/dir/of/repo>
-
-      user = args[0]
+      user = args.first
       if user.nil?
         user = get "username for clone"
         # Make sure username is first arg, since PushPull is expecting this.
