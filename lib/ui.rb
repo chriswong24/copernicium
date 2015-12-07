@@ -24,7 +24,6 @@ module Copernicium
   # todo - consider refactoring some UIComm usage
   # main driver for the command line user interface
   module Driver
-    include Repos # needed to get branch and history info
     include Workspace # needed for most high level commands
     # Executes the required action for a given user command.
     #
