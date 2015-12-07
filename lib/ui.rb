@@ -172,8 +172,10 @@ module Copernicium
         puts "Deleted branch '#{branch}'".grn
       elsif Repos.has_branch? branch # switch branch
         Repos.update_branch  branch
+        puts "Current: ".grn + Repos.current
       else # branch does not exist, create it, switch to it
         Repos.create_branch branch
+        checkout branch # driver
       end
 
       # Don't return a UIComm object, since we didn't use one for any of the
@@ -244,14 +246,13 @@ module Copernicium
       if rev == 'head'
         rev = Repos.current_head
       elsif Repos.has_branch? rev
-        Repos.update_branch rev
+        branch = rev
         rev = Repos.history(rev).last
       end
 
       # call workspace checkout the given / branch
-      ui = UIComm.new(command: 'checkout', rev: rev, files: files)
-      Workspace.checkout(ui)
-      ui
+      Workspace.checkout(UIComm.new(rev: rev, files: files))
+      Repos.update_branch branch unless branch.nil?
     end
 
     def clean(args = [])

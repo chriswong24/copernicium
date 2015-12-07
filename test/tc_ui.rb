@@ -16,10 +16,6 @@ include Copernicium::Driver
 
 class TestUI < Minitest::Test
   describe "UIModule" do
-    before "checking ui performance create driver" do
-      Driver.setup
-    end
-
     def ui_test_helper(comm, cmd, files=nil, rev=nil, msg=nil, repo=nil)
       comm.must_be_instance_of UIComm
       comm.command.must_equal cmd
