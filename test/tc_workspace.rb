@@ -12,8 +12,8 @@ class CoperniciumWorkspaceTest < Minitest::Test
       File.write('1.txt', '1')
       File.write('2.txt', '2')
       Workspace.create_project
-      Workspace.setup # requiring revlog and repos here
-      Workspace.commit(UIComm.new(files: ['1.txt', '2.txt']))
+      Workspace.setup # requiring revlog and repos here, cn init
+      @init = Workspace.commit(UIComm.new(files: ['1.txt', '2.txt']))
     end
 
     after 'manipulating the workspace, clean cn folder' do
@@ -51,7 +51,15 @@ class CoperniciumWorkspaceTest < Minitest::Test
     it 'can clean the workspace to last commit' do
       File.write('1.txt', '1_1')
       File.write('2.txt', '2_2')
-      Workspace.clean(UIComm.new(files: ['1.txt', '2.txt']))
+      Workspace.clean
+      File.read('1.txt').must_equal '1'
+      File.read('2.txt').must_equal '2'
+    end
+
+    it 'can clean the workspace to a specific commit' do
+      File.write('1.txt', '1_1')
+      File.write('2.txt', '2_2')
+      Workspace.clean(@first)
       File.read('1.txt').must_equal '1'
       File.read('2.txt').must_equal '2'
     end

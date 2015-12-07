@@ -18,33 +18,23 @@ module Copernicium
     end
 
     # returns most recent file id in the snapshot it was saved in
-    def last
-      @history.last
-    end
+    def last() @history.last end
   end # FileObj
 
 
   module Workspace
     include Repos # needed for keeping track of history
-    def Workspace.setup(branch = 'master')
+    def Workspace.setup
       @@cwd = Dir.pwd
       @@root = (noroot?? @@cwd : getroot)
       @@root.sub!(@@cwd, '.')
       @@copn = File.join(@@root, '.cn')
       @@snap = File.join(@@copn, 'snap')
       @@revs = File.join(@@copn, 'revs')
-
-      # todo - actually read this stuff from repos
-      @@branch = branch
-      @@files = []
-
       RevLog.setup @@root
       Repos.setup @@root
-      begin # pass modules project root - they assume we are in a repo
-      rescue
-        puts 'Warning: you are not yet in a Copernicium repo.'.yel
-      end
-      @@root # return to notify where the project was created
+      @@files = Repos.current_files
+      @@branch = Repos.current
     end
 
     # create a new copernicium project
@@ -70,12 +60,11 @@ module Copernicium
       if Dir.exist?(@@copn)
         location # return where we made the repo
       else # something has gone horribly wrong
-        badinit = 'Could not create or find a Copernicium folder (.cn).'
-        raise badinit.red
+        raise 'Could not create or find a Copernicium folder (.cn).'.red
       end
     end
 
-    # find  the root .cn folder
+    # find  the root .cn folder, or return nil if it doesnt exist
     def getroot
       cwd = Dir.pwd
       max = 0
@@ -97,9 +86,7 @@ module Copernicium
     end
 
     # tells us whether we are in a cn project or not
-    def noroot?
-      getroot.nil?
-    end
+    def noroot?() getroot.nil? end
 
     # workspace management
     def Workspace.indexOf(x)
@@ -115,14 +102,13 @@ module Copernicium
 
     # if include all the elements in list_files
     def Workspace.include?(files)
-      files.each { |x| return false if indexOf(x) == -1 }
-      true
+      files.any? { |x| indexOf(x) == -1 }
     end
 
     # get all files currently in workspace, except folders and .cn/*
-    def Workspace.ws_files
+    def Workspace.working_files
       Dir[ File.join(@@root, '**', '*') ].reject do |p|
-        File.directory? p || p.include?(File.join(@@root, '.cn'))
+        File.directory? p || p.include?(@@copn)
       end
     end
 
@@ -168,7 +154,7 @@ module Copernicium
       else # file exists
         content = File.read(x)
         hash = RevLog.add_file(x, content)
-        if @@files[indexOf(x)].history[-1] != hash
+        if @@files[indexOf(x)].last != hash
           @@files[indexOf(x)].history << hash
         end
       end
@@ -177,18 +163,15 @@ module Copernicium
     # commit a list of files or the entire workspace to make a new snapshot
     def Workspace.commit(comm)
       if comm.files.nil? # commit everything
-        Workspace.ws_files.each do |x|
-          Workspace.commit_file(x)
-        end
-      else # just commit certain files
+        Workspace.working_files.each { |x| Workspace.commit_file(x) }
+      else # else just commit certain files
         # iterate through each file path specified in comm.files
         # check whether that file exist in the disk first
         comm.files.each do |x|
-          if File.exists? x
+          if File.exist? x
             Workspace.commit_file(x)
           else
-            errmsg = 'File does not exist: '.red + x
-            puts errmsg
+            puts 'Cannot commit, file does not exist: '.yel + x
           end
         end
       end
@@ -196,9 +179,7 @@ module Copernicium
     end
 
     # takes in a snapshot id, returns workspace to that snapshot
-    def Workspace.checkout(comm)
-      @@branch = comm.rev
-
+    def Workspace.checkout(comm = Repos.current)
       # if not snapshots exist, dont checkout
       return -1 unless Repos.has_snapshots?
 
@@ -215,40 +196,39 @@ module Copernicium
         else
           @@files[idx] = file
         end
-        content = RevLog.get_file(file.history.last)
+        content = RevLog.get_file(file.last)
         File.write(file.path, content)
       end
     end
 
     # wrapper for Repos merge_snapshot, update workspace with result
     # returns [{path => content}, [conflicting paths]]
+    # todo update workspace with result
+    # todo return any conflicting files
     def Workspace.merge(id)
       Repos.merge_snapshot(id)
-
-      # todo update workspace with result
-      # todo return any conflicting files
     end
 
     def Workspace.status
       added = []
       edits = []
       remov = []
-      Workspace.ws_files.each do |f|
+      Workspace.working_files.each do |f|
         idx = indexOf(f)
-        if idx == -1 # new file
+        if idx < 0 # new file
           added << f
         else # changed file?
           x2 = File.read(f) # get the current version
-          x1 = RevLog.get_file(@@files[idx].history.last)
+          x1 = RevLog.get_file(@@files[idx].last)
           edits << f if x1 != x2
         end
       end
 
       # any deleted files from the last commit?
-      @@files.each { |f| remov << f.path unless (ws_files.include? f.path) }
+      @@files.each { |f| remov << f.path unless (working_files.include? f.path) }
 
       [added, edits, remov]
     end
-  end
-end
+  end # Workspace
+end # Copernicium
 

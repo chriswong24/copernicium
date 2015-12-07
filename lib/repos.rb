@@ -223,6 +223,9 @@ module Copernicium
     # return the array of our branches snapshots
     def current_snaps() @@brsnaps end
 
+    # return the files in the latest snapshot
+    def current_files() Repos.has_snapshots?? @@brsnaps.last.files : [] end
+
     # Return string array of what branches we have
     def Repos.branches() @@history.keys end
 
