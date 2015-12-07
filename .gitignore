@@ -6,3 +6,4 @@ comm_t*
 *.gem
 .cn
 workspace
+bin/thing

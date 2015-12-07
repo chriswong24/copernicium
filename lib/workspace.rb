@@ -107,6 +107,8 @@ module Copernicium
     end
 
     # if include all the elements in list_files
+    # todo - this really should be a Hash, with
+    # paths as keys, then rather than using indices
     def Workspace.include?(files)
       files.any? { |x| indexOf(x) == -1 }
     end
@@ -161,12 +163,9 @@ module Copernicium
       if comm.files.nil? # commit everything
         Workspace.working_files.each { |x| Workspace.commit_file(x) }
       else # else just commit certain files
-        # iterate through each file path specified in comm.files
-        # check whether that file exist in the disk first
         comm.files.each do |x|
           if File.exist? x
             Workspace.commit_file(x)
-            # todo add to @@files?
           else
             puts 'Cannot commit, file does not exist: '.yel + x
           end
@@ -186,7 +185,7 @@ module Copernicium
         return -1 if snap.files.nil?
         snap.files.each do |file|
           idx = indexOf(file.path)
-          if  idx == -1
+          if idx == -1
             @@files << file
           else
             @@files[idx] = file
@@ -209,10 +208,6 @@ module Copernicium
       added = []
       edits = []
       remov = []
-
-      puts Workspace.working_files
-      puts @@files.to_s.red
-
       Workspace.working_files.each do |f|
         idx = indexOf(f)
         if idx < 0 # new file
@@ -223,9 +218,7 @@ module Copernicium
       end
 
       # any deleted files from the last commit?
-      @@files.each do |f|
-        remov << f.path unless working_files.include? f.path
-      end
+      @@files.each { |f| remov << f.path unless working_files.include? f.path }
 
       [added, edits, remov]
     end

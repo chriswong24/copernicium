@@ -95,7 +95,7 @@ module Copernicium
 
     # Get some info from the user when they dont specify it
     def get(info)
-      puts "Note: #{info} not specified. Enter #{info} to continue."
+      puts "Note: #{info} not specified. Enter #{info} to continue.".yel
       gets.chomp # read a line from user, and return it
     end
 
@@ -114,9 +114,13 @@ module Copernicium
     def status(args)
       ui = UIComm.new(command: 'status', opts: args)
       st = Workspace.status
-      st[0].each { |f| puts "Added:\t".grn + f }
-      st[1].each { |f| puts "Edited:\t".yel + f }
-      st[2].each { |f| puts "Removed:\t".red + f }
+      if st.all?(&:empty?)
+        "No changes since last commit: ".grn + Repos.current_head.msg
+      else
+        st[0].each { |f| puts "Added:   ".grn + f }
+        st[1].each { |f| puts "Edited:  ".yel + f }
+        st[2].each { |f| puts "Removed: ".red + f }
+      end
       ui
     end
 
@@ -124,7 +128,7 @@ module Copernicium
     def create_branch(branch)
       new_branch_hash = Repos.make_branch branch
       Repos.update_branch branch
-      puts "Created branch:'#{branch}'".grn + " with head #{new_branch_hash}"
+      puts "Created branch #{branch} ".grn + " with head #{new_branch_hash}"
     end
 
     def branch(args)
@@ -285,14 +289,13 @@ module Copernicium
 
       # perform the commit, with workspace
       ui = UIComm.new(command: 'commit', files: files, cmt_msg: message)
-      Workspace.commit(ui)
+      puts "New commit: ".grn + Workspace.commit(ui)
       ui
     end
 
     def history(args)
       Repos.current_snaps.each do |snap|
-        time = snap.date.strftime("%m/%d/%Y %I:%M%p")
-        puts (time + ' | ') .grn + snap.msg.yel + ' | ' + snap.id
+        puts (snap.time + ' | ') .grn + (snap.id + ' | ').yel + snap.msg
       end
     end
 
