@@ -114,9 +114,14 @@ module Copernicium
     def status(args)
       ui = UIComm.new(command: 'status', opts: args)
       st = Workspace.status
-      st[0].each { |f| puts "Added:\t".grn + f }
-      st[1].each { |f| puts "Edited:\t".yel + f }
-      st[2].each { |f| puts "Removed:\t".red + f }
+      if st.all?(&:empty?)
+        "No changes since last commit: ".grn + Repos.current_snaps.msg
+      else
+        def based(s) s.sub(/^\.\//, '') end
+        st[0].each { |f| puts "Added:   ".grn + based(f) }
+        st[1].each { |f| puts "Edited:  ".yel + based(f) }
+        st[2].each { |f| puts "Removed: ".red + based(f) }
+      end
       ui
     end
 
@@ -124,7 +129,7 @@ module Copernicium
     def create_branch(branch)
       new_branch_hash = Repos.make_branch branch
       Repos.update_branch branch
-      puts "Created branch:'#{branch}'".grn + " with head #{new_branch_hash}"
+      puts "Created branch #{branch} ".grn + " with head #{new_branch_hash}"
     end
 
     def branch(args)
@@ -285,7 +290,7 @@ module Copernicium
 
       # perform the commit, with workspace
       ui = UIComm.new(command: 'commit', files: files, cmt_msg: message)
-      Workspace.commit(ui)
+      puts "New commit: ".grn + Workspace.commit(ui)
       ui
     end
 
