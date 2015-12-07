@@ -218,7 +218,7 @@ module Copernicium
     end
 
     # BRANCHING
-    def current() @@branches end
+    def current() @@branch end
 
     # Return hash ID of new branch
     def Repos.make_branch(branch)

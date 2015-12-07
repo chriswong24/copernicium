@@ -295,6 +295,8 @@ module Copernicium
     end
 
     def history(args)
+      puts "using the right driver method"
+      puts 'curren branch: ' + Repos.current
       puts Repos.history(Repos.current)
     end
 
