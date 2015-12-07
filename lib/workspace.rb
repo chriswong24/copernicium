@@ -100,12 +100,7 @@ module Copernicium
       @@files.each_with_index do |f, i|
         return i if f.path == x
       end
-      -1 # is not included
-    end
-
-    # if include all the elements in list_files
-    def Workspace.include?(files)
-      files.any? { |x| indexOf(x) != -1 }
+      nil # x is not included in @@files
     end
 
     # get array of filenamess currently in workspace, except folders and .cn/*
@@ -124,13 +119,13 @@ module Copernicium
       @@files = []
     end
 
-    def Workspace.clean(comm = UIComm.new(rev: Repos.current_head))
+    def Workspace.clean(comm = UIComm.new)
       if comm.files.nil? # reset everything
         Workspace.clear
       else # files are not nil
         comm.files.each do |x|
           idx = indexOf(x)
-          if idx == -1
+          if idx.nil?
             puts "Cannot clean #{x}:".yel + " does not exist in snapshot"
           else
             @@files.delete_at(idx)
@@ -138,12 +133,12 @@ module Copernicium
           end
         end
       end
-      Workspace.checkout # cleanse state
+      Workspace.checkout comm # cleanse state
     end
 
     # takes in a snapshot id, returns workspace to that snapshot
-    def Workspace.checkout(comm = UIComm.new(rev: Repos.current_head))
-      if !Repos.has_snapshots? # dont checkout
+    def Workspace.checkout(comm = UIComm.new)
+      if ! Repos.has_snapshots? # dont checkout
         raise 'No snapshots yet! Commit something before checkout.'.red
       elsif comm.rev.nil? # assume last
         comm.rev = Repos.current_head
@@ -151,7 +146,7 @@ module Copernicium
       snap = Repos.get_snapshot(comm.rev)
       snap.files.each do |file|
         idx = indexOf(file.path)
-        if idx == -1
+        if idx.nil?
           @@files << file
         else
           @@files[idx] = file
@@ -173,7 +168,7 @@ module Copernicium
       elsif remov.include? x
         @@files.delete_at(indexOf x)
       else
-        puts 'Failed, no changes: '.yel + x
+        #puts 'Failed, no changes: '.yel + x
       end
     end
 
@@ -185,7 +180,7 @@ module Copernicium
           if File.exist? x
             Workspace.commit_file(x)
           else
-            puts "Cannot commit #{x}:".yel + " does not exist in repo"
+            puts "Cannot commit #{x}:".yel + " file does not exist"
           end
         end
       end
@@ -206,7 +201,7 @@ module Copernicium
       remov = []
       working_files.each do |f|
         idx = indexOf(f)
-        if idx == -1 # new file
+        if idx.nil? # new file
           added << f
         else # changed file
           edits << f if File.read(f) != RevLog.get_file(@@files[idx].last)

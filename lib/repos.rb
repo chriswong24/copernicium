@@ -222,7 +222,7 @@ module Copernicium
 
     # ADDITIONAL MODULE ACCESS INTERFACES
     #
-    # return the current branch we are on now
+    # return the current branch we are on now (strng name)
     def current() @@branch end
 
     # return the snap id of branch head
