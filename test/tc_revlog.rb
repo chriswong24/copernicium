@@ -6,11 +6,11 @@ include Copernicium::RevLog
 
 class TestCoperniciumRevLog < Minitest::Test
   describe "RevLogModule" do
-    before "manipulating the log" do
+    before "manipulating the log, setup tester" do
       Copernicium::RevLog.setup_tester
     end
 
-    after "manipulating the log" do
+    after "manipulating the log, remove cn repo" do
       FileUtils.rm_rf(File.join(Dir.pwd, ".cn"))
     end
 

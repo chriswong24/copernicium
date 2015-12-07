@@ -4,13 +4,10 @@ require_relative 'test_helper'
 
 include Copernicium::Repos
 
-# Note on these tests: rather than merely checking that they are not empty
-# values, check that they are equal to what you would expect them to be.
-
 class TestCnReposModule < Minitest::Test
   describe 'ReposModule' do
-    before 'mixin repo module' do
-      Repos.setup
+    before 'mixin repo module and create file objects' do
+      Repos.setup_tester
       @file1 = FileObj.new('file1', [1, 2])
       @file2 = FileObj.new('file2', [3, 4])
       @file3 = FileObj.new('file3', [5, 6])

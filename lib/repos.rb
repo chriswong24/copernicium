@@ -28,12 +28,15 @@
 # delete_branch: delete a branch
 #   in - branch name
 #   out - exit status code
+# note: @@branches is a hash array of snapshot ids, which is saved as
+# .cn/history to persist between calls to the copernicium tool
 
 module Copernicium
   class Snapshot
     attr_accessor :id, :files, :msg
     # id is computed after creation
     def initialize(files = [], msg)
+      @date = DateTime.now
       @files = files
       @msg = msg
       @id = id
@@ -43,60 +46,42 @@ module Copernicium
   module Repos
     include RevLog # needs diffing and merging
     # check the current branch (.cn/branch)
-    # read in file of snapshots (.cn/history)
-    def Repos.setup(root = Dir.pwd, branch = 'master')
-      @@root = root
-      @@copn = File.join(@@root, '.cn')
-      @@repo = File.join(@@copn, 'repo')
+    # read in file of snapshot ids (.cn/<branches>)
+    def Repos.setup(root = Dir.pwd)
+      @@copn = File.join(root, '.cn')
       @@snap = File.join(@@copn, 'snap')
-      @@repo_path = File.join(@@repo, branch)
-      @@branchhead = File.join(@@copn, 'branch')
+      @@head = File.join(@@copn, 'branch')
+      @@hist = File.join(@@copn, 'history')
+
+      # read history from disk
+      @@branch = File.read(@@head)
+      @@branches = Marshal.load File.read(@@hist)
+    end
+
+    # unit testing version - create folders for this code
+    def Repos.setup_tester(root = Dir.pwd, branch = 'master')
+      @@copn = File.join(root, '.cn')
+      @@snap = File.join(@@copn, 'snap')
+      @@head = File.join(@@copn, 'branch')
+      @@hist = File.join(@@copn, 'history')
+
+      # create folders for testing this module
       Dir.mkdir(@@copn) unless Dir.exist?(@@copn)
-      Dir.mkdir(@@repo) unless Dir.exist?(@@repo)
       Dir.mkdir(@@snap) unless Dir.exist?(@@snap)
 
-      # check if files exist, read them
-      if File.exist?(@@repo_path) && File.exist?(@@branchhead)
-        @@branches = Marshal.load readFile(@@repo_path)
-        @@branch = readFile(@@branchhead)
-      else # use defaults
-        @@branches = {branch => []}
-        @@branch = branch
-      end
+      # default new
+      @@branch = branch
+      @@branches = {branch => []}
     end
 
-    # helper methods for file IO
-    def writeFile(path, content)
-      f = open(path, 'w')
-      f.write(content)
-      f.close
-    end
-
-    # helper methods for file IO
-    def readFile(path)
-      f = open(path, 'r')
-      txt = f.read
-      f.close
-      txt
-    end
-
-    # check if any snapshots exist, if not exit
+    # check if any snapshots exist
     def Repos.has_snapshots?
-      ! Repos.history(@@branch).empty?
-    end
-
-    def Repos.hash_array
-      Hash.new {[]}
+      not Repos.history(@@branch).empty?
     end
 
     # returns the hash of an object
     def Repos.hasher(obj)
       Digest::SHA256.hexdigest Marshal.dump(obj)
-    end
-
-    # Return string array of what branches we have
-    def Repos.branches
-      @@branches.keys
     end
 
     # Create and return snapshot
@@ -112,17 +97,18 @@ module Copernicium
     end
 
     # helper to write a snapshot, saving a new commit
+    # marshal serializes the class instance to a string
     def Repos.update_snap(snap)
-      writeFile File.join(@@snap, snap.id), Marshal.dump(snap) # write snapshot
+      File.write File.join(@@snap, snap.id), Marshal.dump(snap)
     end
 
     # helper to add snap to history
     def Repos.update_history
-      writeFile @@repo_path, Marshal.dump(@@branches) # write history
+      File.write @@hist, Marshal.dump(@@branches) # write history
     end
 
-    # todo - Check to make sure id is from a different branch
     # Merge the target snapshot into HEAD snapshot of the current branch
+    # todo - Check to make sure id is from a different branch
     def Repos.merge_snapshot(id)
       # run diff to get conflicts
       current = @@branches[@@branch].last
@@ -140,15 +126,15 @@ module Copernicium
     # Find snapshot and return snapshot from id
     def Repos.get_snapshot(id)
       @@branches.keys.each do |br|
-        @@branches[br].each do |snap_id|
+        @@branches[br].each do |snapid|
           # If found, read from disk and return
-          if snap_id == id
-            return Marhsall.load(File.join(@@snap, snap_id))
+          if snapid == id
+            return Marhsall.load(File.join(@@snap, snapid))
           end
         end
       end
 
-      raise "Snapshot not found in this repo."
+      raise "Repos: snapshot not found in this repo.".red
     end
 
     # Return array of snapshot IDs
@@ -165,7 +151,8 @@ module Copernicium
     # Find snapshot, delete from snaps/memory
     def Repos.delete_snapshot(id)
       @@branches[@@branch].delete_if { |x| x.id == id }
-      update_snap
+      File.delete File.join(@@snap, id)
+      update_history
     end
 
     #diff_snapshots needs to catch both files in snap1 that aren’t and snap2 and
@@ -217,23 +204,32 @@ module Copernicium
       array1.select { |x| !array2.any? { |y| x == y } }
     end
 
+
     # BRANCHING
+
+    # return the current branch we are on now
     def current() @@branch end
 
-    # Return hash ID of new branch
+    # Return string array of what branches we have
+    def Repos.branches() @@branches.keys end
+
+    # Create and return hash ID of new branch
     def Repos.make_branch(branch)
       @@branches[branch] = @@branches[@@branch]
       @@branch = branch
+      update_history
       hasher @@branches[branch]
     end
 
     def Repos.update_branch(branch)
-      writeFile(@@branchhead, branch)
+      File.write(@@head, branch)
       @@branch = branch
     end
 
+    # todo - also delete snapshots unique to this branch
     def Repos.delete_branch(branch)
       @@branches.delete(branch)
+      update_history
     end
   end # Repos
 end # Copernicium
