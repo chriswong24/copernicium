@@ -134,16 +134,15 @@ module Copernicium
         puts "Branches: ".grn + Repos.branches.join(' ')
       elsif branch == '-c' # try to create a new branch
         # If branch name not specified, get it from the user
-        branch = args.first
+        branch = args[1]
         branch = get "new branch name" if branch.nil?
 
         # Create and switch to the new branch
         create_branch branch
       elsif branch == '-r' # rename the current branch
         # If branch name not specified, get it from the user
-        newname = args.first
+        newname = args[1]
         newname = get "new name for current branch" if newname.nil?
-
         oldname = Repos.current
 
         # Create and switch to a new branch with the given name
@@ -155,7 +154,7 @@ module Copernicium
         puts "Renamed branch '#{oldname}' to '#{newname}'".grn
       elsif branch == '-d' # Delete the specified branch
         # If branch name not specified, get it from the user
-        branch = args.first
+        branch = args[1]
         branch = get "branch to delete" if branch.nil?
 
         # Do not delete the current branch
