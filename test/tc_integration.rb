@@ -11,6 +11,8 @@
 
 require_relative "test_helper"
 
+include Copernicium::Driver
+
 # For testing purposes?  Perhaps implement in Repos later
 module Repos
   def get_branch(bname)
@@ -25,17 +27,16 @@ class CoperniciumIntegrationTests < Minitest::Test
       Driver.run string.split
     end
 
-    before "Calling basic copernicium commands" do
+    before "create a cn new repo to test" do
       Driver.setup
       Dir.mkdir("workspace")
-      #initial commit?
       Copernicium.writeFile("workspace/1.txt", "1")
       Copernicium.writeFile("workspace/2.txt", "2")
       runner("commit -m Test Commit")
       Repos.make_branch("dev")
     end
 
-    after "running integration tests" do
+    after "delete the cn repo and the workspace" do
       FileUtils.rm_rf('workspace')
       FileUtils.rm_rf('.cn')
     end
