@@ -5,9 +5,9 @@ require_relative '../lib/required.rb'
 include Copernicium
 
 # mute output, overwrite puts
-# you can uncomment for debug
+# you can comment to debug
 
-def puts(*x) end
+#def puts(*x) end
 
 # universal place for test requirements
 

@@ -62,6 +62,16 @@ the contents of the public key to a line:
 You should now be able to use the push, pull, and origin functions using only the username.
 
 
+### troubleshooting
+
+##### marshal file format error
+
+    TypeError: incompatible marshal file format (can't be read)
+    format version 4.8 required; 47.85 given
+
+try `bundle install --full-index`
+
+
 ### relevant links:
 
 - [spec. documentation](https://docs.google.com/document/d/1r3-NquhyRLbCncqTOQPwsznSZ-en6G6xzLbWIAmxhys/)

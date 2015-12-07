@@ -28,25 +28,26 @@
 # delete_branch: delete a branch
 #   in - branch name
 #   out - exit status code
-# note: @@branches is a hash array of snapshot ids, which is saved as
+# note: @@history is a hash array of snapshot ids, which is saved as
 # .cn/history to persist between calls to the copernicium tool
 
 module Copernicium
   class Snapshot
     attr_accessor :id, :files, :msg
-    # id is computed after creation
     def initialize(files = [], msg)
       @date = DateTime.now
       @files = files
       @msg = msg
-      @id = id
+
+      # hash self, and return the value
+      @id = Digest::SHA256.hexdigest Marshal.dump(self)
     end
   end
 
   module Repos
     include RevLog # needs diffing and merging
+    # read in file of snapshot ids (.cn/history)
     # check the current branch (.cn/branch)
-    # read in file of snapshot ids (.cn/<branches>)
     def Repos.setup(root = Dir.pwd)
       @@copn = File.join(root, '.cn')
       @@snap = File.join(@@copn, 'snap')
@@ -55,7 +56,7 @@ module Copernicium
 
       # read history from disk
       @@branch = File.read(@@head)
-      @@branches = Marshal.load File.read(@@hist)
+      @@history = Marshal.load File.read(@@hist)
     end
 
     # unit testing version - create folders for this code
@@ -71,24 +72,23 @@ module Copernicium
 
       # default new
       @@branch = branch
-      @@branches = {branch => []}
+      @@history = {branch => []}
     end
 
-    # check if any snapshots exist
+    # check if any snapshots exist for the current branch
     def Repos.has_snapshots?
       not Repos.history(@@branch).empty?
     end
 
-    # returns the hash of an object
+    # Return hash an object
     def Repos.hasher(obj)
       Digest::SHA256.hexdigest Marshal.dump(obj)
     end
 
-    # Create and return snapshot
-    def Repos.make_snapshot(files = [], msg = '')
+    # Create and return snapshot id
+    def Repos.make_snapshot(files = [], msg = 'nil')
       snap = Snapshot.new(files, msg)
-      snap.id = hasher snap
-      @@branches[@@branch] << snap
+      @@history[@@branch] << snap.id
 
       # Update snaps file
       update_snap snap
@@ -104,14 +104,14 @@ module Copernicium
 
     # helper to add snap to history
     def Repos.update_history
-      File.write @@hist, Marshal.dump(@@branches) # write history
+      File.write @@hist, Marshal.dump(@@history) # write history
     end
 
     # Merge the target snapshot into HEAD snapshot of the current branch
     # todo - Check to make sure id is from a different branch
     def Repos.merge_snapshot(id)
       # run diff to get conflicts
-      current = @@branches[@@branch].last
+      current = @@history[@@branch].last
       difference = diff_snapshots(current.id, id)
       conflicts = difference[1]
 
@@ -125,12 +125,9 @@ module Copernicium
 
     # Find snapshot and return snapshot from id
     def Repos.get_snapshot(id)
-      @@branches.keys.each do |br|
-        @@branches[br].each do |snapid|
-          # If found, read from disk and return
-          if snapid == id
-            return Marhsall.load(File.join(@@snap, snapid))
-          end
+      @@history.each do |branch, snapids|
+        snapids.each do |snapid|
+          return Marshal.load(File.join(@@snap, snapid)) if snapid == id
         end
       end
 
@@ -139,18 +136,16 @@ module Copernicium
 
     # Return array of snapshot IDs
     def Repos.history(branch = nil)
-      snapids = []
-      if branch.nil?
-        @@branches[@@branch].each { |x| snapids << x.id }
-      elsif
-        @@branches[branch].each { |x| snapids << x.id }
+      if branch.nil? # return a list of unique all commits
+        (@@history.inject([]) { |o, x| o + x.last }).uniq
+      elsif # just return the stored history
+        @@history[branch]
       end
-      snapids
     end
 
     # Find snapshot, delete from snaps/memory
     def Repos.delete_snapshot(id)
-      @@branches[@@branch].delete_if { |x| x.id == id }
+      @@history[@@branch].delete_if { |x| x == id }
       File.delete File.join(@@snap, id)
       update_history
     end
@@ -211,14 +206,14 @@ module Copernicium
     def current() @@branch end
 
     # Return string array of what branches we have
-    def Repos.branches() @@branches.keys end
+    def Repos.branches() @@history.keys end
 
     # Create and return hash ID of new branch
     def Repos.make_branch(branch)
-      @@branches[branch] = @@branches[@@branch]
+      @@history[branch] = @@history[@@branch]
       @@branch = branch
       update_history
-      hasher @@branches[branch]
+      hasher @@history[branch]
     end
 
     def Repos.update_branch(branch)
@@ -228,7 +223,7 @@ module Copernicium
 
     # todo - also delete snapshots unique to this branch
     def Repos.delete_branch(branch)
-      @@branches.delete(branch)
+      @@history.delete(branch)
       update_history
     end
   end # Repos

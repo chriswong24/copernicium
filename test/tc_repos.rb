@@ -26,6 +26,7 @@ class TestCnReposModule < Minitest::Test
     it 'can get a snapshot from an id' do
       @files = [@file1, @file2]
       snapid = Repos.make_snapshot @files
+      puts snapid
       snap = Repos.get_snapshot snapid
       snap.id.must_equal snapid
       snap.files.must_equal @files
