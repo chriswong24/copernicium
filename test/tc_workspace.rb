@@ -21,10 +21,16 @@ class CoperniciumWorkspaceTest < Minitest::Test
       FileUtils.rm_rf('workspace')
     end
 
+    it 'can commit a list of files' do
+      File.write('1.txt', '1_1_1')
+      Workspace.commit(UIComm.new(files: ['1.txt']))
+      File.read('1.txt').must_equal '1_1_1'
+    end
+
     it 'can commit a entire workspace' do
       File.write('1.txt','1_1')
       File.write('2.txt','2_2')
-      Workspace.commit(UIComm.new(files: ['1.txt', '2.txt']))
+      Workspace.commit
       File.read('1.txt').must_equal '1_1'
       File.read('2.txt').must_equal '2_2'
     end
@@ -66,14 +72,8 @@ class CoperniciumWorkspaceTest < Minitest::Test
 
     it 'can clean specific files in the workspace' do
       File.write('1.txt', '1_1')
-      Workspace.clean(UIComm.new('clean', files: ['1.txt']))
+      Workspace.clean(UIComm.new(files: ['1.txt']))
       File.read('1.txt').must_equal '1'
-    end
-
-    it 'can commit a list of files' do
-      File.write('1.txt', '1_1_1')
-      Workspace.commit(UIComm.new(files: ['1.txt']))
-      File.read('1.txt').must_equal '1_1_1'
     end
 
     it 'can checkout a list of files' do

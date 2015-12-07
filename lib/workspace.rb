@@ -157,7 +157,7 @@ module Copernicium
     end
 
     # commit a list of files or the entire workspace to make a new snapshot
-    def Workspace.commit(comm)
+    def Workspace.commit(comm = UIComm.new)
       if comm.files.nil? # commit everything
         Workspace.working_files.each { |x| Workspace.commit_file(x) }
       else # else just commit certain files
@@ -176,24 +176,23 @@ module Copernicium
 
     # takes in a snapshot id, returns workspace to that snapshot
     def Workspace.checkout(comm = UIComm.new(rev: Repos.current_head))
-      # if not snapshots exist, dont checkout
-      return -1 unless Repos.has_snapshots?
-
-      # if no snapshot files, dont checkout
-      snap = Repos.get_snapshot(comm.rev)
-      return -1 if snap.files.nil?
-
-      # object and finally push all files of it to the # workspace
-      snap.files.each do |file|
-        idx = indexOf(file.path)
-        puts file
-        if  idx == -1
-          @@files << file
-        else
-          @@files[idx] = file
+      if !Repos.has_snapshots? # dont checkout
+        raise 'No snapshots yet! Commit something before checkout.'.red
+      elsif comm.rev.nil? ## assume last
+        comm.rev = Repos.current_head
+      else # assume its a revision id
+        snap = Repos.get_snapshot(comm.rev)
+        return -1 if snap.files.nil?
+        snap.files.each do |file|
+          idx = indexOf(file.path)
+          if  idx == -1
+            @@files << file
+          else
+            @@files[idx] = file
+          end
+          content = RevLog.get_file(file.last)
+          File.write(file.path, content)
         end
-        content = RevLog.get_file(file.last)
-        File.write(file.path, content)
       end
     end
 
