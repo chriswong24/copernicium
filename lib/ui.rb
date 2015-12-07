@@ -9,7 +9,7 @@ module Copernicium
   # rev - revision indicator (commit #, branch name, HEAD, etc.)
   # repo - URL/path to a remote repository
   class UIComm
-    attr_reader :command, :files, :rev, :cmt_msg, :repo, :opts
+    attr_accessor :command, :files, :rev, :cmt_msg, :repo, :opts
     def initialize(command: nil, files: nil, rev: nil,
                    cmt_msg: nil, repo: nil, opts: nil)
       @cmt_msg = cmt_msg

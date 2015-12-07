@@ -146,7 +146,7 @@ module Copernicium
     def Workspace.commit_file(x)
       if indexOf(x) == -1
         hash = RevLog.add_file(x, File.read(x))
-        fobj = FileObj.new(x, [hash,])
+        fobj = FileObj.new File.join('.', x), [hash,]
         @@files.push(fobj)
       else # file exists
         hash = RevLog.add_file(x, File.read(x))
@@ -166,6 +166,7 @@ module Copernicium
         comm.files.each do |x|
           if File.exist? x
             Workspace.commit_file(x)
+            # todo add to @@files?
           else
             puts 'Cannot commit, file does not exist: '.yel + x
           end
@@ -178,7 +179,7 @@ module Copernicium
     def Workspace.checkout(comm = UIComm.new(rev: Repos.current_head))
       if !Repos.has_snapshots? # dont checkout
         raise 'No snapshots yet! Commit something before checkout.'.red
-      elsif comm.rev.nil? ## assume last
+      elsif comm.rev.nil? # assume last
         comm.rev = Repos.current_head
       else # assume its a revision id
         snap = Repos.get_snapshot(comm.rev)
@@ -208,19 +209,23 @@ module Copernicium
       added = []
       edits = []
       remov = []
+
+      puts Workspace.working_files
+      puts @@files.to_s.red
+
       Workspace.working_files.each do |f|
         idx = indexOf(f)
         if idx < 0 # new file
           added << f
-        else # changed file?
-          x2 = File.read(f) # get the current version
-          x1 = RevLog.get_file(@@files[idx].last)
-          edits << f if x1 != x2
+        else # changed file
+          edits << f if File.read(f) != RevLog.get_file(@@files[idx].last)
         end
       end
 
       # any deleted files from the last commit?
-      @@files.each { |f| remov << f.path unless (working_files.include? f.path) }
+      @@files.each do |f|
+        remov << f.path unless working_files.include? f.path
+      end
 
       [added, edits, remov]
     end
