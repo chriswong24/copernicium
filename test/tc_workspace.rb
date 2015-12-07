@@ -55,13 +55,13 @@ class CoperniciumWorkspaceTest < Minitest::Test
 
     it 'can checkout a entire branch' do
       drive "branch -c new"
-      drive "checkout new"
+      drive "branch new"
       File.write('1.txt', '1_1_1_1')
       File.write('2.txt', '2_2_2_2')
-      Workspace.commit(UIComm.new(files: ['1.txt', '2.txt']))
+      Workspace.commit
       File.read('1.txt').must_equal '1_1_1_1'
       File.read('2.txt').must_equal '2_2_2_2'
-      drive "checkout master"
+      drive "branch master"
       File.read('1.txt').must_equal '1'
       File.read('2.txt').must_equal '2'
     end
