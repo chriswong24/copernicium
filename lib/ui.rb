@@ -80,6 +80,8 @@ module Copernicium
           push args
         when 'pull'
           pull args
+        when 'init'
+          # fall through - init handled above, before case statement
         else # handle an unrecognized argument, show help and exit
           pexit "Unrecognized command #{cmd}\n" + COMMAND_BANNER, 1
         end
