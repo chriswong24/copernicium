@@ -113,7 +113,6 @@ module Copernicium
 
     # show the current repos status
     def status(args)
-      ui = UIComm.new(command: 'status', opts: args)
       st = Workspace.status
       if st.all?(&:empty?)
         puts "No changes since last commit | ".grn +
@@ -124,7 +123,6 @@ module Copernicium
         st[1].each { |f| puts "Edited:  ".yel + f }
         st[2].each { |f| puts "Removed: ".red + f }
       end
-      ui
     end
 
     # create and switch to a new branch
@@ -185,7 +183,7 @@ module Copernicium
     def push(args)
       # Command usage is:
       #   cn push <user> <repo.host:/dir/of/repo> <branch-name>
-
+      #
       # If username not given, get it from the user.
       user = args[0]
       if user.nil?
@@ -210,7 +208,7 @@ module Copernicium
     def pull(args)
       # Command usage is:
       #   cn pull <user> <repo.host:/dir/of/repo> <branch-name>
-
+      #
       # If username not given, get it from the user.
       user = args[0]
       if user.nil?
@@ -234,17 +232,18 @@ module Copernicium
 
     def checkout(args)
       if args.empty?
-        rev = get 'branch or revision'
+        rev = get 'branch or commit id'
       else
         rev = args.shift
         files = args
       end
 
-      # if it 'head' keyword, grab the head
-      rev = Repos.current_head if rev == 'head'
-
-      # if it is a branch, get the last head of it
-      rev = Repos.history(rev).last.id if Repos.has_branch? rev
+      # if 'head' keyword, grab the head
+      if rev == 'head'
+        rev = Repos.current_head
+      elsif Repos.has_branch? rev
+        rev = Repos.history(rev).last
+      end
 
       # call workspace checkout the given / branch
       ui = UIComm.new(command: 'checkout', rev: rev, files: files)

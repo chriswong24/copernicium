@@ -109,7 +109,7 @@ module Copernicium
       (Dir[ File.join(@@root, '**', '*') ].reject do |p|
         File.directory? p || p.include?(@@copn)
       end).map do |p|
-        p.sub!(/^\.\//, '') # delete leading ./
+        p.sub!(/^\.\//, '') # delete leading './'
       end
     end
 

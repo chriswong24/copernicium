@@ -21,29 +21,30 @@ TOP_BANNER = 'Copernicium (cn) - simple DVCS'.ugn
 HELP_BANNER = <<-EOS
 #{TOP_BANNER}
 
-Starting out:
+#{'Starting out:'.grn}
     init - create a new repository
     status - check repo status
+    history - show repo commits
     help - show more commands
 EOS
 
 
 COMMAND_BANNER = <<-EOS
 #{HELP_BANNER}
-Commands:
-    clean [files]
+#{'Commands'.grn}
+    clean [files] [commit/branch]
     commit [files] -m <message>
-    checkout [files] <commit id>
-    branch [opt] [branchname]
+    checkout <commit id> [files]
+    branch [opt] [branch]
       -r | rename current branch
       -c | create a new branch
       -d | delete a branch
     merge <branch name>
     clone <remote url>
-    push [remote name]
-    pull [remote name]
+    push <remote user>
+    pull <remote user>
 
-Options:
+#{'Options'.grn}
     -v: print version
     -h: show help
 

@@ -54,7 +54,7 @@ class CoperniciumWorkspaceTest < Minitest::Test
       drive "branch -b new"
       File.write('1.txt', '1_1_1_1')
       File.write('2.txt', '2_2_2_2')
-      drive "checkout new"
+      drive "checkout -b new"
       Workspace.commit(UIComm.new(files: ['1.txt', '2.txt']))
       File.read('1.txt').must_equal '1_1_1_1'
       File.read('2.txt').must_equal '2_2_2_2'

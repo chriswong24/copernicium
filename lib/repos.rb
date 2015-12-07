@@ -222,7 +222,7 @@ module Copernicium
 
     # ADDITIONAL MODULE ACCESS INTERFACES
     #
-    # return the current branch we are on now (strng name)
+    # return the current branch we are on now (string name)
     def current() @@branch end
 
     # return the snap id of branch head
@@ -235,7 +235,7 @@ module Copernicium
     def current_files() Repos.has_snapshots?? @@brsnaps.last.files : [] end
 
     # Return string array of what branches we have
-    def Repos.branches() @@history.keys end
+    def branches() @@history.keys end
 
 
     # BRANCHING FUNCTIONALITY
