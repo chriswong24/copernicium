@@ -309,7 +309,6 @@ module Copernicium
 
     def merge(args)
       if args.empty?
-        puts 'I need a commit or branch to merge.'
         rev = get 'single commit or branch to merge'
       else
         rev = args.first

@@ -53,6 +53,7 @@ class CoperniciumWorkspaceTest < Minitest::Test
     end
 =end
 
+    # will pass when repos branch works better
     it 'can checkout a entire branch' do
       drive "branch -c new"
       drive "branch new"

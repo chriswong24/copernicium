@@ -99,8 +99,20 @@ module Copernicium
       Digest::SHA256.hexdigest Marshal.dump(obj)
     end
 
-    def hash_array
-      Hash.new {[]}
+    # helper to add snap to history
+    def Repos.update_history
+      File.write @@hist, YAML.dump(@@history) # write history
+    end
+
+    # Return array of snapshot IDs
+    def Repos.history(branch = nil)
+      if branch.nil? # return a list of unique all commits
+        (@@history.inject([]) { |o, x| o + x.last }).uniq
+      elsif Repos.has_branch? branch # just return the stored history
+        @@history[branch]
+      else # no commits yet
+        []
+      end
     end
 
     # Create and return snapshot id
@@ -118,11 +130,6 @@ module Copernicium
     # marshal serializes the class instance to a string
     def Repos.update_snap(snap)
       File.write File.join(@@snap, snap.id), YAML.dump(snap)
-    end
-
-    # helper to add snap to history
-    def Repos.update_history
-      File.write @@hist, YAML.dump(@@history) # write history
     end
 
     # Merge the target snapshot into HEAD snapshot of the current branch
@@ -150,17 +157,6 @@ module Copernicium
       end
 
       raise "Repos: snapshot #{id} not found in this repo.".red
-    end
-
-    # Return array of snapshot IDs
-    def Repos.history(branch = nil)
-      if branch.nil? # return a list of unique all commits
-        (@@history.inject([]) { |o, x| o + x.last }).uniq
-      elsif Repos.has_branch? branch # just return the stored history
-        @@history[branch]
-      else # no commits yet
-        []
-      end
     end
 
     # Find snapshot, delete from snaps/memory
@@ -242,7 +238,7 @@ module Copernicium
     #
     # Create and return hash ID of new branch
     def Repos.make_branch(branch)
-      @@history[branch] =  (@@history[@@branch].nil?? [] : @@history[@@branch])
+      @@history[branch] = @@history[@@branch].inject([]) { |n, o| n << o }
       @@branch = branch
       update_history
       hasher @@history[branch]

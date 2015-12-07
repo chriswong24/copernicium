@@ -46,6 +46,16 @@ class TestCnReposModule < Minitest::Test
       Repos.history.must_equal [snap2, snap3]
     end
 
+    it 'can diff snapshots that are different' do
+      hash1 = RevLog.add_file("test1", "testfilecontent")
+      hash2 = RevLog.add_file("test2", "testing testing")
+      diff1 = FileObj.new('test1', [hash1])
+      diff2 = FileObj.new('test2', [hash2])
+      snap1 = Repos.make_snapshot [diff1]
+      snap2 = Repos.make_snapshot [diff2]
+      Repos.diff_snapshots(snap1, snap1)
+    end
+
     it 'can diff snapshots that are equivalent' do
       RevLog.add_file("testfilename", "testfilecontent")
       diff1 = FileObj.new('testfilename', ["dc198016e4d7dcace98d5843a3e6fd506c1c790110091e6748a15c79fefc02ca"])
@@ -53,6 +63,7 @@ class TestCnReposModule < Minitest::Test
       snap1 = Repos.make_snapshot [diff1]
       snap2 = Repos.make_snapshot [diff2]
       Repos.diff_snapshots(snap1, snap1)
+      # todo - put in what this should be
     end
 
     it 'can create branches' do
@@ -65,6 +76,17 @@ class TestCnReposModule < Minitest::Test
       Repos.make_branch 'hello'
       Repos.make_branch 'world'
       Repos.branches.must_equal tester
+    end
+
+    it 'can create branches with different histories' do
+      snap1 = Repos.make_snapshot [@file1, @file2]
+      snap2 = Repos.make_snapshot [@file1, @file2, @file3]
+      snap3 = Repos.make_snapshot [@file1, @file3]
+      Repos.make_branch 'hello'
+      Repos.update_branch 'hello'
+      snap4 = Repos.make_snapshot [@file2, @file3]
+      Repos.history('hello').must_equal [snap1, snap2, snap3, snap4]
+      Repos.history('master').must_equal [snap1, snap2, snap3]
     end
 
     it 'can switch between branches' do
