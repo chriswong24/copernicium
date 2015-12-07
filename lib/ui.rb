@@ -52,10 +52,9 @@ module Copernicium
       # create the cn project, else already in one
       if cmd == 'init'
         noroot?? init(args) : puts(IN_REPO_WARNING.yel, getroot)
-      else # if not in a repo, warn them, tell how to create
-        raise NO_REPO_WARNING.yel if noroot?
-
-        # now, assume we are in a copernicum project
+      elsif noroot? # if not in a repo, warn them, tell how to create
+        puts NO_REPO_WARNING.yel
+      else # now, assume we are in a copernicum project
         Workspace.setup
 
         # Handle all other commands
@@ -125,7 +124,7 @@ module Copernicium
     def create_branch(branch)
       new_branch_hash = Repos.make_branch branch
       Repos.update_branch branch
-      puts "Created new branch '#{branch}' with head #{new_branch_hash}".grn
+      puts "Created branch:'#{branch}'".grn + " with head #{new_branch_hash}"
     end
 
     def branch(args)
