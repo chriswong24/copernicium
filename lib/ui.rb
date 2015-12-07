@@ -1,7 +1,7 @@
 # user interface module - parse and execute commands
 # integrates all modules, central module
 
-VERSION = "0.1"
+VERSION = "0.1.1"
 
 module Copernicium
   # Communication object that will pass commands to backend modules
