@@ -22,6 +22,8 @@ module Copernicium
   end # FileObj
 
 
+  # todo - @@files really should be a Hash, with paths as keys, then rather than
+  # using indices.
   module Workspace
     include Repos # needed for keeping track of history
     def Workspace.setup
@@ -35,7 +37,6 @@ module Copernicium
       Repos.setup @@root
       @@files = Repos.current_files
       @@branch = Repos.current
-
     end
 
     # create a new copernicium project
@@ -96,24 +97,19 @@ module Copernicium
     # WORKSPACE MANAGEMENT
     #
     def Workspace.indexOf(x)
-      index = -1
-      @@files.each_with_index do |e,i|
-        if e.path == x
-          index = i
-          break
-        end
+      @@files.each_with_index do |f, i|
+        return i if f.path == x
       end
-      index
+      -1 # is not included
     end
 
     # if include all the elements in list_files
-    # todo - this really should be a Hash, with
-    # paths as keys, then rather than using indices
     def Workspace.include?(files)
-      files.any? { |x| indexOf(x) == -1 }
+      files.any? { |x| indexOf(x) != -1 }
     end
 
     # get all files currently in workspace, except folders and .cn/*
+    # todo - include files that start with a dot (.)
     def Workspace.working_files
       Dir[ File.join(@@root, '**', '*') ].reject do |p|
         File.directory? p || p.include?(@@copn)
@@ -126,26 +122,25 @@ module Copernicium
       @@files = []
     end
 
-    # reset first: delete them from disk and reset @@files
     def Workspace.clean(comm = UIComm.new(rev: Repos.current_head))
       if comm.files.nil? # reset everything
         Workspace.clear
       else # files are not nil
-        # exit if the specified files arent in workspace
-        return unless (self.include? comm.files)
-
-        # the actual action, delete all of them from the workspace first
         comm.files.each do |x|
           idx = indexOf(x)
-          File.delete(x)
-          @@files.delete_at(idx) unless idx == -1
+          if idx == -1
+            puts "Cannot clean #{x}:".yel + " does not exist in snapshot"
+          else
+            @@files.delete_at(idx)
+            File.delete(x)
+          end
         end
       end
-
-      Workspace.checkout
+      Workspace.checkout # cleanse state
     end
 
     def Workspace.commit_file(x)
+      puts 'Committing: '.grn + x
       if indexOf(x) == -1
         hash = RevLog.add_file(x, File.read(x))
         fobj = FileObj.new File.join('.', x), [hash,]
@@ -167,7 +162,7 @@ module Copernicium
           if File.exist? x
             Workspace.commit_file(x)
           else
-            puts 'Cannot commit, file does not exist: '.yel + x
+            puts "Cannot commit #{x}:".yel + " does not exist in repo"
           end
         end
       end
@@ -182,7 +177,6 @@ module Copernicium
         comm.rev = Repos.current_head
       else # assume its a revision id
         snap = Repos.get_snapshot(comm.rev)
-        return -1 if snap.files.nil?
         snap.files.each do |file|
           idx = indexOf(file.path)
           if idx == -1
