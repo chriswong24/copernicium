@@ -10,9 +10,6 @@
 
 
 require_relative "test_helper"
-require 'byebug'
-
-include Copernicium::Driver
 
 # For testing purposes?  Perhaps implement in Repos later
 module Repos
@@ -25,20 +22,16 @@ end
 class CoperniciumIntegrationTests < Minitest::Test
   describe "IntegrationTesting" do
     def runner(string)
-      Driver.setup
       Driver.run string.split
     end
 
     before "Calling basic copernicium commands" do
-      #@pushpull = Copernicium::PushPull.new
-
-      Workspace.setup
-
+      Driver.setup
       Dir.mkdir("workspace")
       #initial commit?
       Copernicium.writeFile("workspace/1.txt", "1")
       Copernicium.writeFile("workspace/2.txt", "2")
-      comm = runner("commit -m Test Commit")
+      runner("commit -m Test Commit")
       Repos.make_branch("dev")
     end
 
