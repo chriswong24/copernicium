@@ -131,6 +131,7 @@ module Copernicium
     def branch(args)
       branch = args.first
       if branch.nil? # show all branches
+        puts "Current: ".grn + Repos.current
         puts "Branches: ".grn + Repos.branches.join(' ')
       elsif branch == '-c' # try to create a new branch
         # If branch name not specified, get it from the user
