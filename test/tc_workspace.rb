@@ -59,7 +59,7 @@ class CoperniciumWorkspaceTest < Minitest::Test
     it 'can clean the workspace to a specific commit' do
       File.write('1.txt', '1_1')
       File.write('2.txt', '2_2')
-      Workspace.clean(@first)
+      Workspace.clean UIComm.new(rev: @first)
       File.read('1.txt').must_equal '1'
       File.read('2.txt').must_equal '2'
     end

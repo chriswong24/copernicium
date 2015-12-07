@@ -215,8 +215,9 @@ module Copernicium
       array1.select { |x| !array2.any? { |y| x == y } }
     end
 
-    # BRANCHING
 
+    # ADDITIONAL MODULE ACCESS INTERFACES
+    #
     # return the current branch we are on now
     def current() @@branch end
 
@@ -232,6 +233,9 @@ module Copernicium
     # Return string array of what branches we have
     def Repos.branches() @@history.keys end
 
+
+    # BRANCHING FUNCTIONALITY
+    #
     # Create and return hash ID of new branch
     def Repos.make_branch(branch)
       @@history[branch] =  (@@history[@@branch].nil?? [] : @@history[@@branch])

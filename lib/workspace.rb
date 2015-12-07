@@ -65,6 +65,9 @@ module Copernicium
       end
     end
 
+
+    # PROJECT HELPERS
+    #
     # find  the root .cn folder, or return nil if it doesnt exist
     def getroot
       cwd = Dir.pwd
@@ -89,7 +92,9 @@ module Copernicium
     # tells us whether we are in a cn project or not
     def noroot?() getroot.nil? end
 
-    # workspace management
+
+    # WORKSPACE MANAGEMENT
+    #
     def Workspace.indexOf(x)
       index = -1
       @@files.each_with_index do |e,i|
@@ -120,29 +125,22 @@ module Copernicium
     end
 
     # reset first: delete them from disk and reset @@files
-    # restore it with checkout() if we have had a branch name
-    # or it is the initial state, no commit and no checkout
-    # if list_files is nil, then rollback the list of files from the branch
-    # or rollback to the entire branch head pointed
     def Workspace.clean(comm = UIComm.new(rev: Repos.current_head))
-      if comm.files.nil? # reset, checkout last commit
+      if comm.files.nil? # reset everything
         Workspace.clear
-        Workspace.checkout
       else # files are not nil
-        # exit if the specified file is not in the workspace
+        # exit if the specified files arent in workspace
         return unless (self.include? comm.files)
 
         # the actual action, delete all of them from the workspace first
         comm.files.each do |x|
-          File.delete(x)
           idx = indexOf(x)
-          @@files.delete_at(idx) if !idx == -1
+          File.delete(x)
+          @@files.delete_at(idx) unless idx == -1
         end
-
-        # if we have had a branch, first we get the latest snapshot of it
-        # and then checkout with the restored version of them
-        checkout
       end
+
+      Workspace.checkout
     end
 
     def Workspace.commit_file(x)
