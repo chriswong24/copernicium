@@ -202,6 +202,9 @@ module Copernicium
     def PushPull.push(remote, branch, user)
       # check contents of folder for .cn, fail if not present and remove otherwise
       dest = remote.split(':')
+      if(dest.length != 2)
+        dest = dest.insert(0, "cycle3.csug.rochester.edu")
+      end
       contents = Dir.entries(Dir.pwd)
       if(!content.include? '.cn')
         puts 'failed to push to remote, not an initialized Copernicium repo'
@@ -254,6 +257,9 @@ module Copernicium
       # check contents of folder for .cn, fail if not present and remove otherwise
       crbr = Repos.new.current_branch() # assumed function
       dest = remote.split(':')
+      if(dest.length != 2)
+        dest = dest.insert(0, "cycle3.csug.rochester.edu")
+      end
       contents = Dir.entries(Dir.pwd)
       if(!content.include? '.cn')
         puts 'failed to pull from remote, not an initialized Copernicium repo'
@@ -307,6 +313,9 @@ module Copernicium
     def PushPull.clone(remote, user = nil)
       exit_code = false
       dest = remote.split(':')
+      if(dest.length != 2)
+        dest = dest.insert(0, "cycle3.csug.rochester.edu")
+      end
       begin
         fetch(dest[0], dest[1], Dir.pwd, user)
         exit_code = true
