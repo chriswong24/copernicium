@@ -7,7 +7,7 @@
 #  - Merging
 #  - Status
 #  - Push
-
+require 'byebug'
 require_relative 'test_helper'
 
 include Copernicium::Driver
@@ -34,12 +34,12 @@ class CoperniciumIntegrationTests < Minitest::Test
     end
 
     it 'can commit changes' do
-      Repos.history('master').size.must_equal 1
+      Repos.history('master').size.must_equal 0
       File.write 'workspace/1.txt', '1_1'
       File.write 'workspace/2.txt', '2_2'
       drive 'commit -m Test Commit'
-      Repos.history('master').size.must_equal 2
-
+      byebug
+      Repos.history('master').size.must_equal 1
       #todo : make sure commit written to disk
     end
 
@@ -52,6 +52,8 @@ class CoperniciumIntegrationTests < Minitest::Test
 
       # todo read .cn/branch, verify
     end
+
+    # todo: update test
 
 =begin
     # Won't work because clean not handled by UI yet
