@@ -15,7 +15,7 @@ require 'net/scp'       # Needed for file transfer between servers
 require_relative 'banners'
 require_relative 'RevLog'
 require_relative 'repos'
-require_relative 'pushpull'
 require_relative 'workspace'
+require_relative 'pushpull'
 require_relative 'ui'
 
