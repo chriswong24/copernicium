@@ -13,10 +13,10 @@ module Copernicium
   end
 
   module PushPull
-    include Repos # needed for calling their methods
+    include Workspace # needed for calling their methods
     # Chris's edit
     # Takes in Ethan's UICommandCommunicator object and calls
-    # a method based on the command
+  # a method based on the command
     #
     # Fields in UIComm and what they are for me:
     #   @opts - user
@@ -49,7 +49,7 @@ module Copernicium
       if(block.nil?)
         begin
           puts 'inside PushPull connect nil block path'.grn
-          Net::SSH.start(remote, user) do |ssh|
+        Net::SSH.start(remote, user) do |ssh|
             puts ssh.exec!("echo Successful Connection!")
             exit_code = true
           end
@@ -255,7 +255,7 @@ module Copernicium
     # user: the user to connect as
     def PushPull.pull(remote, branch, user)
       # check contents of folder for .cn, fail if not present and remove otherwise
-      crbr = Repos.new.current_branch() # assumed function
+      crbr = Repos.current
       dest = remote.split(':')
       if(dest.length != 2)
         dest = dest.insert(0, "cycle3.csug.rochester.edu")
