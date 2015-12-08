@@ -2,18 +2,18 @@
 # CSC 253
 # PushPull Module
 # November 6, 2015
-
+require_relative 'required'
 
 module Copernicium
   # How to use for Push, Pull and Clone:
   #   Push - cn push <user> <repo.host:/dir/of/repo> <branch-name>
   #   Pull - cn pull <user> <repo.host:/dir/of/repo> <branch-name>
   #   Clone - cn clone <user> <repo.host:/dir/of/repo>
+  include Workspace
   class UIComm
   end
 
   module PushPull
-    include Workspace # needed for calling their methods
     # Chris's edit
     # Takes in Ethan's UICommandCommunicator object and calls
   # a method based on the command
@@ -105,12 +105,11 @@ module Copernicium
     # remote: the remote server and directory to pull from, formatted "my.server"
     # user: the user to connect as
     def PushPull.transfer(remote, user, &block)
-      exit_code = false
       begin
         Net::SCP.start(remote, user) do |scp|
           yield scp
         end
-        exit_code = true
+        return true
       rescue
         begin
           print "Username for remote repo: "
@@ -119,11 +118,11 @@ module Copernicium
           print "Password for #{user}: "
           passwd = (STDIN.noecho(&:gets)).strip
           puts
-
+          
           Net::SCP.start(remote, user, :passwd => passwd) do |scp|
             yield scp
           end
-          exit_code = true
+          return true
         rescue
           raise "Unable to upload file!".red
         end
@@ -200,49 +199,24 @@ module Copernicium
     # branch: the branch that we are pushing to
     # user: the user to connect as
     def PushPull.push(remote, branch, user)
-      # check contents of folder for .cn, fail if not present and remove otherwise
       dest = remote.split(':')
       if(dest.length != 2)
         dest = dest.insert(0, "cycle3.csug.rochester.edu")
       end
-      contents = Dir.entries(Dir.pwd)
-      if(!content.include? '.cn')
-        puts 'failed to push to remote, not an initialized Copernicium repo'
-        return
-      else
-        contents = contents.delete_if{|x| (x.eql? '.cn') || (x.eql? '.') || (x.eql? '..')}
+      if(!Dir.exists?('.cn'))
+      	puts 'failed to push to remote, not an initialized Copernicium repo'
+      	return nil
       end
-
-      # todo - check if branch exists on the remote server
-      # if so, dump contents and save a new commit saying pushed from user
-      # else, create branch and dump files, then make a new commit saying
-      # created branch
+      transfer(dest[0], user) do |session|
+      	session.upload!("#{Dir.pwd}/.cn/revs", "#{dest[1]}/.cn/revs", :recursive => true)
+      	session.upload!("#{Dir.pwd}/.cn/snap", "#{dest[1]}/.cn/snap", :recursive => true)
+      	session.upload!("#{Dir.pwd}/.cn/history", "#{dest[1]}/.cn/merging_#{user}", :recursive => true)
+      end
       connect(dest[0], user) do |session|
-        session.exec!("cd #{dest[1]}")
-        result = session.exec!('ls .cn')
-        if(result.strip.eql? '')
-          puts 'remote directory not a Copernicium repo'
-          return
-        end
-        session.exec!("cn branch .temp_push_#{user}")
-        session.exec!("find . ! -name \".cn\" -exec rm -r {} \\;")
-
-        # Move the files over to the remote branch
-        transfer(dest[0], user) do |scp|
-          contents.each do |x|
-            scp.upload!(Dir.pwd+'/'+x, dest[1], :recursive => true)
-          end
-        end
-
-        # Commit the files and merge the branches
-        session.exec!('cn add .')
-        session.exec!('cn commit -m \'Temp commit for push\'')
-        session.exec!("cn checkout #{branch}")
-        session.exec!("cn merge .temp_push_#{user}")
-        session.exec!("cn branch -d .temp_push_#{user}")
+      	session.exec!("cd #{dest[1]}")
+      	result = session.exec!("cn update #{user}")
       end
-
-      puts "Successfully pushed to #{remote}"
+      puts result
     end
 
     # Function: pull()
@@ -254,53 +228,20 @@ module Copernicium
     # branch: the branch that we are pushing to
     # user: the user to connect as
     def PushPull.pull(remote, branch, user)
-      # check contents of folder for .cn, fail if not present and remove otherwise
-      crbr = Repos.current
       dest = remote.split(':')
       if(dest.length != 2)
         dest = dest.insert(0, "cycle3.csug.rochester.edu")
       end
-      contents = Dir.entries(Dir.pwd)
-      if(!content.include? '.cn')
-        puts 'failed to pull from remote, not an initialized Copernicium repo'
-        return
-      else
-        contents = contents.delete_if{|x| (x.eql? '.cn') || (x.eql? '.') || (x.eql? '..')}
+      if(!Dir.exists?('.cn'))
+      	puts 'failed to push to remote, not an initialized Copernicium repo'
+      	return nil
       end
-
-      # create a new branch and clean it in prep for the incoming files
-      system "cn branch .temp_pull_#{user}"
-      contents.each do |x|
-        system "rm -r #{x}"
-      end
-
-      # get the file list from the remote directory
-      connect(dest[0], user) do |session|
-        session.exec!("cd #{dest[1]}")
-        session.exec!("cn checkout #{branch}")
-        collection = session.exec!("ls | cat")
-      end
-
-      collection  = collection.split('\n')
-      if(!collection.include? '.cn')
-        puts 'failed to pull from remote, remote folder not an initialized Copernicium repo'
-        return
-      else
-        collection = collection.delete_if{|x| (x.eql? '.cn') || (x.eql? '.') || (x.eql? '..')}
-      end
-
-      # fetch the files from the remote directory and merge them to the branch
-      fetch(dest[0], nil, nil, user) do |scp|
-        collection.each do |x|
-          scp.download!(dest[1]+'/'+x, Dir.pwd, :recursive => true)
-        end
-      end
-      system "cn add ."
-      system "cn commit -m \'Temp commit for pull\'"
-      system "cn checkout #{crbr}"
-      system "cn merge .temp_pull_#{user}"
-      system "cn branch -d .temp_pull_#{user}"
-      puts "Successfully pulled from #{remote}"
+      fetch(dest[0], nil, nil, user) do |session|
+      	session.download!("#{dest[1]}/.cn/revs", "#{Dir.pwd}/.cn/revs", :recursive => true)
+      	session.download!("#{dest[1]}/.cn/snap", "#{Dir.pwd}/.cn/snap", :recursive => true)
+      	session.download!("#{dest[1]}/.cn/history", "#{Dir.pwd}/.cn/merging_#{user}", :recursive => true)
+  	  end
+  	  system "cn update #{user}"
     end
 
     # Function: clone()
