@@ -266,31 +266,30 @@ module Copernicium
     # FOR PUSHPULL UPDATE
     def Repos.update(comm = UIComm.new)
 
-      merger = YAML.load File.read(File.join(@@copn,'merging_',comm.ops)
+      merge_name = File.join(@@copn,'merging_',comm.ops)
+
+      merger = YAML.load File.read(merge_name)
 
       # merge @@history with merger hash
       merger.each do |key, val|
         if @@history.keys.include? key
           val.each_with_index do |snap, index|
-            if !@@history[key][index].nil?
+            if @@history[key][index].nil?
               @@history[key] += val[index..-1]
-            end
-            elsif history[key][index] == snap
+            elsif @@history[key][index] == snap
               next
-            else
+            elsif @@history[key][index] != snap
               @@history[key] += val[index..-1]
             end
           end
-          # branch already exists
-          # diff snapshot on key and 
-
         else
           @@history[key] = val
         end
       end
 
-      File.delete(merger)
+      File.delete(merge_name)
 
+      update_history
     end
 
   end # Repos
