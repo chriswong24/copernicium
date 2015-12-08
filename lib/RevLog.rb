@@ -125,14 +125,5 @@ module Copernicium
       File.open(@@log_path, 'w') { |f| f.write(@@logmap.to_yaml) }
       File.open(@@hash_path, 'w') { |f| f.write(@@hashmap.to_yaml) }
     end
-
-    # def RevLog.alterFile(fileObject, fileReferenceString, versionReferenceString)
-    # end
-
-    # def RevLog.deleteFileVersion(fileReferenceString, versionReferenceString)
-    # end
-
-    # def RevLog.viewFileHistory(fileReferenceString)
-    # end
   end
 end
