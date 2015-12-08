@@ -143,7 +143,7 @@ module Copernicium
       exit_code = false
       if(block.nil?)
         begin
-          Net::SCP.start(remote, user, :password => passwd) do |scp|
+          Net::SCP.start(remote, user) do |scp|
             scp.download!(dest, local, :recursive => true)
           end
           exit_code = true
@@ -166,7 +166,7 @@ module Copernicium
         end
       else
         begin
-          Net::SCP.start(remote, user, :password => passwd) do |scp|
+          Net::SCP.start(remote, user) do |scp|
             yield scp
           end
           exit_code = true
