@@ -29,8 +29,8 @@ class CoperniciumIntegrationTests < Minitest::Test
 
     before "create a cn new repo to test" do
       Dir.mkdir("workspace")
-      Copernicium.writeFile("workspace/1.txt", "1")
-      Copernicium.writeFile("workspace/2.txt", "2")
+      Copernicium.File.write("workspace/1.txt", "1")
+      Copernicium.File.write("workspace/2.txt", "2")
       runner("commit -m Test Commit")
       Repos.make_branch("dev")
     end
@@ -42,8 +42,8 @@ class CoperniciumIntegrationTests < Minitest::Test
 
     it "can commit changes" do
       Repos.get_branch("master").size.must_equal 1
-      Copernicium.writeFile("workspace/1.txt", "1_1")
-      Copernicium.writeFile("workspace/2.txt", "2_2")
+      Copernicium.File.write("workspace/1.txt", "1_1")
+      Copernicium.File.write("workspace/2.txt", "2_2")
       comm = runner("commit -m Test Commit")
       Workspace.commit(comm)
       Repos.get_branch("master").size.must_equal 2
@@ -61,34 +61,34 @@ class CoperniciumIntegrationTests < Minitest::Test
 =begin
     # Won't work because clean not handled by UI yet
     it "can revert back to the last commit" do
-      Copernicium.writeFile("workspace/1.txt", "1_1")
-      Copernicium.writeFile("workspace/2.txt", "2_2")
+      Copernicium.File.write("workspace/1.txt", "1_1")
+      Copernicium.File.write("workspace/2.txt", "2_2")
 
       comm = runner("clean")
       Workspace.clean(comm)
 
-      content = Copernicium.readFile("workspace/1.txt")
+      content = Copernicium.File.read("workspace/1.txt")
       content.must_equal "1"
-      content = Copernicium.readFile("workspace/2.txt")
+      content = Copernicium.File.read("workspace/2.txt")
       content.must_equal "2"
     end
 
     # Won't work because clean not handled by UI yet
     it "can clean specific files in the workspace" do
-      Copernicium.writeFile("workspace/1.txt", "1_1")
-      Copernicium.writeFile("workspace/2.txt", "2_2")
+      Copernicium.File.write("workspace/1.txt", "1_1")
+      Copernicium.File.write("workspace/2.txt", "2_2")
 
       comm = runner("clean workspace/1.txt")
       Workspace.clean(comm)
 
-      Workspace.readFile("workspace/1.txt").must_equal "1"
-      Workspace.readFile("workspace/2.txt").must_equal "2_2"
+      Workspace.File.read("workspace/1.txt").must_equal "1"
+      Workspace.File.read("workspace/2.txt").must_equal "2_2"
     end
 
     it "can check the status of the repository" do
       File.delete('workspace/2.txt')
-      @ws.writeFile("workspace/1.txt","edit")
-      @ws.writeFile("workspace/3.txt","3")
+      @ws.File.write("workspace/1.txt","edit")
+      @ws.File.write("workspace/3.txt","3")
 
       comm = runner("status")
       changedFiles = @ws.status(comm)
@@ -96,10 +96,10 @@ class CoperniciumIntegrationTests < Minitest::Test
     end
 
     it "can checkout a branch" do
-      @ws.readFile("workspace/1.txt").must_equal "1"
-      @ws.readFile("workspace/2.txt").must_equal "2"
-      @ws.writeFile("workspace/1.txt", "1_1")
-      @ws.writeFile("workspace/2.txt", "2_2")
+      @ws.File.read("workspace/1.txt").must_equal "1"
+      @ws.File.read("workspace/2.txt").must_equal "2"
+      @ws.File.write("workspace/1.txt", "1_1")
+      @ws.File.write("workspace/2.txt", "2_2")
       comm = runner("commit -m Test Commit")
       @ws.commit(comm)
 
@@ -108,17 +108,17 @@ class CoperniciumIntegrationTests < Minitest::Test
       @ws.checkout(comm)
 
       # Switch to dev, files should not be modified
-      @ws.readFile("workspace/1.txt").must_equal "1"
-      @ws.readFile("workspace/2.txt").must_equal "2"
+      @ws.File.read("workspace/1.txt").must_equal "1"
+      @ws.File.read("workspace/2.txt").must_equal "2"
 
     end
 
     it "can checkout a list of files" do
-      @ws.writeFile("workspace/1.txt","none")
+      @ws.File.write("workspace/1.txt","none")
       comm = runner("checkout master ./workspace/1.txt")
       @ws.checkout(comm)
 
-      content = @ws.readFile("workspace/1.txt")
+      content = @ws.File.read("workspace/1.txt")
       content.must_equal "1"
     end
 
