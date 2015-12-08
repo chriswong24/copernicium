@@ -10,8 +10,10 @@ include Copernicium::PushPull
 class TestPushPullModule < Minitest::Test
   describe 'Copernicium PushPull' do
     before 'connecting to host, define constants' do
-      @host = 'cycle2.csug.rochester.edu'
-      @user = 'ftamburr'
+      #@host = 'cycle2.csug.rochester.edu'
+      #@user = 'ftamburr'
+      @host = 'cycle3.csug.rochester.edu'
+      @user = 'jwarn10'
       puts
     end
 
