@@ -262,6 +262,36 @@ module Copernicium
       @@history.delete(branch)
       update_history
     end
+
+    # FOR PUSHPULL UPDATE
+    def Repos.update(comm = UIComm.new)
+      merge_name = File.join(@@copn,'merging_',comm.ops)
+      
+      if File.exist?(merge_name)
+        merger = YAML.load File.read(merge_name)
+
+        # merge @@history with merger hash
+        merger.each do |key, val|
+          if @@history.keys.include? key
+            val.each_with_index do |snap, index|
+              if @@history[key][index].nil?
+                @@history[key] += val[index..-1]
+              elsif @@history[key][index] == snap
+                next
+              elsif @@history[key][index] != snap
+                @@history[key] += val[index..-1]
+              end
+            end
+          else
+            @@history[key] = val
+          end
+        end
+        File.delete(merge_name)
+        update_history
+      end
+    else
+      puts 'Error updating: '.red + merge_name + 'doesnt exist.'
+    end
   end # Repos
 end # Copernicium
 

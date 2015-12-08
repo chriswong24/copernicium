@@ -79,6 +79,8 @@ module Copernicium
           push args
         when 'pull'
           pull args
+        when 'update'
+          update args
         when 'init'
           # fall through - init handled above, before case statement
         else # handle an unrecognized argument, show help and exit
@@ -312,6 +314,15 @@ module Copernicium
       else # branch not found
         puts "Branch not found: ".red + rev
       end
+    end
+
+    def update(args)
+      if args.empty?
+        username = get "user to update to"
+      else
+        username = args.first
+      end
+      Repos.update(UIComm.new(command: 'update', ops: username))
     end
   end # Driver
 end # Copernicium
