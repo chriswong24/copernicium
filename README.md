@@ -16,27 +16,47 @@ Repository for Team Copernicium's DVCS.
     $ [sudo] gem install copernicium
 
 
-### development
+### cn usage
 
-First, clone this repository:
+##### starting out
 
-    $ git clone https://github.com/jeremywrnr/copernicium.git
+    init - create a new repository
+    status - check repo status
+    history - show repo commits
+    help - show more commands
 
-To install all runtime and testing dependencies, run:
+##### commands
 
-    $ [sudo] gem install rake
-    $ rake setup
+    clean [files] [commit/branch]
+    commit [files] -m <message>
+    checkout <commit id> [files]
+    branch [opt] [branch]
+      -r | rename current branch
+      -c | create a new branch
+      -d | delete a branch
+    merge <branch name>
+    clone <remote url>
+    push <remote user>
+    pull <remote user>
 
-To run the entire test suite, run `rake test`. To run a specific test suite:
+##### options
 
-    $ rake test[pushpull]
+    -v: print version
+    -h: show help
 
-To show information about each module's tests, and branches commits, run:
-
-    $ rake info
+Note: `[optional] <required>`
 
 
-### Setting up SSH keys
+### troubleshooting
+
+If you are having trouble installing Copernicium as a ruby gem, you can try the
+following to install it in a PATH folder where you have write access. For
+example, this will install cn in ~/bin:
+
+    $ gem install copernicium -n~/bin
+
+
+### ssh keys
 
 If SSH keys are not setup, you will be required to provide a user and password
 for each use of the push, pull and clone methods.  In order to avoid this, SSH
@@ -59,17 +79,28 @@ the contents of the public key to a line:
 	$ cd ~/.ssh
 	$ echo [public key info] > authorized_keys
 
-You should now be able to use the push, pull, and origin functions using only the username.
+You should now be able to use the push, pull, and origin functions using only
+the username.
 
 
-### troubleshooting
+### development
 
-##### marshal file format error
+First, clone this repository:
 
-    TypeError: incompatible marshal file format (can't be read)
-    format version 4.8 required; 47.85 given
+    $ git clone https://github.com/jeremywrnr/copernicium.git
 
-try `bundle install --full-index`
+To install all runtime and testing dependencies, run:
+
+    $ [sudo] gem install rake
+    $ rake setup
+
+To run the entire test suite, run `rake test`. To run a specific test suite:
+
+    $ rake test[pushpull]
+
+To show information about each module's tests, and branches commits, run:
+
+    $ rake info
 
 
 ### relevant links:

@@ -40,8 +40,8 @@ task :info do
   # parse how many tests exist/work
   puts "Copernicium Test info...\n\n"
   puts "All: \t" + `yes | rake test 2>/dev/null | sed -ne '/.*tests.*skips/p'`
-  %w[repos revlog ui workspace integration].each do |mod|
-  #%w[repos revlog ui workspace pushpull integration].each do |mod|
+  #%w[repos revlog ui workspace integration].each do |mod|
+  %w[repos revlog ui workspace pushpull integration].each do |mod|
     puts "#{mod}:\t" +
       `yes | rake test[#{mod}] 2>/dev/null | sed -ne '/.*tests.*skips/p'`
   end
