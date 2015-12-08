@@ -297,7 +297,7 @@ module Copernicium
 
     def merge(args)
       if args.empty?
-        rev = get 'single commit or branch to merge'
+        rev = get 'branch to merge'
       else
         rev = args.first
       end
@@ -305,21 +305,14 @@ module Copernicium
       # If rev is a branch name, resolve it to a rev ID.
       if Repos.has_branch? rev
         rev = (Repos.history rev).last
-      end
-
-      conflicts = Workspace.merge(rev)
-
-      # If there were any conflicts, display them to the user.
-      if not conflicts.nil?
-
-        conflicts.each do |conflict|
-          puts "   #{conflict}".red
+        conflicts = Workspace.merge(rev)
+        unless conflicts.nil?
+          conflicts.each { |conflict| puts "Conflict: ".red + conflict }
         end
+      else # branch not found
+        puts "Branch not found: ".red + rev
       end
-
-      # Don't return a UIComm object, since we didn't use one for any of the
-      # backend calls.
     end
   end # Driver
-end
+end # Copernicium
 
