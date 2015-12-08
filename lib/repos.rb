@@ -262,6 +262,23 @@ module Copernicium
       @@history.delete(branch)
       update_history
     end
+
+    # FOR PUSHPULL UPDATE
+    def Repos.update(comm = UIComm.new)
+
+      merger = YAML.load File.read(@@copn + '/merging_' + comm.ops)
+
+      # merge @@history with merger hash
+      merger.each do |key, val|
+
+        if @@history.keys.include? key
+
+        else
+
+        end
+      end
+    end
+
   end # Repos
 end # Copernicium
 
