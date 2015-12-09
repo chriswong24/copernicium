@@ -265,7 +265,7 @@ module Copernicium
 
     # FOR PUSHPULL UPDATE
     def Repos.update(comm = UIComm.new)
-      merge_name = File.join(@@copn,'merging_',comm.opts)
+      merge_name = File.join(@@copn, 'merging_'+comm.opts)
       status = "Remote is either up-to-date or ahead of local"
 
       if File.exist?(merge_name)
