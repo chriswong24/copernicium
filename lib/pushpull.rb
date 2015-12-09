@@ -100,7 +100,8 @@ module Copernicium
     # Function: fetch()
     #
     # Description:
-    #   a net/scp wrapper to copy from server, can take a block or do a one-off copy without one
+    #   a net/scp wrapper to copy from server, can take a block or do a one-off
+    #   copy without one
     #
     # local: where we want to put the file, not needed for blocked calls
     def PushPull.fetch
