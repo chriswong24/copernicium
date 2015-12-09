@@ -164,14 +164,14 @@ module Copernicium
       begin
         PushPull.fetch do |session|
           # uploading our history to remote
-          session.download!("#{@@path}/.cn/merging_#{@@user}",
-                            "#{Dir.pwd}/.cn/history")
+          session.download!( "#{Dir.pwd}/.cn/history",
+                            "#{@@path}/.cn/merging_#{@@user}")
 
           # uploading our .cn info to remote
           %w{revs snap}.each do |file|
             session.download!("#{@@path}/.cn/#{file}",
                               "#{Dir.pwd}/.cn/",
-                              :recursive => true)
+                                :recursive => true)
           end
         end
         system "cn update", @@user
