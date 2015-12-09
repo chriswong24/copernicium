@@ -126,17 +126,17 @@ help - show more commands</pre>
 
 <h5 id="label-commands">commands<span><a href="#label-commands">&para;</a> <a href="#top">&uarr;</a></span></h5>
 
-<pre>clean [files] [commit/branch]
-commit [files] -m &lt;message&gt;
-checkout &lt;commit id&gt; [files]
+<pre>commit [files] &lt;-m message&gt;
 branch [opt] [branch]
   -r | rename current branch
   -c | create a new branch
   -d | delete a branch
-merge &lt;branch name&gt;
-clone &lt;remote url&gt;
-push &lt;remote user&gt;
-pull &lt;remote user&gt;</pre>
+checkout &lt;commit id&gt; [files]
+clean [files] [commit/branch]
+clone &lt;user&gt; &lt;remote url&gt;
+push &lt;user&gt; &lt;remote url&gt;
+pull &lt;user&gt; &lt;remote url&gt;
+merge &lt;branch&gt;</pre>
 
 <h5 id="label-options">options<span><a href="#label-options">&para;</a> <a href="#top">&uarr;</a></span></h5>
 
@@ -146,6 +146,9 @@ pull &lt;remote user&gt;</pre>
 <p>Note: <code>[optional] &lt;required&gt;</code></p>
 
 <h3 id="label-troubleshooting">troubleshooting<span><a href="#label-troubleshooting">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Note: clone, push and pull require ssh keys to be setup on the hosting
+server.</p>
 
 <p>If you are having trouble installing <a
 href="Copernicium.html">Copernicium</a> as a ruby gem, you can try the
