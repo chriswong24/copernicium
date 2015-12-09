@@ -49,6 +49,8 @@ Note: `[optional] <required>`
 
 ### troubleshooting
 
+Note: clone, push and pull require ssh keys to be setup on the hosting server.
+
 If you are having trouble installing Copernicium as a ruby gem, you can try the
 following to install it in a PATH folder where you have write access. For
 example, this will install cn in ~/bin:
