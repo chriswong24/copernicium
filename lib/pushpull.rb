@@ -1,7 +1,7 @@
 # Frank Tamburrino
-# CSC 253
+# CSC 254
 # PushPull Module
-# November 6, 2015
+# November 7, 2015
 #
 # How to use for Push, Pull and Clone:
 #   Push - cn push <user> <repo.host:/dir/of/repo> <branch-name>
@@ -31,11 +31,11 @@ module Copernicium
       @@user = comm.opts
       case comm.command
       when "clone"
-        clone
+        PushPull.clone
       when "push"
-        push
+        PushPull.push
       when "pull"
-        pull
+        PushPull.pull
       when 'test'
         # avoid error while doing unit testing
       else
@@ -44,9 +44,11 @@ module Copernicium
     end
 
     # tell user to set up their ssh keys
-    def PushPull.connection_failure(str = '')
+    def PushPull.connection_failure(str = '', err = '')
+      puts "Make sure SSH keys are setup to the host server.".grn
       puts "Connection error while: ".red + str
-      puts "Make sure SSH keys are setup.".yel
+      puts "Error: ".red + err.to_s
+      puts "Backtrace:\n\t".red + "#{err.backtrace.join("\n\t")}"
       puts "User: ".yel + @@user
       puts "Host: ".yel + @@host
       puts "Path: ".yel + @@path
@@ -62,8 +64,8 @@ module Copernicium
       begin
         Net::SSH.start(@@host, @@user) { |ssh| yield ssh }
         true
-      rescue
-        connection_failure 'trying to execute a command'
+      rescue => error
+        connection_failure 'trying to execute a command', error
       end
     end
 
@@ -75,8 +77,8 @@ module Copernicium
     def PushPull.clone
       begin
         PushPull.fetch
-      rescue
-        connection_failure 'trying to clone a repo'
+      rescue => error
+        connection_failure 'trying to clone a repo', error
       end
     end
 
@@ -89,8 +91,8 @@ module Copernicium
       begin
         Net::SCP.start(@@host, @@user) { |scp| yield scp }
         true
-      rescue
-        connection_failure 'trying to upload a file'
+      rescue => error
+        connection_failure 'trying to upload a file', error
       end
     end
 
@@ -101,21 +103,21 @@ module Copernicium
     #   a net/scp wrapper to copy from server, can take a block or do a one-off copy without one
     #
     # local: where we want to put the file, not needed for blocked calls
-    def PushPull.fetch(local = Dir.pwd, &block)
-      if block.nil? # we are cloning a repo in this section of code
-        begin
-          Net::SCP.start(@@host, @@user) do |scp|
-            scp.download! @@path, local, :recursive => true
-          end
-        rescue # no ssh keys are setup, die
-          connection_failure 'trying to copy a file'
-        end
-
-      else # fetch more than one file or folder
+    def PushPull.fetch
+      if block_given? # fetch more than one file or folder
         begin
           Net::SCP.start(@@host, @@user) { |scp| yield scp }
-        rescue
-          connection_failure "trying to fetch files"
+        rescue => error
+          connection_failure "trying to fetch files", error
+        end
+
+      else # no block given, clone the repo
+        begin
+          Net::SCP.start(@@host, @@user) do |scp|
+            scp.download!(@@path, Dir.pwd, :recursive => true)
+          end
+        rescue => error
+          connection_failure 'trying to clone a repo', error
         end
       end
       true
@@ -128,7 +130,7 @@ module Copernicium
     #   pushes local changes on the current branch to a remote branch
     def PushPull.push
       begin
-        transfer do |ssh|
+        PushPull.transfer do |ssh|
           # uploading our history to remote
           ssh.upload!("#{Dir.pwd}/.cn/history",
                       "#{@@path}/.cn/merging_#{@@user}")
@@ -141,12 +143,12 @@ module Copernicium
           end
         end # ssh
 
-        connect do |ssh|
+        PushPull.connect do |ssh|
           ssh.exec! "cd #{@@path}"
           puts ssh.exec! "cn update #{@@user}"
         end
-      rescue
-        connection_failure "trying to push files"
+      rescue => error
+        connection_failure "trying to push files", error
       end
       true
     end
@@ -159,7 +161,7 @@ module Copernicium
     #
     def PushPull.pull
       begin
-        fetch do |session|
+        PushPull.fetch do |session|
           # uploading our history to remote
           session.download!("#{@@path}/.cn/merging_#{@@user}",
                             "#{Dir.pwd}/.cn/history")
@@ -173,8 +175,8 @@ module Copernicium
         end
         system "cn update", @@user
         puts "Remote pulled: ".grn + @@host + @@path
-      rescue
-        connection_failure "trying to pull files"
+      rescue => error
+        connection_failure "trying to pull files", error
       end
       true
     end
