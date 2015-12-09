@@ -173,7 +173,7 @@ module Copernicium
       elsif remov.include? x
         @@files.delete_at(indexOf x)
       else
-        puts 'Failed, no changes: '.yel + x
+        puts 'No changes: '.yel + x
       end
     end
 
