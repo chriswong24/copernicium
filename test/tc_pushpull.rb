@@ -10,71 +10,63 @@ include Copernicium::PushPull
 class TestPushPullModule < Minitest::Test
   describe 'Copernicium PushPull' do
     before 'connecting to host, define constants' do
+      @filename = 'copernicium'
+      File.write(@filename, 'hello')
       #@host = 'cycle2.csug.rochester.edu'
       #@user = 'ftamburr'
       @host = 'cycle3.csug.rochester.edu:/u/jwarn10/testing'
       @user = 'jwarn10'
       @comm = UIComm.new(repo: @host, opts: @user, rev: 'master')
+      setup = UIComm.new(repo: @host, opts: @user, rev: 'master')
+      setup.command = 'test'
+      PushPull.UICommandParser setup
+    end
+
+    after 'running each test, clean up' do
+      File.delete(@filename) if File.exist? @filename
     end
 
     it 'can clone a remote cn repo locally' do
-       @comm.command = 'clone'
-       (PushPull.UICommandParser @comm).must_equal true
+      @comm.command = 'clone'
+      (PushPull.UICommandParser @comm).must_equal true
     end
 
-=begin
     # test for a good connection and a bad connection
     it 'is able to connect to a remote computer' do
-      puts 'testing connection'.yel
-      conn = PushPull.connect(@host, @user) do |ssh|
-            puts ssh.exec!("echo Successful Connection!")
-          end
-      conn.must_equal true
+      (PushPull.connect do |ssh|
+        ssh.exec!('echo success!')
+      end).must_equal true
     end
 
-    it 'can yield a remote connection to a block' do
+    it 'can capture output from a block' do
       test = Object.new
-      conn = PushPull.connect(@host, @user) do |x|
+      (conn = PushPull.connect do |x|
         test = (x.exec!('echo Blocks Working!')).strip;
-      end
+      end).must_equal true
       test.must_equal 'Blocks Working!'
     end
 
     it 'can move files to remote servers for push' do
-      tfile = File.new('.copernicium', 'w')
-      tfile.close
-      test = PushPull.transfer(@host, @user) do |session|
-        session.upload!(".copernicium", '/localdisk/.copernicium')
+      (PushPull.transfer do |session|
+        session.upload!(@filename, '/localdisk/' + @filename)
+      end).must_equal true
+
+      PushPull.connect do |ssh|
+        yes = ssh.exec! "test -e /localdisk/#{@filename} && echo 'exists'"
+        yes.must_equal "exists\n"
       end
-      File.delete('comm_t.copernicium')
-      PushPull.connect(@host, @user) do |x|
-        x.exec!('ls /localdisk/comm_t.copernicium')
-        x.exec!('rm /localdisk/comm_t.copernicium')
-      end
-      test.must_equal true
     end
 
     it 'can fetch files from a server for pull' do
-      PushPull.connect(@host, @user) do |x|
-        x.exec!('touch /localdisk/comm_t.copernicium')
+      PushPull.connect do |ssh|
+        ssh.exec! "touch /localdisk/#{@filename}"
       end
-      result = PushPull.fetch(@host, '/localdisk/comm_t.copernicium', './', @user)
-      File.delete('./comm_t.copernicium')
-      result.must_equal true
+      File.delete(@filename) if File.exist? @filename
+      (PushPull.fetch do |scp|
+        scp.download! "/localdisk/#{@filename}", @filename
+        File.read(@filename).must_equal 'hello'
+      end).must_equal true
     end
-
-    it 'can clone a repository from a server' do
-      conn = PushPull.connect(@host, @user) do |x|
-        x.exec!('mkdir /localdisk/.t_copernicium')
-        x.exec!('touch /localdisk/.t_copernicium/comm_t.copernicium');
-      end
-      result = PushPull.clone('cycle2.csug.rochester.edu:/localdisk/.t_copernicium', @user)
-      conn = PushPull.connect(@host, @user) do |x|
-        x.exec!('rm -r .t_copernicium')
-      end
-      result.must_equal true
-    end
-=end
   end
 end
 

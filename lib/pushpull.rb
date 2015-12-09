@@ -21,11 +21,11 @@ module Copernicium
       # handle parsing out remote info
       remote = comm.repo.split(':')
       if remote.length == 2
-         @@host = remote[0]
-         @@path = remote[1]
+        @@host = remote[0]
+        @@path = remote[1]
       elsif remote.length == 1
-         @@host = "cycle3.csug.rochester.edu"
-         @@path = remote[0].sub!(/^:/, '')
+        @@host = "cycle3.csug.rochester.edu"
+        @@path = remote[0].sub!(/^:/, '')
       else
         raise 'Remote host information not given'.red
       end
@@ -38,25 +38,18 @@ module Copernicium
         push
       when "pull"
         pull
+      when 'test'
+        # avoid error while doing unit testing
       else
         raise "Error: Invalid command supplied to PushPull".red
-      end
-    end
-
-    # execute commands on the server
-    def execute(commands)
-      Net::SSH.start(@@repo, @@user) do |ssh|
-        commands.each do |command|
-          puts ssh.exec!(command)
-        end
       end
     end
 
     # tell user to set up their ssh keys
     def connection_failure(str = '')
       puts "Connection error while: ".red + str
-      puts "Make sure ssh keys are setup.".yel
-      return false
+      puts "Make sure SSH keys are setup.".yel
+      false
     end
 
     # Function: connect()
@@ -69,7 +62,7 @@ module Copernicium
     # user: the user to connect as
     def PushPull.connect
       begin
-        Net::SCP.start(@@host, @@user) { |scp| yield scp }
+        Net::SSH.start(@@host, @@user) { |scp| yield scp }
         true
       rescue
         connection_failure 'trying to execute a command'
@@ -85,7 +78,7 @@ module Copernicium
     # user: the user to connect as
     def PushPull.transfer
       begin
-        Net::SCP.start(remote, @@user) { |scp| yield scp }
+        Net::SCP.start(@@host, @@user) { |scp| yield scp }
         true
       rescue
         connection_failure 'trying to upload a file'
@@ -104,8 +97,6 @@ module Copernicium
     def PushPull.fetch(local = Dir.pwd, &block)
       if block.nil? # we are cloning a repo in this section of code
         begin
-          puts '<' + @@host + '>'
-          puts '<' + @@user + '>'
           Net::SCP.start(@@host, @@user) do |scp|
             scp.download!(@@path, local, :recursive => true)
           end
@@ -134,13 +125,20 @@ module Copernicium
     # user: the user to connect as
     def PushPull.push
       transfer do |session|
-        session.upload!("#{Dir.pwd}/.cn/revs", "#{dest[1]}/.cn/revs", :recursive => true)
-        session.upload!("#{Dir.pwd}/.cn/snap", "#{dest[1]}/.cn/snap", :recursive => true)
-        session.upload!("#{Dir.pwd}/.cn/history", "#{dest[1]}/.cn/merging_#{@@user}", :recursive => true)
-      end
+        # uploading our history to remote
+        session.upload!("#{Dir.pwd}/.cn/history",
+                        "#{@@path}/.cn/merging_#{@@user}")
+
+        # uploading our .cn info to remote
+        %w{revs snap}.each do |file|
+          session.upload!("#{Dir.pwd}/.cn/#{file}",
+                          "#{@@path}/.cn/#{file}",
+                          :recursive => true)
+        end
+      end # session
 
       connect do |session|
-        session.exec!("cd #{dest[1]}")
+        session.exec!("cd #{@@path}")
         puts session.exec!("cn update #{@@user}")
       end
     end
@@ -155,12 +153,20 @@ module Copernicium
     # branch: the branch that we are pushing to
     # user: the user to connect as
     def PushPull.pull
-      fetch(dest[0], nil, nil, @@user) do |session|
-        session.download!("#{dest[1]}/.cn/revs", "#{Dir.pwd}/.cn/revs", :recursive => true)
-        session.download!("#{dest[1]}/.cn/snap", "#{Dir.pwd}/.cn/snap", :recursive => true)
-        session.download!("#{dest[1]}/.cn/history", "#{Dir.pwd}/.cn/merging_#{@@user}", :recursive => true)
+      fetch do |session|
+        # uploading our history to remote
+        session.download!("#{@@path}/.cn/merging_#{@@user}",
+                          "#{Dir.pwd}/.cn/history")
+
+        # uploading our .cn info to remote
+        %w{revs snap}.each do |file|
+          session.download!("#{@@path}/.cn/#{file}",
+                            "#{Dir.pwd}/.cn/#{file}",
+                            :recursive => true)
+        end
       end
-      puts `cn update #{user}`
+      system "cn update", @@user
+      puts "Remote #{@@repo} pulled.".grn
     end
 
 
