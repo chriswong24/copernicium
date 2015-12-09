@@ -67,6 +67,18 @@ class CoperniciumWorkspaceTest < Minitest::Test
       File.read('2.txt').must_equal '2_1'
     end
 
+    it 'can checkout a entire branch and switch files' do
+      drive "branch new"
+      File.write('1.txt', '1_1_1_1')
+      File.write('2.txt', '2_2_2_2')
+      drive "commit -m new"
+      File.read('1.txt').must_equal '1_1_1_1'
+      File.read('2.txt').must_equal '2_2_2_2'
+      drive "branch master"
+      File.read('1.txt').must_equal '1_2'
+      File.read('2.txt').must_equal '2_1'
+    end
+
     it 'can check the status of the workspace' do
       File.delete('2.txt')
       File.write('1.txt', 'edit')

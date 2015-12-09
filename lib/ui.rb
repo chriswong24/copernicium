@@ -168,9 +168,12 @@ module Copernicium
       elsif Repos.has_branch? branch # switch branch (branch <branch name>)
         Repos.update_branch branch
         puts "Current: ".grn + Repos.current
+        Workspace.checkout
 
       else # create it, switch to it
         Repos.create_branch branch
+        Repos.update_branch branch
+        Workspace.checkout
       end
     end
 
