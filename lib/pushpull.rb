@@ -144,8 +144,7 @@ module Copernicium
         end # ssh
 
         PushPull.connect do |ssh|
-          ssh.exec! "cd #{@@path}"
-          puts ssh.exec! "cn update #{@@user}"
+          puts ssh.exec! "cd #{@@path} && cn update #{@@user}"
         end
       rescue => error
         connection_failure "trying to push files", error
