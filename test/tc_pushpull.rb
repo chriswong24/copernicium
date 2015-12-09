@@ -10,15 +10,16 @@ include Copernicium::PushPull
 class TestPushPullModule < Minitest::Test
   describe 'Copernicium PushPull' do
     before 'connecting to host, define constants' do
-      @filename = 'copernicium'
-      File.write(@filename, 'hello')
+      @remotefile = '/u/jwarn10/testfile'
+      @filename = 'testfile'
+      File.write(@filename, 'world')
       #@host = 'cycle2.csug.rochester.edu'
       #@user = 'ftamburr'
       @host = 'cycle3.csug.rochester.edu:/u/jwarn10/testing'
       @user = 'jwarn10'
-      @comm = UIComm.new(repo: @host, opts: @user, rev: 'master')
-      setup = UIComm.new(repo: @host, opts: @user, rev: 'master')
-      setup.command = 'test'
+      @comm = UIComm.new repo: @host, opts: @user, rev: 'master'
+      setup = UIComm.new repo: @host, opts: @user,
+                         rev: 'master', command: 'test'
       PushPull.UICommandParser setup
     end
 
@@ -49,24 +50,32 @@ class TestPushPullModule < Minitest::Test
 
     it 'can move files to remote servers for push' do
       (PushPull.transfer do |session|
-        session.upload!(@filename, '/localdisk/' + @filename)
+        session.upload! @filename, @remotefile
       end).must_equal true
 
       PushPull.connect do |ssh|
-        yes = ssh.exec! "test -e /localdisk/#{@filename} && echo 'exists'"
-        yes.must_equal "exists\n"
+        yes = ssh.exec! "test -e '#{@remotefile}' && echo -n exists"
+        yes.must_equal "exists"
       end
     end
 
     it 'can fetch files from a server for pull' do
-      PushPull.connect do |ssh|
-        ssh.exec! "touch /localdisk/#{@filename}"
-      end
       File.delete(@filename) if File.exist? @filename
+      content = 'hello hello'
+      PushPull.connect do |ssh|
+        ssh.exec! "rm #{@remotefile}"
+        ssh.exec! "echo -n #{content} > #{@remotefile}"
+      end
+
       (PushPull.fetch do |scp|
-        scp.download! "/localdisk/#{@filename}", @filename
-        File.read(@filename).must_equal 'hello'
+        scp.download! @remotefile, @filename
       end).must_equal true
+
+      File.read(@filename).must_equal content
+
+      PushPull.connect do |ssh|
+        ssh.exec! "rm #{@remotefile}"
+      end
     end
   end
 end
