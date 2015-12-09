@@ -15,8 +15,8 @@ class TestPushPullModule < Minitest::Test
       File.write(@filename, 'world')
       #@host = 'cycle2.csug.rochester.edu'
       #@user = 'ftamburr'
-      @host = 'cycle3.csug.rochester.edu:/u/jwarn10/testing'
-      #@host = '/u/jwarn10/testing'
+      #@host = 'cycle3.csug.rochester.edu:/u/jwarn10/testing'
+      @host = '/u/jwarn10/testing'
       @user = 'jwarn10'
       @comm = UIComm.new repo: @host, opts: @user, rev: 'master'
       setup = UIComm.new repo: @host, opts: @user,
@@ -27,10 +27,24 @@ class TestPushPullModule < Minitest::Test
     after 'running each test, clean up' do
       File.delete(@filename) if File.exist? @filename
       FileUtils.rm_rf "testing" if Dir.exist? 'testing'
+      FileUtils.rm_rf ".cn" if Dir.exist? '.cn'
     end
 
     it 'can clone a remote cn repo locally' do
       @comm.command = 'clone'
+      (PushPull.UICommandParser @comm).must_equal true
+       File.read('testing/world').must_equal "hello\n"
+    end
+
+    it 'can push to a remote' do
+      Workspace.create_project
+      @comm.command = 'push'
+      (PushPull.UICommandParser @comm).must_equal true
+    end
+
+    it 'can pull from a remote' do
+      Workspace.create_project
+      @comm.command = 'pull'
       (PushPull.UICommandParser @comm).must_equal true
     end
 

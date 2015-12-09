@@ -101,9 +101,8 @@ module Copernicium
       if block.nil? # we are cloning a repo in this section of code
         begin
           Net::SCP.start(@@host, @@user) do |scp|
-            scp.download!(@@path, local, :recursive => true)
+            scp.download! @@path, local, :recursive => true
           end
-          true
         rescue # no ssh keys are setup, die
           connection_failure 'trying to copy a file'
         end
@@ -111,11 +110,11 @@ module Copernicium
       else # fetch more than one file or folder
         begin
           Net::SCP.start(@@host, @@user) { |scp| yield scp }
-          true
         rescue
           connection_failure "trying to fetch files"
         end
       end
+      true
     end
 
     # Function: push()
@@ -127,23 +126,28 @@ module Copernicium
     # branch: the branch that we are pushing to
     # user: the user to connect as
     def PushPull.push
-      transfer do |ssh|
-        # uploading our history to remote
-        ssh.upload!("#{Dir.pwd}/.cn/history",
-                        "#{@@path}/.cn/merging_#{@@user}")
+      begin
+        transfer do |ssh|
+          # uploading our history to remote
+          ssh.upload!("#{Dir.pwd}/.cn/history",
+                      "#{@@path}/.cn/merging_#{@@user}")
 
-        # uploading our .cn info to remote
-        %w{revs snap}.each do |file|
-          ssh.upload!("#{Dir.pwd}/.cn/#{file}/",
-                          "#{@@path}/.cn/#{file}/",
-                          :recursive => true)
+          # uploading our .cn info to remote
+          %w{revs snap}.each do |file|
+            ssh.upload!("#{Dir.pwd}/.cn/#{file}/",
+                        "#{@@path}/.cn/#{file}/",
+                        :recursive => true)
+          end
+        end # ssh
+
+        connect do |ssh|
+          ssh.exec! "cd #{@@path}"
+          puts ssh.exec! "cn update #{@@user}"
         end
-      end # ssh
-
-      connect do |ssh|
-        ssh.exec!("cd #{@@path}")
-        puts ssh.exec!("cn update #{@@user}")
+      rescue
+        connection_failure "trying to push files"
       end
+      true
     end
 
 
@@ -156,20 +160,25 @@ module Copernicium
     # branch: the branch that we are pushing to
     # user: the user to connect as
     def PushPull.pull
-      fetch do |session|
-        # uploading our history to remote
-        session.download!("#{@@path}/.cn/merging_#{@@user}",
-                          "#{Dir.pwd}/.cn/history")
+      begin
+        fetch do |session|
+          # uploading our history to remote
+          session.download!("#{@@path}/.cn/merging_#{@@user}",
+                            "#{Dir.pwd}/.cn/history")
 
-        # uploading our .cn info to remote
-        %w{revs snap}.each do |file|
-          session.download!("#{@@path}/.cn/#{file}",
-                            "#{Dir.pwd}/.cn/#{file}",
-                            :recursive => true)
+          # uploading our .cn info to remote
+          %w{revs snap}.each do |file|
+            session.download!("#{@@path}/.cn/#{file}",
+                              "#{Dir.pwd}/.cn/#{file}",
+                              :recursive => true)
+          end
         end
+        system "cn update", @@user
+        puts "Remote pulled: ".grn + @@host + @@path
+      rescue
+        connection_failure "trying to pull files"
       end
-      system "cn update", @@user
-      puts "Remote #{@@repo} pulled.".grn
+      true
     end
 
 
