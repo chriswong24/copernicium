@@ -172,54 +172,34 @@ module Copernicium
       end
     end
 
-    def push(args)
-      # Command usage is:
-      #   cn push <user> <repo.host:/dir/of/repo> <branch-name>
-      #
-      # If username not given, get it from the user.
-      user = args[0]
-      if user.nil?
-        user = get "username for push"
-        # Make sure username is the first arg, since PushPull is expecting this.
-        args << user
-      end
-
-      remote = args[1]
-      remote = get "remote path to push to (format: <repo.host:/dir/of/repo>)" if remote.nil?
-
-      branchname = args[2]
-      branchname = get "remote branch to push to" if branchname.nil?
-
-      comm = UIComm.new(command: 'push', opts: args, repo: remote, rev: branchname)
-      # Do the push
+    def clone(args)
+      user = args.first
+      host = args.last
+      user = get "username for push" if user.nil?
+      host = get "host path (<host:/dir/of/repo>)" if host.nil?
+      comm = UIComm.new(command: 'clone', opts: user, repo: host)
       PushPull.UICommandParser(comm)
+      return comm
+    end
 
-      comm
+    def push(args)
+      user = args.first
+      host = args.last
+      user = get "username for push" if user.nil?
+      host = get "host path (<host:/dir/of/repo>)" if host.nil?
+      comm = UIComm.new(command: 'push', opts: user, repo: host)
+      PushPull.UICommandParser(comm)
+      return comm
     end
 
     def pull(args)
-      # Command usage is:
-      #   cn pull <user> <repo.host:/dir/of/repo> <branch-name>
-      #
-      # If username not given, get it from the user.
-      user = args[0]
-      if user.nil?
-        user = get "username for pull"
-        # Make sure username is the first arg, since PushPull is expecting this.
-        args << user
-      end
-
-      remote = args[1]
-      remote = get "remote path to pull from (format: <repo.host:/dir/of/repo>)" if remote.nil?
-
-      branchname = args[2]
-      branchname = get "remote branch to pull from" if branchname.nil?
-
-      comm = UIComm.new(command: 'pull', opts: args, repo: remote, rev: branchname)
-      # Do the pull
+      user = args.first
+      host = args.last
+      user = get "username for push" if user.nil?
+      host = get "host path (<host:/dir/of/repo>)" if host.nil?
+      comm = UIComm.new(command: 'pull', opts: user, repo: host)
       PushPull.UICommandParser(comm)
-
-      comm
+      return comm
     end
 
     # Take in a revision (snaptshot) id or branch
@@ -249,19 +229,6 @@ module Copernicium
       ui = UIComm.new(command: 'clean', files: args)
       Workspace.clean(ui)
       ui
-    end
-
-    # usage: cn clone <user> <repo.host:/dir/of/repo>
-    def clone(args)
-      user = args.shift
-      user = get "username for clone" if user.nil?
-
-      repo = args.first
-      repo = get "url to clone (format: <repo.host:/dir/of/repo>)" if repo.nil?
-
-      comm = UIComm.new(command: 'clone', opts: user, repo: repo)
-      PushPull.UICommandParser(comm)
-      comm
     end
 
     def commit(args)
