@@ -1,7 +1,7 @@
 # user interface module - parse and execute commands
 # integrates all modules, central module
 
-VERSION = "0.1.5"
+VERSION = "0.2"
 
 include Copernicium::PushPull
 
