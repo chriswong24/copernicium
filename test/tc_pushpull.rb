@@ -5,6 +5,7 @@
 
 require_relative 'test_helper'
 
+#include Copernicium::Driver
 include Copernicium::PushPull
 
 class TestPushPullModule < Minitest::Test

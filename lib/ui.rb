@@ -21,11 +21,12 @@ module Copernicium
     end
   end
 
+
   # todo - consider refactoring some UIComm usage
   # main driver for the command line user interface
   module Driver
-    include PushPull # needed for syncing with remote branch
     include Workspace # needed for most high level commands
+    include PushPull # needed for syncing with remote branch
     # Executes the required action for a given user command.
     #
     # Parameters:
