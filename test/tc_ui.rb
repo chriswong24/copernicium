@@ -18,13 +18,15 @@ class TestUI < Minitest::Test
       Driver.run str.split
     end
 
-    def ui_test_helper(comm, cmd, files=nil, rev=nil, msg=nil, repo=nil)
-      comm.must_be_instance_of UIComm
-      comm.command.must_equal cmd
-      comm.files.must_equal files
-      comm.rev.must_equal rev
-      comm.cmt_msg.must_equal msg
-      comm.repo.must_equal repo
+    before 'testing the driver ui' do
+      drive 'cn init'
+      @user = 'jwarn10'
+      @host = '/u/jwarn10/testing'
+    end
+
+    after 'testing the driver ui' do
+      FileUtils.rm_rf "testing" if Dir.exist? 'testing'
+      FileUtils.rm_rf ".cn" if Dir.exist? '.cn'
     end
 
     it "supports 'init' command" do
@@ -68,30 +70,23 @@ class TestUI < Minitest::Test
     end
 
     it "supports 'merge' command" do
+      Driver.run %w{commit -m a commit message}
       Driver.run %w{branch -c branch1}
       Driver.run %w{branch -c branch2}
       Driver.run %w{merge branch1}
     end
 
-    # Format: cn clone <user> <repo.host:/dir/of/repo>
-    # todo make cloning work haha
     it "supports 'clone' command" do
-      host = "jwarn10@cycle1.csug.rochester.edu"
-      comm = drive "clone " + host
-      #ui_test_helper(comm, "clone", nil, nil, nil, host)
+      Driver.run ["clone", @user, @host]
     end
 
-=begin
     it "supports 'pull' command" do
-      comm = Driver.run ["pull"]
-      ui_test_helper(comm, "pull")
+       Driver.run ["pull", @user, @host]
     end
 
     it "supports 'push' command" do
-      comm = Driver.run ["push"]
-      ui_test_helper(comm, "push")
+      Driver.run ["push", @user, @host]
     end
-=end
   end
 end
 

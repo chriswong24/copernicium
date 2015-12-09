@@ -176,7 +176,7 @@ module Copernicium
       user = args.first
       host = args.last
       user = get "username for push" if user.nil?
-      host = get "host path (<host:/dir/of/repo>)" if host.nil?
+      host = get "host path (<host:/dir/of/repo>)" if host.nil? || user == host
       comm = UIComm.new(command: 'clone', opts: user, repo: host)
       PushPull.UICommandParser(comm)
       return comm
