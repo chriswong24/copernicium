@@ -284,7 +284,7 @@ module Copernicium
       else
         username = args.first
       end
-      Repos.update(UIComm.new(command: 'update', ops: username))
+      Repos.update(UIComm.new(command: 'update', opts: username))
     end
   end # Driver
 end # Copernicium
