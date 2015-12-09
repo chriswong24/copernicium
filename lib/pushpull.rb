@@ -164,8 +164,8 @@ module Copernicium
       begin
         PushPull.fetch do |session|
           # uploading our history to remote
-          session.download!( "#{Dir.pwd}/.cn/history",
-                            "#{@@path}/.cn/merging_#{@@user}")
+          session.download!( "#{@@path}/.cn/history",
+                            "#{Dir.pwd}/.cn/merging_#{@@user}")
 
           # uploading our .cn info to remote
           %w{revs snap}.each do |file|
