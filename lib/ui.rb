@@ -3,6 +3,8 @@
 
 VERSION = "0.1.3"
 
+include Copernicium::PushPull
+
 module Copernicium
   # Communication object that will pass commands to backend modules
   # also used in unit test to make sure command is being parsed ok
@@ -21,12 +23,10 @@ module Copernicium
     end
   end
 
-
-  # todo - consider refactoring some UIComm usage
   # main driver for the command line user interface
   module Driver
     include Workspace # needed for most high level commands
-    include PushPull # needed for syncing with remote branch
+    include PushPull # needed for most high level commands
     # Executes the required action for a given user command.
     #
     # Parameters:
@@ -55,7 +55,7 @@ module Copernicium
       if cmd == 'init'
         noroot?? init(args) : puts(IN_REPO_WARNING.yel, getroot)
       elsif cmd == 'clone' # allow cloning a new repo
-          clone args
+          clonecn args
       elsif noroot? # if not in a repo, warn them, tell how to create
         puts NO_REPO_WARNING.yel
       else # now, assume we are in a copernicum project
@@ -174,7 +174,7 @@ module Copernicium
       end
     end
 
-    def clone(args)
+    def clonecn(args)
       user = args.first
       host = args.last
       user = get "username for push" if user.nil?

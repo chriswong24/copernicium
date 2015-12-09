@@ -31,11 +31,11 @@ module Copernicium
       @@user = comm.opts
       case comm.command
       when "clone"
-        PushPull.clone
+        PushPull.pclone
       when "push"
-        PushPull.push
+        PushPull.ppush
       when "pull"
-        PushPull.pull
+        PushPull.ppull
       when 'test'
         # avoid error while doing unit testing
       else
@@ -74,7 +74,7 @@ module Copernicium
     #
     # Description:
     #   Grabs a repository from a remote server
-    def PushPull.clone
+    def PushPull.pclone
       begin
         PushPull.fetch
       rescue => error
@@ -124,11 +124,11 @@ module Copernicium
     end
 
 
-    # Function: push()
+    # Function: ppush()
     #
     # Description:
     #   pushes local changes on the current branch to a remote branch
-    def PushPull.push
+    def PushPull.ppush
       begin
         PushPull.transfer do |ssh|
           # uploading our history to remote
@@ -154,12 +154,12 @@ module Copernicium
     end
 
 
-    # Function: pull()
+    # Function: ppull()
     #
     # Description:
     #   pulls remote changes to the current branch from remote branch
     #
-    def PushPull.pull
+    def PushPull.ppull
       begin
         PushPull.fetch do |session|
           # uploading our history to remote
