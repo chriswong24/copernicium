@@ -263,38 +263,55 @@ module Copernicium
       update_history
     end
 
+    # only append commits that arent already in there
+    # thus - the order is not the same, but that is ok
+    # bc each snapshot in our repo is atomic, not diffed
+    # snap here is the id of a specific commit id
+    # todo - optionally sort these by timestamp, sync
+    def Repos.merge_history(branch, hist)
+      hist.each do |snap|
+        @@history[branch] << snap unless @@history[branch].include? snap
+      end
+    end
+
     # FOR PUSHPULL UPDATE
+    # - give a comm with username hist to merge
     def Repos.update(comm = UIComm.new)
-      merge_name = File.join(@@copn, 'merging_'+comm.opts)
+      merge_name = File.join(@@copn, 'merging_' + comm.opts)
       status = "Remote is either up-to-date or ahead of local"
 
       if File.exist?(merge_name)
-        merger = YAML.load File.read(merge_name)
+        branches = YAML.load File.read(merge_name)
 
-        # merge @@history with merger hash
-        merger.each do |key, val|
-          if @@history.keys.include? key
-            val.each_with_index do |snap, index|
-              if @@history[key][index].nil?
-                @@history[key] += val[index..-1]
-                status = "Updated remote successfully"
-              elsif @@history[key][index] == snap
-                next
-              elsif @@history[key][index] != snap
-                @@history[key] += val[index..-1]
+        # merge @@history with remote hash
+        branches.each do |branch, hist|
+          if Repos.has_branch? branch
+            hist.each_with_index do |snap, i|
+
+              # merger hist length is longer than ours
+              if @@history[branch][i].nil?
+                status = "Updated successfully"
+                Repos.merge_history branch, hist
+                break
+
+              # merger hist diverged from our system
+              elsif @@history[branch][i] != snap
                 status = "Merged remote history with local"
+                Repos.merge_history branch, hist
+                break
               end
-            end
-          else
-            @@history[key] = val
+            end # will exit cleanly if we are more up-to-date
+          else # branch does not exist locally yet, copy
+            @@history[branch] = hist
           end
         end
 
+        puts 'Result: '.grn + status
         File.delete(merge_name)
         update_history
-        puts status
+        return status
       else
-        puts 'Error updating: '.red + merge_name + 'doesnt exist.'
+        puts 'Error updating: '.red + merge_name + ' does not exist.'
       end
     end # update
   end # Repos

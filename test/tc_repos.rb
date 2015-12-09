@@ -114,6 +114,35 @@ class TestCnReposModule < Minitest::Test
       newer = @@branch
       newer.must_equal 'hello'
     end
+
+    it 'can merge two histories' do
+      Repos.make_snapshot([@file1, @file2])
+      Repos.make_snapshot([@file2, @file3])
+      newer = @@history
+      branch = 'tester'
+      newer[branch] = newer['master'] << 'new-commit'
+      newer['master'] << 'other-commit'
+      comm = UIComm.new opts: branch
+      (Repos.update comm).must_equal "Updated successfully"
+      @@history['master'].must_equal newer['master']
+      @@history[branch].must_equal newer[branch]
+    end
+
+    it 'can merge two conflicting histories' do
+      Repos.make_snapshot([@file1, @file2])
+      Repos.make_snapshot([@file2, @file3])
+      newer = @@history
+      branch = 'tester'
+      newer[branch] = ['new-commit']
+      newer['master'] = ['other-commit']
+      comm = UIComm.new opts: branch
+      Repos.update comm
+
+      @@history['master'].must_equal newer['master']
+      @@history['master'].length.must_equal 3
+      @@history[branch].must_equal newer[branch]
+      @@history[branch].length.must_equal 1
+    end
   end
 end
 
