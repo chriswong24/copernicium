@@ -11,7 +11,6 @@
 
 
 module Copernicium
-  include Workspace
   module PushPull
     def PushPull.UICommandParser(comm)
       # handle parsing out remote info

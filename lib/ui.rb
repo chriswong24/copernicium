@@ -24,6 +24,7 @@ module Copernicium
   # todo - consider refactoring some UIComm usage
   # main driver for the command line user interface
   module Driver
+    include PushPull # needed for syncing with remote branch
     include Workspace # needed for most high level commands
     # Executes the required action for a given user command.
     #
@@ -177,7 +178,7 @@ module Copernicium
       host = args.last
       user = get "username for push" if user.nil?
       host = get "host path (<host:/dir/of/repo>)" if host.nil? || user == host
-      comm = UIComm.new(command: 'clone', opts: user, repo: host)
+      comm = UIComm.new(command: 'clone', repo: host, opts: user)
       PushPull.UICommandParser(comm)
       return comm
     end
@@ -187,7 +188,7 @@ module Copernicium
       host = args.last
       user = get "username for push" if user.nil?
       host = get "host path (<host:/dir/of/repo>)" if host.nil? || user == host
-      comm = UIComm.new(command: 'push', opts: user, repo: host)
+      comm = UIComm.new(command: 'push', repo: host, opts: user)
       PushPull.UICommandParser(comm)
       return comm
     end
@@ -197,7 +198,7 @@ module Copernicium
       host = args.last
       user = get "username for push" if user.nil?
       host = get "host path (<host:/dir/of/repo>)" if host.nil? || user == host
-      comm = UIComm.new(command: 'pull', opts: user, repo: host)
+      comm = UIComm.new(command: 'pull', repo: host, opts: user)
       PushPull.UICommandParser(comm)
       return comm
     end

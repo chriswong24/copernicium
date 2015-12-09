@@ -16,11 +16,10 @@ class TestPushPullModule < Minitest::Test
       #@host = 'cycle2.csug.rochester.edu'
       #@user = 'ftamburr'
       #@host = 'cycle3.csug.rochester.edu:/u/jwarn10/testing'
-      @host = '/u/jwarn10/testing'
+      @host = '/u/jwarn10/testing/'
       @user = 'jwarn10'
-      @comm = UIComm.new repo: @host, opts: @user, rev: 'master'
-      setup = UIComm.new repo: @host, opts: @user,
-                         rev: 'master', command: 'test'
+      @comm = UIComm.new repo: @host, opts: @user
+      setup = UIComm.new repo: @host, opts: @user, command: 'test'
       PushPull.UICommandParser setup
     end
 
@@ -33,7 +32,7 @@ class TestPushPullModule < Minitest::Test
     it 'can clone a remote cn repo locally' do
       @comm.command = 'clone'
       (PushPull.UICommandParser @comm).must_equal true
-       File.read('testing/world').must_equal "hello\n"
+      File.read('testing/world').must_equal "hello\n"
     end
 
     it 'can push to a remote' do
