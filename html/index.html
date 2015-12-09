@@ -115,28 +115,46 @@ src="https://codeclimate.com/github/jeremywrnr/copernicium/badges/gpa.svg"></a><
 
 <pre>$ [sudo] gem install copernicium</pre>
 
-<h3 id="label-development">development<span><a href="#label-development">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-cn+usage">cn usage<span><a href="#label-cn+usage">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>First, clone this repository:</p>
+<h5 id="label-starting+out">starting out<span><a href="#label-starting+out">&para;</a> <a href="#top">&uarr;</a></span></h5>
 
-<pre>$ git clone https://github.com/jeremywrnr/copernicium.git</pre>
+<pre>init - create a new repository
+status - check repo status
+history - show repo commits
+help - show more commands</pre>
 
-<p>To install all runtime and testing dependencies, run:</p>
+<h5 id="label-commands">commands<span><a href="#label-commands">&para;</a> <a href="#top">&uarr;</a></span></h5>
 
-<pre>$ [sudo] gem install rake
-$ rake setup</pre>
+<pre>clean [files] [commit/branch]
+commit [files] -m &lt;message&gt;
+checkout &lt;commit id&gt; [files]
+branch [opt] [branch]
+  -r | rename current branch
+  -c | create a new branch
+  -d | delete a branch
+merge &lt;branch name&gt;
+clone &lt;remote url&gt;
+push &lt;remote user&gt;
+pull &lt;remote user&gt;</pre>
 
-<p>To run the entire test suite, run <code>rake test</code>. To run a specific
-test suite:</p>
+<h5 id="label-options">options<span><a href="#label-options">&para;</a> <a href="#top">&uarr;</a></span></h5>
 
-<pre>$ rake test[pushpull]</pre>
+<pre>-v: print version
+-h: show help</pre>
 
-<p>To show information about each module&#39;s tests, and branches commits,
-run:</p>
+<p>Note: <code>[optional] &lt;required&gt;</code></p>
 
-<pre>$ rake info</pre>
+<h3 id="label-troubleshooting">troubleshooting<span><a href="#label-troubleshooting">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<h3 id="label-Setting+up+SSH+keys">Setting up SSH keys<span><a href="#label-Setting+up+SSH+keys">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<p>If you are having trouble installing <a
+href="Copernicium.html">Copernicium</a> as a ruby gem, you can try the
+following to install it in a PATH folder where you have write access. For
+example, this will install cn in ~/bin:</p>
+
+<pre>$ gem install copernicium -n~/bin</pre>
+
+<h3 id="label-ssh+keys">ssh keys<span><a href="#label-ssh+keys">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p>If SSH keys are not setup, you will be required to provide a user and
 password for each use of the push, pull and clone methods. In order to
@@ -162,6 +180,27 @@ file and add the contents of the public key to a line:</p>
 
 <p>You should now be able to use the push, pull, and origin functions using
 only the username.</p>
+
+<h3 id="label-development">development<span><a href="#label-development">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>First, clone this repository:</p>
+
+<pre>$ git clone https://github.com/jeremywrnr/copernicium.git</pre>
+
+<p>To install all runtime and testing dependencies, run:</p>
+
+<pre>$ [sudo] gem install rake
+$ rake setup</pre>
+
+<p>To run the entire test suite, run <code>rake test</code>. To run a specific
+test suite:</p>
+
+<pre>$ rake test[pushpull]</pre>
+
+<p>To show information about each module&#39;s tests, and branches commits,
+run:</p>
+
+<pre>$ rake info</pre>
 
 <h3 id="label-relevant+links-3A">relevant links:<span><a href="#label-relevant+links-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>

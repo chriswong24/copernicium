@@ -74,8 +74,6 @@
 
   <ul class="link-list" role="directory">
     
-    <li ><a href="#method-c-branches">::branches</a>
-    
     <li ><a href="#method-c-delete_branch">::delete_branch</a>
     
     <li ><a href="#method-c-delete_snapshot">::delete_snapshot</a>
@@ -84,11 +82,13 @@
     
     <li ><a href="#method-c-diffset">::diffset</a>
     
+    <li ><a href="#method-c-get_branch">::get_branch</a>
+    
     <li ><a href="#method-c-get_snapshot">::get_snapshot</a>
     
-    <li ><a href="#method-c-has_snapshots-3F">::has_snapshots?</a>
+    <li ><a href="#method-c-has_branch-3F">::has_branch?</a>
     
-    <li ><a href="#method-c-hash_array">::hash_array</a>
+    <li ><a href="#method-c-has_snapshots-3F">::has_snapshots?</a>
     
     <li ><a href="#method-c-hasher">::hasher</a>
     
@@ -102,15 +102,25 @@
     
     <li ><a href="#method-c-setup">::setup</a>
     
+    <li ><a href="#method-c-setup_tester">::setup_tester</a>
+    
+    <li ><a href="#method-c-update">::update</a>
+    
     <li ><a href="#method-c-update_branch">::update_branch</a>
+    
+    <li ><a href="#method-c-update_history">::update_history</a>
     
     <li ><a href="#method-c-update_snap">::update_snap</a>
     
+    <li ><a href="#method-i-branches">#branches</a>
+    
     <li ><a href="#method-i-current">#current</a>
     
-    <li ><a href="#method-i-readFile">#readFile</a>
+    <li ><a href="#method-i-current_files">#current_files</a>
     
-    <li ><a href="#method-i-writeFile">#writeFile</a>
+    <li ><a href="#method-i-current_head">#current_head</a>
+    
+    <li ><a href="#method-i-current_snaps">#current_snaps</a>
     
   </ul>
 </div>
@@ -146,39 +156,6 @@
        </header>
 
     
-      <div id="method-c-branches" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">branches</span><span
-            class="method-args">()</span>
-          
-          <span class="method-click-advice">click to toggle source</span>
-          
-        </div>
-        
-
-        <div class="method-description">
-          
-          <p>Return string array of what branches we have</p>
-          
-          
-
-          
-          <div class="method-source-code" id="branches-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 104</span>
-<span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">branches</span>
-  <span class="ruby-identifier">@@branches</span>.<span class="ruby-identifier">keys</span>
-<span class="ruby-keyword">end</span></pre>
-          </div>
-          
-        </div>
-
-        
-
-        
-      </div>
-
-    
       <div id="method-c-delete_branch" class="method-detail ">
         
         <div class="method-heading">
@@ -192,15 +169,16 @@
 
         <div class="method-description">
           
-          
+          <p>todo - also delete snapshots unique to this branch</p>
           
           
 
           
           <div class="method-source-code" id="delete_branch-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 232</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 261</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">delete_branch</span>(<span class="ruby-identifier">branch</span>)
-  <span class="ruby-identifier">@@branches</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">branch</span>)
+  <span class="ruby-identifier">@@history</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">branch</span>)
+  <span class="ruby-identifier">update_history</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -233,8 +211,9 @@
           <div class="method-source-code" id="delete_snapshot-source">
             <pre><span class="ruby-comment"># File lib/repos.rb, line 163</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">delete_snapshot</span>(<span class="ruby-identifier">id</span>)
-  <span class="ruby-identifier">@@branches</span>[<span class="ruby-identifier">@@branch</span>].<span class="ruby-identifier">delete_if</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">id</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">id</span> }
-  <span class="ruby-identifier">update_snap</span>
+  <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">@@branch</span>].<span class="ruby-identifier">delete_if</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">id</span> }
+  <span class="ruby-constant">File</span>.<span class="ruby-identifier">delete</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@snap</span>, <span class="ruby-identifier">id</span>)
+  <span class="ruby-identifier">update_history</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -270,7 +249,7 @@ differences in between the files by calling RevLogs diffy.</p>
 
           
           <div class="method-source-code" id="diff_snapshots-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 171</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 172</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">diff_snapshots</span>(<span class="ruby-identifier">id1</span>, <span class="ruby-identifier">id2</span>)
   <span class="ruby-identifier">new_files</span> = []
   <span class="ruby-identifier">conflicts</span> = []
@@ -293,8 +272,8 @@ differences in between the files by calling RevLogs diffy.</p>
       <span class="ruby-identifier">id2</span> = <span class="ruby-identifier">files2</span>[<span class="ruby-identifier">f2_index</span>].<span class="ruby-identifier">last</span>
 
       <span class="ruby-comment"># get file contents</span>
-      <span class="ruby-identifier">content1</span> = <span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">id1</span>)
-      <span class="ruby-identifier">content2</span> = <span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">id2</span>)
+      <span class="ruby-identifier">content1</span> = <span class="ruby-constant">RevLog</span>.<span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">id1</span>)
+      <span class="ruby-identifier">content2</span> = <span class="ruby-constant">RevLog</span>.<span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">id2</span>)
 
       <span class="ruby-comment"># check if the file content for each path is the same</span>
       <span class="ruby-keyword">if</span> <span class="ruby-identifier">content1</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">content2</span>
@@ -340,9 +319,45 @@ differences in between the files by calling RevLogs diffy.</p>
 
           
           <div class="method-source-code" id="diffset-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 213</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 214</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">diffset</span>(<span class="ruby-identifier">array1</span>, <span class="ruby-identifier">array2</span>)
   <span class="ruby-identifier">array1</span>.<span class="ruby-identifier">select</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-operator">!</span><span class="ruby-identifier">array2</span>.<span class="ruby-identifier">any?</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">y</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">y</span> } }
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-c-get_branch" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">get_branch</span><span
+            class="method-args">(branch)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>From the branch names, get the history, ant build the array of snapshots
+This is different than the history branch which just contains ids</p>
+          
+          
+
+          
+          <div class="method-source-code" id="get_branch-source">
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 254</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">get_branch</span>(<span class="ruby-identifier">branch</span>)
+  <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">history</span>(<span class="ruby-identifier">branch</span>).<span class="ruby-identifier">inject</span>([]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hist</span>, <span class="ruby-identifier">snapid</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">hist</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">get_snapshot</span>(<span class="ruby-identifier">snapid</span>)
+  <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -373,15 +388,48 @@ differences in between the files by calling RevLogs diffy.</p>
 
           
           <div class="method-source-code" id="get_snapshot-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 141</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 152</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">get_snapshot</span>(<span class="ruby-identifier">id</span>)
-  <span class="ruby-identifier">@@branches</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">br</span><span class="ruby-operator">|</span>
-    <span class="ruby-identifier">@@branches</span>[<span class="ruby-identifier">br</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">sn</span><span class="ruby-operator">|</span>
-      <span class="ruby-keyword">return</span> <span class="ruby-identifier">sn</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">sn</span>.<span class="ruby-identifier">id</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">id</span>
+  <span class="ruby-identifier">@@history</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">branch</span>, <span class="ruby-identifier">snapids</span><span class="ruby-operator">|</span>
+    <span class="ruby-identifier">snapids</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">snapid</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword">return</span> <span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load_file</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@snap</span>, <span class="ruby-identifier">id</span>)) <span class="ruby-keyword">if</span> <span class="ruby-identifier">snapid</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">id</span>
     <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">end</span>
 
-  <span class="ruby-identifier">raise</span> <span class="ruby-string">&quot;Snapshot not found in this repo.&quot;</span>
+  <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Repos: snapshot #{id} not found in this repo.&quot;</span>.<span class="ruby-identifier">red</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-c-has_branch-3F" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">has_branch?</span><span
+            class="method-args">(branch)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>check whether a specific branch exists</p>
+          
+          
+
+          
+          <div class="method-source-code" id="has_branch-3F-source">
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 88</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">has_branch?</span>(<span class="ruby-identifier">branch</span>)
+  <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">branches</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">branch</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -406,48 +454,15 @@ differences in between the files by calling RevLogs diffy.</p>
 
         <div class="method-description">
           
-          <p>check if any snapshots exist, if not exit</p>
+          <p>check if any snapshots exist for the current branch</p>
           
           
 
           
           <div class="method-source-code" id="has_snapshots-3F-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 90</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 93</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">has_snapshots?</span>
-  <span class="ruby-operator">!</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">history</span>(<span class="ruby-identifier">@@branch</span>).<span class="ruby-identifier">empty?</span>
-<span class="ruby-keyword">end</span></pre>
-          </div>
-          
-        </div>
-
-        
-
-        
-      </div>
-
-    
-      <div id="method-c-hash_array" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">hash_array</span><span
-            class="method-args">()</span>
-          
-          <span class="method-click-advice">click to toggle source</span>
-          
-        </div>
-        
-
-        <div class="method-description">
-          
-          
-          
-          
-
-          
-          <div class="method-source-code" id="hash_array-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 94</span>
-<span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">hash_array</span>
-  <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span> {[]}
+  <span class="ruby-keyword">not</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">history</span>(<span class="ruby-identifier">@@branch</span>).<span class="ruby-identifier">empty?</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -472,13 +487,13 @@ differences in between the files by calling RevLogs diffy.</p>
 
         <div class="method-description">
           
-          <p>returns the hash of an object</p>
+          <p>Return hash of an object</p>
           
           
 
           
           <div class="method-source-code" id="hasher-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 99</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 98</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">hasher</span>(<span class="ruby-identifier">obj</span>)
   <span class="ruby-constant">Digest</span><span class="ruby-operator">::</span><span class="ruby-constant">SHA256</span>.<span class="ruby-identifier">hexdigest</span> <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">obj</span>)
 <span class="ruby-keyword">end</span></pre>
@@ -511,15 +526,15 @@ differences in between the files by calling RevLogs diffy.</p>
 
           
           <div class="method-source-code" id="history-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 152</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 108</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">history</span>(<span class="ruby-identifier">branch</span> = <span class="ruby-keyword">nil</span>)
-  <span class="ruby-identifier">snapids</span> = []
-  <span class="ruby-keyword">if</span> <span class="ruby-identifier">branch</span>.<span class="ruby-identifier">nil?</span>
-    <span class="ruby-identifier">@@branches</span>[<span class="ruby-identifier">@@branch</span>].<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">snapids</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">id</span> }
-  <span class="ruby-keyword">elsif</span>
-    <span class="ruby-identifier">@@branches</span>[<span class="ruby-identifier">branch</span>].<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">snapids</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">id</span> }
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">branch</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-comment"># return a list of unique all commits</span>
+    (<span class="ruby-identifier">@@history</span>.<span class="ruby-identifier">inject</span>([]) { <span class="ruby-operator">|</span><span class="ruby-identifier">o</span>, <span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">last</span> }).<span class="ruby-identifier">uniq</span>
+  <span class="ruby-keyword">elsif</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">has_branch?</span> <span class="ruby-identifier">branch</span> <span class="ruby-comment"># just return the stored history</span>
+    <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">branch</span>]
+  <span class="ruby-keyword">else</span> <span class="ruby-comment"># no commits yet</span>
+    []
   <span class="ruby-keyword">end</span>
-  <span class="ruby-identifier">snapids</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -544,17 +559,20 @@ differences in between the files by calling RevLogs diffy.</p>
 
         <div class="method-description">
           
-          <p>Return hash ID of new branch</p>
+          <p>BRANCHING FUNCTIONALITY</p>
+
+<p>Create and return hash ID of new branch</p>
           
           
 
           
           <div class="method-source-code" id="make_branch-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 221</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 240</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">make_branch</span>(<span class="ruby-identifier">branch</span>)
-  <span class="ruby-identifier">@@branches</span>[<span class="ruby-identifier">branch</span>] = <span class="ruby-identifier">@@branches</span>[<span class="ruby-identifier">@@branch</span>]
+  <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">branch</span>] = <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">@@branch</span>].<span class="ruby-identifier">inject</span>([]) { <span class="ruby-operator">|</span><span class="ruby-identifier">n</span>, <span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">o</span> }
   <span class="ruby-identifier">@@branch</span> = <span class="ruby-identifier">branch</span>
-  <span class="ruby-identifier">hasher</span> <span class="ruby-identifier">@@branches</span>[<span class="ruby-identifier">branch</span>]
+  <span class="ruby-identifier">update_history</span>
+  <span class="ruby-identifier">hasher</span> <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">branch</span>]
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -570,7 +588,7 @@ differences in between the files by calling RevLogs diffy.</p>
         
         <div class="method-heading">
           <span class="method-name">make_snapshot</span><span
-            class="method-args">(files = [])</span>
+            class="method-args">(files = [], msg = 'nil')</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -579,20 +597,20 @@ differences in between the files by calling RevLogs diffy.</p>
 
         <div class="method-description">
           
-          <p>Create and return snapshot</p>
+          <p>Create and return snapshot id</p>
           
           
 
           
           <div class="method-source-code" id="make_snapshot-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 109</span>
-<span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">make_snapshot</span>(<span class="ruby-identifier">files</span> = [])
-  <span class="ruby-identifier">snap</span> = <span class="ruby-constant">Snapshot</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">files</span>)
-  <span class="ruby-identifier">snap</span>.<span class="ruby-identifier">id</span> = <span class="ruby-identifier">hasher</span> <span class="ruby-identifier">snap</span>
-  <span class="ruby-identifier">@@branches</span>[<span class="ruby-identifier">@@branch</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">snap</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 119</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">make_snapshot</span>(<span class="ruby-identifier">files</span> = [], <span class="ruby-identifier">msg</span> = <span class="ruby-string">&#39;nil&#39;</span>)
+  <span class="ruby-identifier">snap</span> = <span class="ruby-constant">Snapshot</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">files</span>, <span class="ruby-identifier">msg</span>)
+  <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">@@branch</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">snap</span>.<span class="ruby-identifier">id</span>
 
   <span class="ruby-comment"># Update snaps file</span>
-  <span class="ruby-identifier">update_snap</span>
+  <span class="ruby-identifier">update_snap</span> <span class="ruby-identifier">snap</span>
+  <span class="ruby-identifier">update_history</span>
   <span class="ruby-identifier">snap</span>.<span class="ruby-identifier">id</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
@@ -618,17 +636,17 @@ differences in between the files by calling RevLogs diffy.</p>
 
         <div class="method-description">
           
-          <p>todo - Check to make sure id is from a different branch Merge the target
-snapshot into HEAD snapshot of the current branch</p>
+          <p>Merge the target snapshot into HEAD snapshot of the current branch todo -
+Check to make sure id is from a different branch</p>
           
           
 
           
           <div class="method-source-code" id="merge_snapshot-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 126</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 137</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">merge_snapshot</span>(<span class="ruby-identifier">id</span>)
   <span class="ruby-comment"># run diff to get conflicts</span>
-  <span class="ruby-identifier">current</span> = <span class="ruby-identifier">@@branches</span>[<span class="ruby-identifier">@@branch</span>].<span class="ruby-identifier">last</span>
+  <span class="ruby-identifier">current</span> = <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">@@branch</span>].<span class="ruby-identifier">last</span>
   <span class="ruby-identifier">difference</span> = <span class="ruby-identifier">diff_snapshots</span>(<span class="ruby-identifier">current</span>.<span class="ruby-identifier">id</span>, <span class="ruby-identifier">id</span>)
   <span class="ruby-identifier">conflicts</span> = <span class="ruby-identifier">difference</span>[<span class="ruby-value">1</span>]
 
@@ -653,6 +671,48 @@ snapshot into HEAD snapshot of the current branch</p>
         
         <div class="method-heading">
           <span class="method-name">setup</span><span
+            class="method-args">(root = Dir.pwd)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>read in file of snapshot ids (.cn/history) check the current branch
+(.cn/branch)</p>
+          
+          
+
+          
+          <div class="method-source-code" id="setup-source">
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 56</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">setup</span>(<span class="ruby-identifier">root</span> = <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>)
+  <span class="ruby-identifier">@@copn</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">root</span>, <span class="ruby-string">&#39;.cn&#39;</span>)
+  <span class="ruby-identifier">@@snap</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@copn</span>, <span class="ruby-string">&#39;snap&#39;</span>)
+  <span class="ruby-identifier">@@head</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@copn</span>, <span class="ruby-string">&#39;branch&#39;</span>)
+  <span class="ruby-identifier">@@hist</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@copn</span>, <span class="ruby-string">&#39;history&#39;</span>)
+
+  <span class="ruby-comment"># read history from disk</span>
+  <span class="ruby-identifier">@@branch</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">@@head</span>)
+  <span class="ruby-identifier">@@history</span> = <span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">@@hist</span>)
+  <span class="ruby-identifier">@@brsnaps</span> = <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">get_branch</span> <span class="ruby-identifier">@@branch</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-c-setup_tester" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">setup_tester</span><span
             class="method-args">(root = Dir.pwd, branch = 'master')</span>
           
           <span class="method-click-advice">click to toggle source</span>
@@ -662,39 +722,91 @@ snapshot into HEAD snapshot of the current branch</p>
 
         <div class="method-description">
           
-          <p>check the current branch (.cn/branch) read in file of snapshots
-(.cn/history)</p>
+          <p>unit testing version - create folders for this code</p>
           
           
 
           
-          <div class="method-source-code" id="setup-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 46</span>
-<span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">setup</span>(<span class="ruby-identifier">root</span> = <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>, <span class="ruby-identifier">branch</span> = <span class="ruby-string">&#39;master&#39;</span>)
-  <span class="ruby-identifier">@@root</span> = <span class="ruby-identifier">root</span>
-  <span class="ruby-identifier">@@copn</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@root</span>, <span class="ruby-string">&#39;.cn&#39;</span>)
-  <span class="ruby-identifier">@@repo</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@copn</span>, <span class="ruby-string">&#39;repo&#39;</span>)
-  <span class="ruby-identifier">@@bpath</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@copn</span>, <span class="ruby-string">&#39;branch&#39;</span>)
-  <span class="ruby-identifier">@@spath</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@repo</span>, <span class="ruby-identifier">branch</span>)
+          <div class="method-source-code" id="setup_tester-source">
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 69</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">setup_tester</span>(<span class="ruby-identifier">root</span> = <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>, <span class="ruby-identifier">branch</span> = <span class="ruby-string">&#39;master&#39;</span>)
+  <span class="ruby-identifier">@@copn</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">root</span>, <span class="ruby-string">&#39;.cn&#39;</span>)
+  <span class="ruby-identifier">@@snap</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@copn</span>, <span class="ruby-string">&#39;snap&#39;</span>)
+  <span class="ruby-identifier">@@revs</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@copn</span>, <span class="ruby-string">&#39;revs&#39;</span>)
+  <span class="ruby-identifier">@@head</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@copn</span>, <span class="ruby-string">&#39;branch&#39;</span>)
+  <span class="ruby-identifier">@@hist</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@copn</span>, <span class="ruby-string">&#39;history&#39;</span>)
+
+  <span class="ruby-comment"># create folders for testing this module</span>
   <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">mkdir</span>(<span class="ruby-identifier">@@copn</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">@@copn</span>)
-  <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">mkdir</span>(<span class="ruby-identifier">@@repo</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">@@repo</span>)
+  <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">mkdir</span>(<span class="ruby-identifier">@@snap</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">@@snap</span>)
+  <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">mkdir</span>(<span class="ruby-identifier">@@revs</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">@@revs</span>)
 
-  <span class="ruby-comment"># check if files exist, read them</span>
-  <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">@@spath</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">@@bpath</span>)
-    <span class="ruby-identifier">@@branches</span> = <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span> <span class="ruby-identifier">readFile</span>(<span class="ruby-identifier">@@spath</span>)
-    <span class="ruby-identifier">@@branch</span> = <span class="ruby-identifier">readFile</span>(<span class="ruby-identifier">@@bpath</span>)
-  <span class="ruby-keyword">else</span> <span class="ruby-comment"># use defaults</span>
-    <span class="ruby-identifier">@@branches</span> = {<span class="ruby-identifier">branch</span> =<span class="ruby-operator">&gt;</span> []}
-    <span class="ruby-identifier">@@branch</span> = <span class="ruby-identifier">branch</span>
-  <span class="ruby-keyword">end</span>
+  <span class="ruby-comment"># default new</span>
+  <span class="ruby-identifier">@@branch</span> = <span class="ruby-identifier">branch</span>
+  <span class="ruby-identifier">@@history</span> = {<span class="ruby-identifier">branch</span> =<span class="ruby-operator">&gt;</span> []}
+  <span class="ruby-constant">RevLog</span>.<span class="ruby-identifier">setup</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
 
-  <span class="ruby-comment"># check if files exist, read them</span>
-  <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">@@spath</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">@@bpath</span>)
-    <span class="ruby-identifier">@@branches</span> = <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span> <span class="ruby-identifier">readFile</span>(<span class="ruby-identifier">@@spath</span>)
-    <span class="ruby-identifier">@@branch</span> = <span class="ruby-identifier">readFile</span>(<span class="ruby-identifier">@@bpath</span>)
-  <span class="ruby-keyword">else</span> <span class="ruby-comment"># use defaults</span>
-    <span class="ruby-identifier">@@branches</span> = {<span class="ruby-identifier">branch</span> =<span class="ruby-operator">&gt;</span> []}
-    <span class="ruby-identifier">@@branch</span> = <span class="ruby-identifier">branch</span>
+        
+
+        
+      </div>
+
+    
+      <div id="method-c-update" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">update</span><span
+            class="method-args">(comm = UIComm.new)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>FOR PUSHPULL UPDATE</p>
+          
+          
+
+          
+          <div class="method-source-code" id="update-source">
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 267</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">update</span>(<span class="ruby-identifier">comm</span> = <span class="ruby-constant">UIComm</span>.<span class="ruby-identifier">new</span>)
+  <span class="ruby-identifier">merge_name</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@copn</span>, <span class="ruby-string">&#39;merging_&#39;</span><span class="ruby-operator">+</span><span class="ruby-identifier">comm</span>.<span class="ruby-identifier">opts</span>)
+  <span class="ruby-identifier">status</span> = <span class="ruby-string">&quot;Remote is either up-to-date or ahead of local&quot;</span>
+
+  <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">merge_name</span>)
+    <span class="ruby-identifier">merger</span> = <span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">merge_name</span>)
+
+    <span class="ruby-comment"># merge @@history with merger hash</span>
+    <span class="ruby-identifier">merger</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">key</span>, <span class="ruby-identifier">val</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword">if</span> <span class="ruby-identifier">@@history</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">key</span>
+        <span class="ruby-identifier">val</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">snap</span>, <span class="ruby-identifier">index</span><span class="ruby-operator">|</span>
+          <span class="ruby-keyword">if</span> <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">key</span>][<span class="ruby-identifier">index</span>].<span class="ruby-identifier">nil?</span>
+            <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">key</span>] <span class="ruby-operator">+=</span> <span class="ruby-identifier">val</span>[<span class="ruby-identifier">index</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>]
+            <span class="ruby-identifier">status</span> = <span class="ruby-string">&quot;Updated remote successfully&quot;</span>
+          <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">key</span>][<span class="ruby-identifier">index</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">snap</span>
+            <span class="ruby-keyword">next</span>
+          <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">key</span>][<span class="ruby-identifier">index</span>] <span class="ruby-operator">!=</span> <span class="ruby-identifier">snap</span>
+            <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">key</span>] <span class="ruby-operator">+=</span> <span class="ruby-identifier">val</span>[<span class="ruby-identifier">index</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>]
+            <span class="ruby-identifier">status</span> = <span class="ruby-string">&quot;Merged remote history with local&quot;</span>
+          <span class="ruby-keyword">end</span>
+        <span class="ruby-keyword">end</span>
+      <span class="ruby-keyword">else</span>
+        <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">key</span>] = <span class="ruby-identifier">val</span>
+      <span class="ruby-keyword">end</span>
+    <span class="ruby-keyword">end</span>
+
+    <span class="ruby-constant">File</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">merge_name</span>)
+    <span class="ruby-identifier">update_history</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-identifier">status</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;Error updating: &#39;</span>.<span class="ruby-identifier">red</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">merge_name</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39;doesnt exist.&#39;</span>
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
@@ -726,10 +838,43 @@ snapshot into HEAD snapshot of the current branch</p>
 
           
           <div class="method-source-code" id="update_branch-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 227</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 247</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">update_branch</span>(<span class="ruby-identifier">branch</span>)
-  <span class="ruby-identifier">writeFile</span>(<span class="ruby-identifier">@@bpath</span>, <span class="ruby-identifier">branch</span>)
+  <span class="ruby-constant">File</span>.<span class="ruby-identifier">write</span>(<span class="ruby-identifier">@@head</span>, <span class="ruby-identifier">branch</span>)
   <span class="ruby-identifier">@@branch</span> = <span class="ruby-identifier">branch</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-c-update_history" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">update_history</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>helper to add snap to history</p>
+          
+          
+
+          
+          <div class="method-source-code" id="update_history-source">
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 103</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">update_history</span>
+  <span class="ruby-constant">File</span>.<span class="ruby-identifier">write</span> <span class="ruby-identifier">@@hist</span>, <span class="ruby-constant">YAML</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">@@history</span>) <span class="ruby-comment"># write history</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -745,7 +890,7 @@ snapshot into HEAD snapshot of the current branch</p>
         
         <div class="method-heading">
           <span class="method-name">update_snap</span><span
-            class="method-args">()</span>
+            class="method-args">(snap)</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -754,15 +899,16 @@ snapshot into HEAD snapshot of the current branch</p>
 
         <div class="method-description">
           
-          <p>helper to write a snapshot, saving a new commit</p>
+          <p>helper to write a snapshot, saving a new commit marshal serializes the
+class instance to a string</p>
           
           
 
           
           <div class="method-source-code" id="update_snap-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 120</span>
-<span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">update_snap</span>
-  <span class="ruby-identifier">writeFile</span> <span class="ruby-identifier">@@spath</span>, <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">@@branches</span>)
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 131</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">update_snap</span>(<span class="ruby-identifier">snap</span>)
+  <span class="ruby-constant">File</span>.<span class="ruby-identifier">write</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@snap</span>, <span class="ruby-identifier">snap</span>.<span class="ruby-identifier">id</span>), <span class="ruby-constant">YAML</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">snap</span>)
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -782,6 +928,37 @@ snapshot into HEAD snapshot of the current branch</p>
        </header>
 
     
+      <div id="method-i-branches" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">branches</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Return string array of what branches we have</p>
+          
+          
+
+          
+          <div class="method-source-code" id="branches-source">
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 234</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">branches</span>() <span class="ruby-identifier">@@history</span>.<span class="ruby-identifier">keys</span> <span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
       <div id="method-i-current" class="method-detail ">
         
         <div class="method-heading">
@@ -795,14 +972,16 @@ snapshot into HEAD snapshot of the current branch</p>
 
         <div class="method-description">
           
-          <p>BRANCHING</p>
+          <p>ADDITIONAL MODULE ACCESS INTERFACES</p>
+
+<p>return the current branch we are on now (string name)</p>
           
           
 
           
           <div class="method-source-code" id="current-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 218</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">current</span>() <span class="ruby-identifier">@@branches</span> <span class="ruby-keyword">end</span></pre>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 222</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">current</span>() <span class="ruby-identifier">@@branch</span> <span class="ruby-keyword">end</span></pre>
           </div>
           
         </div>
@@ -813,11 +992,11 @@ snapshot into HEAD snapshot of the current branch</p>
       </div>
 
     
-      <div id="method-i-readFile" class="method-detail ">
+      <div id="method-i-current_files" class="method-detail ">
         
         <div class="method-heading">
-          <span class="method-name">readFile</span><span
-            class="method-args">(path)</span>
+          <span class="method-name">current_files</span><span
+            class="method-args">()</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -826,19 +1005,14 @@ snapshot into HEAD snapshot of the current branch</p>
 
         <div class="method-description">
           
-          <p>helper methods for file IO</p>
+          <p>return the files in the latest snapshot</p>
           
           
 
           
-          <div class="method-source-code" id="readFile-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 82</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">readFile</span>(<span class="ruby-identifier">path</span>)
-  <span class="ruby-identifier">f</span> = <span class="ruby-identifier">open</span>(<span class="ruby-identifier">path</span>, <span class="ruby-string">&#39;r&#39;</span>)
-  <span class="ruby-identifier">txt</span> = <span class="ruby-identifier">f</span>.<span class="ruby-identifier">read</span>
-  <span class="ruby-identifier">f</span>.<span class="ruby-identifier">close</span>
-  <span class="ruby-identifier">txt</span>
-<span class="ruby-keyword">end</span></pre>
+          <div class="method-source-code" id="current_files-source">
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 231</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">current_files</span>() <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">has_snapshots?</span><span class="ruby-operator">?</span> <span class="ruby-identifier">@@brsnaps</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">files</span> <span class="ruby-operator">:</span> [] <span class="ruby-keyword">end</span></pre>
           </div>
           
         </div>
@@ -849,11 +1023,11 @@ snapshot into HEAD snapshot of the current branch</p>
       </div>
 
     
-      <div id="method-i-writeFile" class="method-detail ">
+      <div id="method-i-current_head" class="method-detail ">
         
         <div class="method-heading">
-          <span class="method-name">writeFile</span><span
-            class="method-args">(path, content)</span>
+          <span class="method-name">current_head</span><span
+            class="method-args">()</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -862,18 +1036,45 @@ snapshot into HEAD snapshot of the current branch</p>
 
         <div class="method-description">
           
-          <p>helper methods for file IO</p>
+          <p>return the snap id of branch head</p>
           
           
 
           
-          <div class="method-source-code" id="writeFile-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 75</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">writeFile</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">content</span>)
-  <span class="ruby-identifier">f</span> = <span class="ruby-identifier">open</span>(<span class="ruby-identifier">path</span>, <span class="ruby-string">&#39;w&#39;</span>)
-  <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-identifier">content</span>)
-  <span class="ruby-identifier">f</span>.<span class="ruby-identifier">close</span>
-<span class="ruby-keyword">end</span></pre>
+          <div class="method-source-code" id="current_head-source">
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 225</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">current_head</span>() <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">@@branch</span>].<span class="ruby-identifier">last</span> <span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-current_snaps" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">current_snaps</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>return the array of our branches snapshots</p>
+          
+          
+
+          
+          <div class="method-source-code" id="current_snaps-source">
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 228</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">current_snaps</span>() <span class="ruby-identifier">@@brsnaps</span> <span class="ruby-keyword">end</span></pre>
           </div>
           
         </div>

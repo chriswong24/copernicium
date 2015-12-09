@@ -57,19 +57,7 @@
     
     
     
-    <!-- Method Quickref -->
-<div id="method-list-section" class="nav-section">
-  <h3>Methods</h3>
-
-  <ul class="link-list" role="directory">
     
-    <li ><a href="#method-i-readFile">#readFile</a>
-    
-    <li ><a href="#method-i-writeFile">#writeFile</a>
-    
-  </ul>
-</div>
-
   </div>
 </nav>
 
@@ -99,6 +87,17 @@ hashed id</p>
 
 <p>merge: given two files, try to merge them in - file_id_1, file_id_2 out -
 success and merged file name/content, or failure and conflict</p>
+
+<p>Frank Tamburrino CSC 254 <a href="Copernicium/PushPull.html">PushPull</a>
+Module November 7, 2015</p>
+
+<p>How to use for Push, Pull and Clone:</p>
+
+<pre>Push - cn push &lt;user&gt; &lt;repo.host:/dir/of/repo&gt; &lt;branch-name&gt;
+Pull - cn pull &lt;user&gt; &lt;repo.host:/dir/of/repo&gt; &lt;branch-name&gt;
+Clone - cn clone &lt;user&gt; &lt;repo.host:/dir/of/repo&gt;</pre>
+
+<p>assumes that the user has ssh keys to the remote server setup</p>
 
 <p>make_snapshot: Creates new snapshot from current files and versions</p>
 
@@ -146,6 +145,9 @@ out - hash id of new branch</pre>
 <pre>in - branch name
 out - exit status code</pre>
 
+<p>note: @@history is a hash array of snapshot ids, which is saved as
+.cn/history to persist between calls to the copernicium tool</p>
+
 <p>workspace module - linfeng and qiguang</p>
 
   </section>
@@ -163,85 +165,6 @@ out - exit status code</pre>
     
 
     
-     <section id="public-instance-5Buntitled-5D-method-details" class="method-section">
-       <header>
-         <h3>Public Instance Methods</h3>
-       </header>
-
-    
-      <div id="method-i-readFile" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">readFile</span><span
-            class="method-args">(path)</span>
-          
-          <span class="method-click-advice">click to toggle source</span>
-          
-        </div>
-        
-
-        <div class="method-description">
-          
-          <p>helper methods for file IO</p>
-          
-          
-
-          
-          <div class="method-source-code" id="readFile-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 35</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">readFile</span>(<span class="ruby-identifier">path</span>)
-  <span class="ruby-identifier">f</span> = <span class="ruby-identifier">open</span>(<span class="ruby-identifier">path</span>, <span class="ruby-string">&#39;r&#39;</span>)
-  <span class="ruby-identifier">txt</span> = <span class="ruby-identifier">f</span>.<span class="ruby-identifier">read</span>
-  <span class="ruby-identifier">f</span>.<span class="ruby-identifier">close</span>
-  <span class="ruby-identifier">txt</span>
-<span class="ruby-keyword">end</span></pre>
-          </div>
-          
-        </div>
-
-        
-
-        
-      </div>
-
-    
-      <div id="method-i-writeFile" class="method-detail ">
-        
-        <div class="method-heading">
-          <span class="method-name">writeFile</span><span
-            class="method-args">(path, content)</span>
-          
-          <span class="method-click-advice">click to toggle source</span>
-          
-        </div>
-        
-
-        <div class="method-description">
-          
-          <p>helper methods for file IO</p>
-          
-          
-
-          
-          <div class="method-source-code" id="writeFile-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 28</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier">writeFile</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">content</span>)
-  <span class="ruby-identifier">f</span> = <span class="ruby-identifier">open</span>(<span class="ruby-identifier">path</span>, <span class="ruby-string">&#39;w&#39;</span>)
-  <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-identifier">content</span>)
-  <span class="ruby-identifier">f</span>.<span class="ruby-identifier">close</span>
-<span class="ruby-keyword">end</span></pre>
-          </div>
-          
-        </div>
-
-        
-
-        
-      </div>
-
-    
-    </section>
-  
   </section>
 </main>
 

@@ -30,8 +30,13 @@
     <ul>
       <li><a href="README_md.html#label-copernicium"><a href="https://en.wikipedia.org/wiki/Copernicium">copernicium</a></a>
       <li><a href="README_md.html#label-installation">installation</a>
+      <li><a href="README_md.html#label-cn+usage">cn usage</a>
+      <li><a href="README_md.html#label-starting+out">starting out</a>
+      <li><a href="README_md.html#label-commands">commands</a>
+      <li><a href="README_md.html#label-options">options</a>
+      <li><a href="README_md.html#label-troubleshooting">troubleshooting</a>
+      <li><a href="README_md.html#label-ssh+keys">ssh keys</a>
       <li><a href="README_md.html#label-development">development</a>
-      <li><a href="README_md.html#label-Setting+up+SSH+keys">Setting up SSH keys</a>
       <li><a href="README_md.html#label-relevant+links-3A">relevant links:</a>
     </ul>
   </li>
@@ -49,7 +54,7 @@
   <li class="class">
     <a href="Copernicium/FileObj.html">Copernicium::FileObj</a>
   </li>
-  <li class="class">
+  <li class="module">
     <a href="Copernicium/PushPull.html">Copernicium::PushPull</a>
   </li>
   <li class="module">
@@ -79,17 +84,22 @@
 <ul>
 
   <li class="method">
+    <a href="Copernicium/PushPull.html#method-c-UICommandParser">::UICommandParser</a>
+    &mdash;
+    <span class="container">Copernicium::PushPull</span>
+
+  <li class="method">
     <a href="Copernicium/RevLog.html#method-c-add_file">::add_file</a>
     &mdash;
     <span class="container">Copernicium::RevLog</span>
 
   <li class="method">
-    <a href="Copernicium/Repos.html#method-c-branches">::branches</a>
+    <a href="Copernicium/Workspace.html#method-c-checkout">::checkout</a>
     &mdash;
-    <span class="container">Copernicium::Repos</span>
+    <span class="container">Copernicium::Workspace</span>
 
   <li class="method">
-    <a href="Copernicium/Workspace.html#method-c-checkout">::checkout</a>
+    <a href="Copernicium/Workspace.html#method-c-checkout_file">::checkout_file</a>
     &mdash;
     <span class="container">Copernicium::Workspace</span>
 
@@ -107,6 +117,21 @@
     <a href="Copernicium/Workspace.html#method-c-commit">::commit</a>
     &mdash;
     <span class="container">Copernicium::Workspace</span>
+
+  <li class="method">
+    <a href="Copernicium/Workspace.html#method-c-commit_file">::commit_file</a>
+    &mdash;
+    <span class="container">Copernicium::Workspace</span>
+
+  <li class="method">
+    <a href="Copernicium/PushPull.html#method-c-connect">::connect</a>
+    &mdash;
+    <span class="container">Copernicium::PushPull</span>
+
+  <li class="method">
+    <a href="Copernicium/PushPull.html#method-c-connection_failure">::connection_failure</a>
+    &mdash;
+    <span class="container">Copernicium::PushPull</span>
 
   <li class="method">
     <a href="Copernicium/Workspace.html#method-c-create_project">::create_project</a>
@@ -144,6 +169,16 @@
     <span class="container">Copernicium::Repos</span>
 
   <li class="method">
+    <a href="Copernicium/PushPull.html#method-c-fetch">::fetch</a>
+    &mdash;
+    <span class="container">Copernicium::PushPull</span>
+
+  <li class="method">
+    <a href="Copernicium/Repos.html#method-c-get_branch">::get_branch</a>
+    &mdash;
+    <span class="container">Copernicium::Repos</span>
+
+  <li class="method">
     <a href="Copernicium/RevLog.html#method-c-get_file">::get_file</a>
     &mdash;
     <span class="container">Copernicium::RevLog</span>
@@ -154,12 +189,12 @@
     <span class="container">Copernicium::Repos</span>
 
   <li class="method">
-    <a href="Copernicium/Repos.html#method-c-has_snapshots-3F">::has_snapshots?</a>
+    <a href="Copernicium/Repos.html#method-c-has_branch-3F">::has_branch?</a>
     &mdash;
     <span class="container">Copernicium::Repos</span>
 
   <li class="method">
-    <a href="Copernicium/Repos.html#method-c-hash_array">::hash_array</a>
+    <a href="Copernicium/Repos.html#method-c-has_snapshots-3F">::has_snapshots?</a>
     &mdash;
     <span class="container">Copernicium::Repos</span>
 
@@ -174,19 +209,14 @@
     <span class="container">Copernicium::Repos</span>
 
   <li class="method">
-    <a href="Copernicium/RevLog.html#method-c-history">::history</a>
-    &mdash;
-    <span class="container">Copernicium::RevLog</span>
-
-  <li class="method">
     <a href="Copernicium/Repos.html#method-c-history">::history</a>
     &mdash;
     <span class="container">Copernicium::Repos</span>
 
   <li class="method">
-    <a href="Copernicium/Workspace.html#method-c-include-3F">::include?</a>
+    <a href="Copernicium/RevLog.html#method-c-history">::history</a>
     &mdash;
-    <span class="container">Copernicium::Workspace</span>
+    <span class="container">Copernicium::RevLog</span>
 
   <li class="method">
     <a href="Copernicium/Workspace.html#method-c-indexOf">::indexOf</a>
@@ -219,11 +249,6 @@
     <span class="container">Copernicium::Repos</span>
 
   <li class="method">
-    <a href="Copernicium/FileObj.html#method-c-new">::new</a>
-    &mdash;
-    <span class="container">Copernicium::FileObj</span>
-
-  <li class="method">
     <a href="Copernicium/Snapshot.html#method-c-new">::new</a>
     &mdash;
     <span class="container">Copernicium::Snapshot</span>
@@ -232,6 +257,26 @@
     <a href="Copernicium/UIComm.html#method-c-new">::new</a>
     &mdash;
     <span class="container">Copernicium::UIComm</span>
+
+  <li class="method">
+    <a href="Copernicium/FileObj.html#method-c-new">::new</a>
+    &mdash;
+    <span class="container">Copernicium::FileObj</span>
+
+  <li class="method">
+    <a href="Copernicium/PushPull.html#method-c-pclone">::pclone</a>
+    &mdash;
+    <span class="container">Copernicium::PushPull</span>
+
+  <li class="method">
+    <a href="Copernicium/PushPull.html#method-c-ppull">::ppull</a>
+    &mdash;
+    <span class="container">Copernicium::PushPull</span>
+
+  <li class="method">
+    <a href="Copernicium/PushPull.html#method-c-ppush">::ppush</a>
+    &mdash;
+    <span class="container">Copernicium::PushPull</span>
 
   <li class="method">
     <a href="Copernicium/Workspace.html#method-c-setup">::setup</a>
@@ -249,12 +294,37 @@
     <span class="container">Copernicium::RevLog</span>
 
   <li class="method">
+    <a href="Copernicium/RevLog.html#method-c-setup_tester">::setup_tester</a>
+    &mdash;
+    <span class="container">Copernicium::RevLog</span>
+
+  <li class="method">
+    <a href="Copernicium/Repos.html#method-c-setup_tester">::setup_tester</a>
+    &mdash;
+    <span class="container">Copernicium::Repos</span>
+
+  <li class="method">
     <a href="Copernicium/Workspace.html#method-c-status">::status</a>
     &mdash;
     <span class="container">Copernicium::Workspace</span>
 
   <li class="method">
+    <a href="Copernicium/PushPull.html#method-c-transfer">::transfer</a>
+    &mdash;
+    <span class="container">Copernicium::PushPull</span>
+
+  <li class="method">
+    <a href="Copernicium/Repos.html#method-c-update">::update</a>
+    &mdash;
+    <span class="container">Copernicium::Repos</span>
+
+  <li class="method">
     <a href="Copernicium/Repos.html#method-c-update_branch">::update_branch</a>
+    &mdash;
+    <span class="container">Copernicium::Repos</span>
+
+  <li class="method">
+    <a href="Copernicium/Repos.html#method-c-update_history">::update_history</a>
     &mdash;
     <span class="container">Copernicium::Repos</span>
 
@@ -269,7 +339,7 @@
     <span class="container">Copernicium::RevLog</span>
 
   <li class="method">
-    <a href="Copernicium/Workspace.html#method-c-ws_files">::ws_files</a>
+    <a href="Copernicium/Workspace.html#method-c-working_files">::working_files</a>
     &mdash;
     <span class="container">Copernicium::Workspace</span>
 
@@ -277,11 +347,6 @@
     <a href="Copernicium/FileObj.html#method-i-3D-3D">#==</a>
     &mdash;
     <span class="container">Copernicium::FileObj</span>
-
-  <li class="method">
-    <a href="Copernicium/PushPull.html#method-i-UICommandParser">#UICommandParser</a>
-    &mdash;
-    <span class="container">Copernicium::PushPull</span>
 
   <li class="method">
     <a href="String.html#method-i-blu">#blu</a>
@@ -294,6 +359,11 @@
     <span class="container">Copernicium::Driver</span>
 
   <li class="method">
+    <a href="Copernicium/Repos.html#method-i-branches">#branches</a>
+    &mdash;
+    <span class="container">Copernicium::Repos</span>
+
+  <li class="method">
     <a href="Copernicium/Driver.html#method-i-checkout">#checkout</a>
     &mdash;
     <span class="container">Copernicium::Driver</span>
@@ -304,14 +374,9 @@
     <span class="container">Copernicium::Driver</span>
 
   <li class="method">
-    <a href="Copernicium/Driver.html#method-i-clone">#clone</a>
+    <a href="Copernicium/Driver.html#method-i-clonecn">#clonecn</a>
     &mdash;
     <span class="container">Copernicium::Driver</span>
-
-  <li class="method">
-    <a href="Copernicium/PushPull.html#method-i-clone">#clone</a>
-    &mdash;
-    <span class="container">Copernicium::PushPull</span>
 
   <li class="method">
     <a href="String.html#method-i-colorize">#colorize</a>
@@ -324,11 +389,6 @@
     <span class="container">Copernicium::Driver</span>
 
   <li class="method">
-    <a href="Copernicium/PushPull.html#method-i-connect">#connect</a>
-    &mdash;
-    <span class="container">Copernicium::PushPull</span>
-
-  <li class="method">
     <a href="Copernicium/Driver.html#method-i-create_branch">#create_branch</a>
     &mdash;
     <span class="container">Copernicium::Driver</span>
@@ -339,9 +399,19 @@
     <span class="container">Copernicium::Repos</span>
 
   <li class="method">
-    <a href="Copernicium/PushPull.html#method-i-fetch">#fetch</a>
+    <a href="Copernicium/Repos.html#method-i-current_files">#current_files</a>
     &mdash;
-    <span class="container">Copernicium::PushPull</span>
+    <span class="container">Copernicium::Repos</span>
+
+  <li class="method">
+    <a href="Copernicium/Repos.html#method-i-current_head">#current_head</a>
+    &mdash;
+    <span class="container">Copernicium::Repos</span>
+
+  <li class="method">
+    <a href="Copernicium/Repos.html#method-i-current_snaps">#current_snaps</a>
+    &mdash;
+    <span class="container">Copernicium::Repos</span>
 
   <li class="method">
     <a href="Copernicium/Driver.html#method-i-get">#get</a>
@@ -374,11 +444,6 @@
     <span class="container">Copernicium::Driver</span>
 
   <li class="method">
-    <a href="Copernicium/Driver.html#method-i-isbranch-3F">#isbranch?</a>
-    &mdash;
-    <span class="container">Copernicium::Driver</span>
-
-  <li class="method">
     <a href="Copernicium/FileObj.html#method-i-last">#last</a>
     &mdash;
     <span class="container">Copernicium::FileObj</span>
@@ -404,34 +469,14 @@
     <span class="container">Copernicium::Driver</span>
 
   <li class="method">
-    <a href="Copernicium/PushPull.html#method-i-pull">#pull</a>
-    &mdash;
-    <span class="container">Copernicium::PushPull</span>
-
-  <li class="method">
     <a href="Copernicium/Driver.html#method-i-pull">#pull</a>
     &mdash;
     <span class="container">Copernicium::Driver</span>
 
   <li class="method">
-    <a href="Copernicium/PushPull.html#method-i-push">#push</a>
-    &mdash;
-    <span class="container">Copernicium::PushPull</span>
-
-  <li class="method">
     <a href="Copernicium/Driver.html#method-i-push">#push</a>
     &mdash;
     <span class="container">Copernicium::Driver</span>
-
-  <li class="method">
-    <a href="Copernicium/Repos.html#method-i-readFile">#readFile</a>
-    &mdash;
-    <span class="container">Copernicium::Repos</span>
-
-  <li class="method">
-    <a href="Copernicium.html#method-i-readFile">#readFile</a>
-    &mdash;
-    <span class="container">Copernicium</span>
 
   <li class="method">
     <a href="String.html#method-i-red">#red</a>
@@ -454,29 +499,24 @@
     <span class="container">Copernicium::Driver</span>
 
   <li class="method">
-    <a href="Copernicium/Driver.html#method-i-setup">#setup</a>
-    &mdash;
-    <span class="container">Copernicium::Driver</span>
-
-  <li class="method">
     <a href="Copernicium/Driver.html#method-i-status">#status</a>
     &mdash;
     <span class="container">Copernicium::Driver</span>
 
   <li class="method">
-    <a href="Copernicium/PushPull.html#method-i-transfer">#transfer</a>
+    <a href="Copernicium/Snapshot.html#method-i-time">#time</a>
     &mdash;
-    <span class="container">Copernicium::PushPull</span>
+    <span class="container">Copernicium::Snapshot</span>
 
   <li class="method">
-    <a href="Copernicium/Repos.html#method-i-writeFile">#writeFile</a>
+    <a href="String.html#method-i-ugn">#ugn</a>
     &mdash;
-    <span class="container">Copernicium::Repos</span>
+    <span class="container">String</span>
 
   <li class="method">
-    <a href="Copernicium.html#method-i-writeFile">#writeFile</a>
+    <a href="Copernicium/Driver.html#method-i-update">#update</a>
     &mdash;
-    <span class="container">Copernicium</span>
+    <span class="container">Copernicium::Driver</span>
 
   <li class="method">
     <a href="String.html#method-i-yel">#yel</a>
