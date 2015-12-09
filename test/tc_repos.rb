@@ -129,19 +129,19 @@ class TestCnReposModule < Minitest::Test
     end
 
     it 'can merge two conflicting histories' do
+      branch = 'tester'
       Repos.make_snapshot([@file1, @file2])
       Repos.make_snapshot([@file2, @file3])
       newer = @@history
-      branch = 'tester'
       newer[branch] = ['new-commit']
       newer['master'] = ['other-commit']
-      comm = UIComm.new opts: branch
-      Repos.update comm
-
-      @@history['master'].must_equal newer['master']
-      @@history['master'].length.must_equal 3
+      newfl = File.join('.cn', 'merging_' + branch)
+      File.write newfl, YAML.dump(newer)
+      Repos.update(UIComm.new opts: branch)
       @@history[branch].must_equal newer[branch]
       @@history[branch].length.must_equal 1
+      @@history['master'].must_equal newer['master']
+      @@history['master'].length.must_equal 3
     end
   end
 end
