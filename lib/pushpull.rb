@@ -25,9 +25,9 @@ module Copernicium
         @@path = remote[1]
       elsif remote.length == 1
         @@host = "cycle3.csug.rochester.edu"
-        @@path = remote[0].sub!(/^:/, '')
+        @@path = remote.first
       else
-        raise 'Remote host information not given'.red
+        raise 'Remote host information not given.'.red
       end
 
       @@user = comm.opts
@@ -46,9 +46,12 @@ module Copernicium
     end
 
     # tell user to set up their ssh keys
-    def connection_failure(str = '')
+    def PushPull.connection_failure(str = '')
       puts "Connection error while: ".red + str
       puts "Make sure SSH keys are setup.".yel
+      puts "User: ".yel + @@user
+      puts "Host: ".yel + @@host
+      puts "Path: ".yel + @@path
       false
     end
 
@@ -124,22 +127,22 @@ module Copernicium
     # branch: the branch that we are pushing to
     # user: the user to connect as
     def PushPull.push
-      transfer do |session|
+      transfer do |ssh|
         # uploading our history to remote
-        session.upload!("#{Dir.pwd}/.cn/history",
+        ssh.upload!("#{Dir.pwd}/.cn/history",
                         "#{@@path}/.cn/merging_#{@@user}")
 
         # uploading our .cn info to remote
         %w{revs snap}.each do |file|
-          session.upload!("#{Dir.pwd}/.cn/#{file}",
-                          "#{@@path}/.cn/#{file}",
+          ssh.upload!("#{Dir.pwd}/.cn/#{file}/",
+                          "#{@@path}/.cn/#{file}/",
                           :recursive => true)
         end
-      end # session
+      end # ssh
 
-      connect do |session|
-        session.exec!("cd #{@@path}")
-        puts session.exec!("cn update #{@@user}")
+      connect do |ssh|
+        ssh.exec!("cd #{@@path}")
+        puts ssh.exec!("cn update #{@@user}")
       end
     end
 

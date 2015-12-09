@@ -16,6 +16,7 @@ class TestPushPullModule < Minitest::Test
       #@host = 'cycle2.csug.rochester.edu'
       #@user = 'ftamburr'
       @host = 'cycle3.csug.rochester.edu:/u/jwarn10/testing'
+      #@host = '/u/jwarn10/testing'
       @user = 'jwarn10'
       @comm = UIComm.new repo: @host, opts: @user, rev: 'master'
       setup = UIComm.new repo: @host, opts: @user,
