@@ -27,17 +27,17 @@ Repository for Team Copernicium's DVCS.
 
 ##### commands
 
-    clean [files] [commit/branch]
-    commit [files] -m <message>
-    checkout <commit id> [files]
+    commit [files] <-m message>
     branch [opt] [branch]
       -r | rename current branch
       -c | create a new branch
       -d | delete a branch
-    merge <branch name>
-    clone <remote url>
-    push <remote user>
-    pull <remote user>
+    checkout <commit id> [files]
+    clean [files] [commit/branch]
+    clone <user> <remote url>
+    push <user> <remote url>
+    pull <user> <remote url>
+    merge <branch>
 
 ##### options
 
