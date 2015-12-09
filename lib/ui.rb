@@ -52,6 +52,8 @@ module Copernicium
       # create the cn project, else already in one
       if cmd == 'init'
         noroot?? init(args) : puts(IN_REPO_WARNING.yel, getroot)
+      elsif cmd == 'clone' # allow cloning a new repo
+          clone args
       elsif noroot? # if not in a repo, warn them, tell how to create
         puts NO_REPO_WARNING.yel
       else # now, assume we are in a copernicum project
@@ -67,8 +69,6 @@ module Copernicium
           branch args
         when 'clean'
           clean args
-        when 'clone'
-          clone args
         when 'commit'
           commit args
         when 'checkout'
