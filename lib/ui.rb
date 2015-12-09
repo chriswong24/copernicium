@@ -251,23 +251,16 @@ module Copernicium
       ui
     end
 
+    # usage: cn clone <user> <repo.host:/dir/of/repo>
     def clone(args)
-      # Command usage is:
-      #   cn clone <user> <repo.host:/dir/of/repo>
-      user = args.first
-      if user.nil?
-        user = get "username for clone"
-        # Make sure username is first arg, since PushPull is expecting this.
-        args << user
-      end
+      user = args.shift
+      user = get "username for clone" if user.nil?
 
-      repo = args[1]
-      repo = get "repo url to clone (format: <repo.host:/dir/of/repo>)" if repo.nil?
+      repo = args.first
+      repo = get "url to clone (format: <repo.host:/dir/of/repo>)" if repo.nil?
 
-      comm = UIComm.new(command: 'clone', opts: args, repo: repo)
-      # Do the clone
+      comm = UIComm.new(command: 'clone', opts: user, repo: repo)
       PushPull.UICommandParser(comm)
-
       comm
     end
 

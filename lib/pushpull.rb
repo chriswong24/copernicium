@@ -2,37 +2,61 @@
 # CSC 253
 # PushPull Module
 # November 6, 2015
-require_relative 'required'
+#
+# How to use for Push, Pull and Clone:
+#   Push - cn push <user> <repo.host:/dir/of/repo> <branch-name>
+#   Pull - cn pull <user> <repo.host:/dir/of/repo> <branch-name>
+#   Clone - cn clone <user> <repo.host:/dir/of/repo>
+# assumes that the user has ssh keys to the remote server setup
 
 module Copernicium
-  # How to use for Push, Pull and Clone:
-  #   Push - cn push <user> <repo.host:/dir/of/repo> <branch-name>
-  #   Pull - cn pull <user> <repo.host:/dir/of/repo> <branch-name>
-  #   Clone - cn clone <user> <repo.host:/dir/of/repo>
   include Workspace
-  class UIComm
-  end
-
   module PushPull
-    # Chris's edit
-    # Takes in Ethan's UICommandCommunicator object and calls
-  # a method based on the command
-    #
     # Fields in UIComm and what they are for me:
     #   @opts - user
     #   @repo - repo.host:/path/to/repo
+    #   @repo - :/path/to/repo
     #   @rev - branch name
-    def PushPull.UICommandParser(ui_comm)
-      case ui_comm.command
+    def PushPull.UICommandParser(comm)
+      # handle parsing out remote info
+      remote = comm.repo.split(':')
+      if remote.length == 2
+         @@host = remote[0]
+         @@path = remote[1]
+      elsif remote.length == 1
+         @@host = "cycle3.csug.rochester.edu"
+         @@path = remote[0].sub!(/^:/, '')
+      else
+        raise 'Remote host information not given'.red
+      end
+
+      @@user = comm.opts
+      case comm.command
       when "clone"
-        clone(ui_comm.repo, ui_comm.opts.first)
+        clone
       when "push"
-        push(ui_comm.repo, ui_comm.rev, ui_comm.opts.first)
+        push
       when "pull"
-        pull(ui_comm.repo, ui_comm.rev, ui_comm.opts.first)
+        pull
       else
         raise "Error: Invalid command supplied to PushPull".red
       end
+    end
+
+    # execute commands on the server
+    def execute(commands)
+      Net::SSH.start(@@repo, @@user) do |ssh|
+        commands.each do |command|
+          puts ssh.exec!(command)
+        end
+      end
+    end
+
+    # tell user to set up their ssh keys
+    def connection_failure(str = '')
+      puts "Connection error while: ".red + str
+      puts "Make sure ssh keys are setup.".yel
+      return false
     end
 
     # Function: connect()
@@ -43,58 +67,13 @@ module Copernicium
     #
     # remote: the remote server, formatted "my.server"
     # user: the user to connect as
-    def PushPull.connect(remote, user, &block)
-      exit_code = false
-      puts 'inside PushPull connect'.blu
-      if(block.nil?)
-        begin
-          puts 'inside PushPull connect nil block path'.grn
-        Net::SSH.start(remote, user) do |ssh|
-            puts ssh.exec!("echo Successful Connection!")
-            exit_code = true
-          end
-        rescue
-          begin
-            print "Username for remote repo?: "
-            user = (STDIN.readline).strip
-
-            print "Password for #{user}: "
-            passwd = (STDIN.noecho(&:gets)).strip
-            puts
-
-            Net::SSH.start(remote, user, :password => passwd) do |ssh|
-              puts ssh.exec!("echo Successful Connection!")
-              exit_code = true
-            end
-          rescue
-            raise "Unsuccessful Connection".red
-          end
-        end
-      else
-        begin
-          Net::SSH.start(remote, user) do |ssh|
-            yield ssh
-          end
-          exit_code = true
-        rescue
-          begin
-            print "Username for remote repo: "
-            user = (STDIN.readline).strip
-
-            print "Password for #{user}: "
-            passwd = (STDIN.noecho(&:gets)).strip
-            puts
-
-            Net::SSH.start(remote, user, :password => passwd) do |ssh|
-              yield ssh
-            end
-            exit_code = true
-          rescue
-            raise "Unable to execute command!".red
-          end
-        end
+    def PushPull.connect
+      begin
+        Net::SCP.start(@@host, @@user) { |scp| yield scp }
+        true
+      rescue
+        connection_failure 'trying to execute a command'
       end
-      return exit_code
     end
 
     # Function: transfer()
@@ -104,28 +83,12 @@ module Copernicium
     #
     # remote: the remote server and directory to pull from, formatted "my.server"
     # user: the user to connect as
-    def PushPull.transfer(remote, user, &block)
+    def PushPull.transfer
       begin
-        Net::SCP.start(remote, user) do |scp|
-          yield scp
-        end
-        return true
+        Net::SCP.start(remote, @@user) { |scp| yield scp }
+        true
       rescue
-        begin
-          print "Username for remote repo: "
-          user = (STDIN.readline).strip
-
-          print "Password for #{user}: "
-          passwd = (STDIN.noecho(&:gets)).strip
-          puts
-          
-          Net::SCP.start(remote, user, :passwd => passwd) do |scp|
-            yield scp
-          end
-          return true
-        rescue
-          raise "Unable to upload file!".red
-        end
+        connection_failure 'trying to upload a file'
       end
     end
 
@@ -138,56 +101,27 @@ module Copernicium
     # dest: what we want of the branch, not needed for blocked calls
     # local: where we want to put the file, not needed for blocked calls
     # user: the user to connect as
-    def PushPull.fetch(remote, dest, local, user, &block)
-      exit_code = false
-      if(block.nil?)
+    def PushPull.fetch(local = Dir.pwd, &block)
+      if block.nil? # we are cloning a repo in this section of code
         begin
-          Net::SCP.start(remote, user) do |scp|
-            scp.download!(dest, local, :recursive => true)
+          puts '<' + @@host + '>'
+          puts '<' + @@user + '>'
+          Net::SCP.start(@@host, @@user) do |scp|
+            scp.download!(@@path, local, :recursive => true)
           end
-          exit_code = true
-        rescue
-          begin
-            print "Username for remote repo: "
-            user = (STDIN.readline).strip
-
-            print "Password for #{user}: "
-            passwd = (STDIN.noecho(&:gets)).strip
-            puts
-
-            Net::SCP.start(remote, user, :password => passwd) do |scp|
-              scp.download!(dest, local, :recursive => true)
-            end
-            exit_code = true
-          rescue
-            raise "Unable to fetch file(s)!".red
-          end
+          true
+        rescue # no ssh keys are setup, die
+          connection_failure 'trying to copy a file'
         end
-      else
+
+      else # fetch more than one file or folder
         begin
-          Net::SCP.start(remote, user) do |scp|
-            yield scp
-          end
-          exit_code = true
+          Net::SCP.start(@@host, @@user) { |scp| yield scp }
+          true
         rescue
-          begin
-            print "Username for remote repo: "
-            user = (STDIN.readline).strip
-
-            print "Password for #{user}: "
-            passwd = (STDIN.noecho(&:gets)).strip
-            puts
-
-            Net::SCP.start(remote, user, :password => passwd) do |scp|
-              yield scp
-            end
-            exit_code = true
-          rescue
-            raise "Unable to fetch file(s)!".red
-          end
+          connection_failure "trying to fetch files"
         end
       end
-      return exit_code
     end
 
     # Function: push()
@@ -198,26 +132,19 @@ module Copernicium
     # remote: the remote server and directory to push to, formatted "my.server:/the/location/we/want"
     # branch: the branch that we are pushing to
     # user: the user to connect as
-    def PushPull.push(remote, branch, user)
-      dest = remote.split(':')
-      if(dest.length != 2)
-        dest = dest.insert(0, "cycle3.csug.rochester.edu")
+    def PushPull.push
+      transfer do |session|
+        session.upload!("#{Dir.pwd}/.cn/revs", "#{dest[1]}/.cn/revs", :recursive => true)
+        session.upload!("#{Dir.pwd}/.cn/snap", "#{dest[1]}/.cn/snap", :recursive => true)
+        session.upload!("#{Dir.pwd}/.cn/history", "#{dest[1]}/.cn/merging_#{@@user}", :recursive => true)
       end
-      if(!Dir.exists?('.cn'))
-      	puts 'failed to push to remote, not an initialized Copernicium repo'
-      	return nil
+
+      connect do |session|
+        session.exec!("cd #{dest[1]}")
+        puts session.exec!("cn update #{@@user}")
       end
-      transfer(dest[0], user) do |session|
-      	session.upload!("#{Dir.pwd}/.cn/revs", "#{dest[1]}/.cn/revs", :recursive => true)
-      	session.upload!("#{Dir.pwd}/.cn/snap", "#{dest[1]}/.cn/snap", :recursive => true)
-      	session.upload!("#{Dir.pwd}/.cn/history", "#{dest[1]}/.cn/merging_#{user}", :recursive => true)
-      end
-      connect(dest[0], user) do |session|
-      	session.exec!("cd #{dest[1]}")
-      	result = session.exec!("cn update #{user}")
-      end
-      puts result
     end
+
 
     # Function: pull()
     #
@@ -227,22 +154,15 @@ module Copernicium
     # remote: the remote server and directory to push to, formatted "my.server:/the/location/we/want"
     # branch: the branch that we are pushing to
     # user: the user to connect as
-    def PushPull.pull(remote, branch, user)
-      dest = remote.split(':')
-      if(dest.length != 2)
-        dest = dest.insert(0, "cycle3.csug.rochester.edu")
+    def PushPull.pull
+      fetch(dest[0], nil, nil, @@user) do |session|
+        session.download!("#{dest[1]}/.cn/revs", "#{Dir.pwd}/.cn/revs", :recursive => true)
+        session.download!("#{dest[1]}/.cn/snap", "#{Dir.pwd}/.cn/snap", :recursive => true)
+        session.download!("#{dest[1]}/.cn/history", "#{Dir.pwd}/.cn/merging_#{@@user}", :recursive => true)
       end
-      if(!Dir.exists?('.cn'))
-      	puts 'failed to push to remote, not an initialized Copernicium repo'
-      	return nil
-      end
-      fetch(dest[0], nil, nil, user) do |session|
-      	session.download!("#{dest[1]}/.cn/revs", "#{Dir.pwd}/.cn/revs", :recursive => true)
-      	session.download!("#{dest[1]}/.cn/snap", "#{Dir.pwd}/.cn/snap", :recursive => true)
-      	session.download!("#{dest[1]}/.cn/history", "#{Dir.pwd}/.cn/merging_#{user}", :recursive => true)
-  	  end
-  	  system "cn update #{user}"
+      puts `cn update #{user}`
     end
+
 
     # Function: clone()
     #
@@ -251,20 +171,12 @@ module Copernicium
     #
     # remote: the remote server and directory to push to, formatted "my.server:/the/location/we/want"
     # user: the user to connect as
-    def PushPull.clone(remote, user = nil)
-      exit_code = false
-      dest = remote.split(':')
-      if(dest.length != 2)
-        dest = dest.insert(0, "cycle3.csug.rochester.edu")
-      end
+    def PushPull.clone
       begin
-        fetch(dest[0], dest[1], Dir.pwd, user)
-        exit_code = true
+        PushPull.fetch
       rescue
-        puts "Failed to clone the remote branch!".red
+        connection_failure 'trying to clone a repo'
       end
-
-      return exit_code
     end
   end
 end

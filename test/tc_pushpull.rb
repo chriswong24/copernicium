@@ -12,17 +12,23 @@ class TestPushPullModule < Minitest::Test
     before 'connecting to host, define constants' do
       #@host = 'cycle2.csug.rochester.edu'
       #@user = 'ftamburr'
-      @host = 'cycle3.csug.rochester.edu'
-      @user = 'ftamburr'
-      puts
+      @host = 'cycle3.csug.rochester.edu:/u/jwarn10/testing'
+      @user = 'jwarn10'
+      @comm = UIComm.new(repo: @host, opts: @user, rev: 'master')
     end
 
-    # todo - add testing for UI parser
+    it 'can clone a remote cn repo locally' do
+       @comm.command = 'clone'
+       (PushPull.UICommandParser @comm).must_equal true
+    end
 
+=begin
     # test for a good connection and a bad connection
     it 'is able to connect to a remote computer' do
       puts 'testing connection'.yel
-      conn = PushPull.connect(@host, @user)
+      conn = PushPull.connect(@host, @user) do |ssh|
+            puts ssh.exec!("echo Successful Connection!")
+          end
       conn.must_equal true
     end
 
@@ -68,6 +74,7 @@ class TestPushPullModule < Minitest::Test
       end
       result.must_equal true
     end
+=end
   end
 end
 

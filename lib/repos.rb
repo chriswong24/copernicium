@@ -289,13 +289,14 @@ module Copernicium
             @@history[key] = val
           end
         end
+
         File.delete(merge_name)
         update_history
         puts status
+      else
+        puts 'Error updating: '.red + merge_name + 'doesnt exist.'
       end
-    else
-      puts 'Error updating: '.red + merge_name + 'doesnt exist.'
-    end
+    end # update
   end # Repos
 end # Copernicium
 
