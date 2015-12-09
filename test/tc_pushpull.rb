@@ -13,7 +13,7 @@ class TestPushPullModule < Minitest::Test
       #@host = 'cycle2.csug.rochester.edu'
       #@user = 'ftamburr'
       @host = 'cycle3.csug.rochester.edu'
-      @user = 'jwarn10'
+      @user = 'ftamburr'
       puts
     end
 
@@ -35,10 +35,10 @@ class TestPushPullModule < Minitest::Test
     end
 
     it 'can move files to remote servers for push' do
-      tfile = File.new('comm_t.copernicium', 'w')
+      tfile = File.new('.copernicium', 'w')
       tfile.close
-      test = PushPull.transfer(@host, @user) do |scp|
-        scp.upload!('./comm_t.copernicium', '/localdisk/comm_t.copernicium', :recursive => true)
+      test = PushPull.transfer(@host, @user) do |session|
+        session.upload!(".copernicium", '/localdisk/.copernicium')
       end
       File.delete('comm_t.copernicium')
       PushPull.connect(@host, @user) do |x|
