@@ -26,14 +26,12 @@ class CoperniciumWorkspaceTest < Minitest::Test
       FileUtils.rm_rf('workspace')
     end
 
-    # todo this test is not robust. fix
     it 'can commit a list of files' do
       File.write('1.txt', '1_1_1')
       Workspace.commit(UIComm.new(files: ['1.txt']))
       File.read('1.txt').must_equal '1_1_1'
     end
 
-    # todo this test is not robust. fix
     it 'can commit a entire workspace' do
       File.write('1.txt','1_1')
       File.write('2.txt','2_2')
@@ -42,8 +40,6 @@ class CoperniciumWorkspaceTest < Minitest::Test
       File.read('2.txt').must_equal '2_2'
     end
 
-=begin
-    # nah, it actually cant do that
     it 'can checkout a list of files' do
       File.write('1.txt','none')
       File.write('2.txt','none')
@@ -51,7 +47,6 @@ class CoperniciumWorkspaceTest < Minitest::Test
       File.read('1.txt').must_equal '1_2'
       File.read('2.txt').must_equal 'none'
     end
-=end
 
     it 'can checkout a entire branch' do
       drive "branch -c new"
@@ -118,6 +113,18 @@ class CoperniciumWorkspaceTest < Minitest::Test
       Workspace.clean UIComm.new(rev: @second)
       File.read('1.txt').must_equal '1_2'
       File.read('2.txt').must_equal '2_1'
+    end
+
+    it 'can create files while switching branches' do
+      drive "branch -c new"
+      drive "branch new"
+      File.write('3.txt', '3')
+      Workspace.commit
+      File.delete('3.txt')
+      drive "branch master"
+      File.exist?('3.txt').must_equal false
+      drive "branch new"
+      File.read('3.txt').must_equal '3'
     end
   end
 end
