@@ -266,7 +266,8 @@ module Copernicium
     # FOR PUSHPULL UPDATE
     def Repos.update(comm = UIComm.new)
       merge_name = File.join(@@copn,'merging_',comm.ops)
-      
+      status = "Remote is either up-to-date or ahead of local"
+
       if File.exist?(merge_name)
         merger = YAML.load File.read(merge_name)
 
@@ -276,10 +277,12 @@ module Copernicium
             val.each_with_index do |snap, index|
               if @@history[key][index].nil?
                 @@history[key] += val[index..-1]
+                status = "Updated remote successfully"
               elsif @@history[key][index] == snap
                 next
               elsif @@history[key][index] != snap
                 @@history[key] += val[index..-1]
+                status = "Merged remote history with local"
               end
             end
           else
@@ -288,6 +291,7 @@ module Copernicium
         end
         File.delete(merge_name)
         update_history
+        puts status
       end
     else
       puts 'Error updating: '.red + merge_name + 'doesnt exist.'
