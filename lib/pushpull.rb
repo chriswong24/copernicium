@@ -146,6 +146,7 @@ module Copernicium
 
         PushPull.connect do |ssh|
           puts ssh.exec! "cd #{@@path} && cn update #{@@user}"
+          puts ssh.exec! "cd #{@@path} && cn checkout head"
         end
       rescue => error
         connection_failure "trying to push files", error
@@ -174,6 +175,7 @@ module Copernicium
           end
         end
         system "cn update", @@user
+        system "cn checkout head"
         puts "Remote pulled: ".grn + @@host + @@path
       rescue => error
         connection_failure "trying to pull files", error
