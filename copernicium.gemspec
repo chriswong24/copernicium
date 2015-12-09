@@ -1,6 +1,6 @@
 Gem::Specification.new do |g|
   g.name        = 'copernicium'
-  g.version     = '0.1.2'
+  g.version     = '0.1.3'
   g.date        = '2015-12-08'
   g.summary     = 'Simple DVCS in Ruby.'
   g.description = 'A simple distributed version control system written in Ruby.'

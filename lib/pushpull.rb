@@ -9,23 +9,22 @@
 #   Clone - cn clone <user> <repo.host:/dir/of/repo>
 # assumes that the user has ssh keys to the remote server setup
 
+
 module Copernicium
   include Workspace
   module PushPull
-    # Fields in UIComm and what they are for me:
-    #   @opts - user
-    #   @repo - repo.host:/path/to/repo
-    #   @repo - :/path/to/repo
-    #   @rev - branch name
     def PushPull.UICommandParser(comm)
       # handle parsing out remote info
+      #   @opts - user
+      #   @repo - repo.host:/path/to/repo
+      #        OR /path/to/repo
       remote = comm.repo.split(':')
       if remote.length == 2
-        @@host = remote[0].strip
-        @@path = remote[1].strip
+        @@host = remote[0]
+        @@path = remote[1]
       elsif remote.length == 1
         @@host = "cycle3.csug.rochester.edu"
-        @@path = remote.first.strip
+        @@path = remote.first
       else
         raise 'Remote host information not given.'.red
       end
@@ -60,25 +59,33 @@ module Copernicium
     # Description:
     #   a net/ssh wrapper, if given a block will execute block on server,
     #   otherwise tests connection.
-    #
-    # remote: the remote server, formatted "my.server"
-    # user: the user to connect as
     def PushPull.connect
       begin
-        Net::SSH.start(@@host, @@user) { |scp| yield scp }
+        Net::SSH.start(@@host, @@user) { |ssh| yield ssh }
         true
       rescue
         connection_failure 'trying to execute a command'
       end
     end
 
+
+    # Function: clone()
+    #
+    # Description:
+    #   Grabs a repository from a remote server
+    def PushPull.clone
+      begin
+        PushPull.fetch
+      rescue
+        connection_failure 'trying to clone a repo'
+      end
+    end
+
+
     # Function: transfer()
     #
     # Description:
     #   a net/scp wrapper to copy to server
-    #
-    # remote: the remote server and directory to pull from, formatted "my.server"
-    # user: the user to connect as
     def PushPull.transfer
       begin
         Net::SCP.start(@@host, @@user) { |scp| yield scp }
@@ -88,15 +95,13 @@ module Copernicium
       end
     end
 
+
     # Function: fetch()
     #
     # Description:
     #   a net/scp wrapper to copy from server, can take a block or do a one-off copy without one
     #
-    # remote: the remote server and directory to push to, formatted "my.server:/the/location/we/want"
-    # dest: what we want of the branch, not needed for blocked calls
     # local: where we want to put the file, not needed for blocked calls
-    # user: the user to connect as
     def PushPull.fetch(local = Dir.pwd, &block)
       if block.nil? # we are cloning a repo in this section of code
         begin
@@ -117,14 +122,11 @@ module Copernicium
       true
     end
 
+
     # Function: push()
     #
     # Description:
     #   pushes local changes on the current branch to a remote branch
-    #
-    # remote: the remote server and directory to push to, formatted "my.server:/the/location/we/want"
-    # branch: the branch that we are pushing to
-    # user: the user to connect as
     def PushPull.push
       begin
         transfer do |ssh|
@@ -156,9 +158,6 @@ module Copernicium
     # Description:
     #   pulls remote changes to the current branch from remote branch
     #
-    # remote: the remote server and directory to push to, formatted "my.server:/the/location/we/want"
-    # branch: the branch that we are pushing to
-    # user: the user to connect as
     def PushPull.pull
       begin
         fetch do |session|
@@ -179,22 +178,6 @@ module Copernicium
         connection_failure "trying to pull files"
       end
       true
-    end
-
-
-    # Function: clone()
-    #
-    # Description:
-    #   Grabs a repository from a remote server
-    #
-    # remote: the remote server and directory to push to, formatted "my.server:/the/location/we/want"
-    # user: the user to connect as
-    def PushPull.clone
-      begin
-        PushPull.fetch
-      rescue
-        connection_failure 'trying to clone a repo'
-      end
     end
   end
 end
