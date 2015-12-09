@@ -139,7 +139,7 @@ module Copernicium
           # uploading our .cn info to remote
           %w{revs snap}.each do |file|
             ssh.upload!("#{Dir.pwd}/.cn/#{file}/",
-                        "#{@@path}/.cn/#{file}/",
+                        "#{@@path}/.cn/",
                         :recursive => true)
           end
         end # ssh
@@ -169,7 +169,7 @@ module Copernicium
           # uploading our .cn info to remote
           %w{revs snap}.each do |file|
             session.download!("#{@@path}/.cn/#{file}",
-                              "#{Dir.pwd}/.cn/#{file}",
+                              "#{Dir.pwd}/.cn/",
                               :recursive => true)
           end
         end
