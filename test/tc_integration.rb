@@ -38,7 +38,7 @@ class CoperniciumIntegrationTests < Minitest::Test
       File.write 'workspace/1.txt', '1_1'
       File.write 'workspace/2.txt', '2_2'
       drive 'commit -m Test Commit'
-      byebug
+      #byebug
       Repos.history('master').size.must_equal 1
       #todo : make sure commit written to disk
     end
@@ -48,9 +48,7 @@ class CoperniciumIntegrationTests < Minitest::Test
       Repos.history('test').wont_be_nil
 
       drive 'branch -d test'
-      Repos.history('test').must_be_nil
-
-      # todo read .cn/branch, verify
+      Repos.history('test').must_equal []
     end
 
     # todo: update test

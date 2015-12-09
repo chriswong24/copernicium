@@ -21,11 +21,11 @@ module Copernicium
       # handle parsing out remote info
       remote = comm.repo.split(':')
       if remote.length == 2
-        @@host = remote[0]
-        @@path = remote[1]
+        @@host = remote[0].strip
+        @@path = remote[1].strip
       elsif remote.length == 1
         @@host = "cycle3.csug.rochester.edu"
-        @@path = remote.first
+        @@path = remote.first.strip
       else
         raise 'Remote host information not given.'.red
       end
