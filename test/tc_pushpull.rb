@@ -24,6 +24,7 @@ class TestPushPullModule < Minitest::Test
 
     after 'running each test, clean up' do
       File.delete(@filename) if File.exist? @filename
+      FileUtils.rm_rf "testing" if Dir.exist? 'testing'
     end
 
     it 'can clone a remote cn repo locally' do
