@@ -22,7 +22,7 @@ module Copernicium
         @@host = remote[0]
         @@path = remote[1]
       elsif remote.length == 1
-        @@host = "cycle3.csug.rochester.edu"
+        @@host = "cycle1.csug.rochester.edu"
         @@path = remote.first
       else
         raise 'Remote host information not given.'.red
@@ -129,6 +129,7 @@ module Copernicium
     #
     # Description:
     #   pushes local changes on the current branch to a remote branch
+    #
     def PushPull.ppush
       begin
         PushPull.transfer do |ssh|
