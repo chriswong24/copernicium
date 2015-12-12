@@ -115,5 +115,11 @@ To show information about each module's tests, and branches commits, run:
 - [asana tasks](https://app.asana.com/0/56905660582491/calendar)
 
 
+### todos
+
+- checkout commits by semantic id
+- refactor ui logic code into modules
+
+
 [wiki]:https://en.wikipedia.org/wiki/Copernicium
 

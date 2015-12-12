@@ -54,14 +54,24 @@ EOS
 
 
 IN_REPO_WARNING = <<-EOS
-You are currently in a Copernicium repo... `cn init` is not valid here!
+You are currently in a Copernicium repo...
+`cn init` is not valid here!
 EOS
 
 NO_REPO_WARNING = <<-EOS
-You are not currently in a Copernicium repo... run `cn init` to create one!
+You are not currently in a Copernicium repo...
+Run `cn init` to create one!
 EOS
 
 AUTHOR_BANNER = <<-EOS
-  todo
+  Jeremy Warner
+  Luisa Neves
+  Chris Wong
+  Xiang-Ru Lian
+  Logan Gittelson
+  Linfeng Song
+  Qiguang Liu
+  Frank Tamburrino
+  Ethan Johnson
 EOS
 

@@ -139,14 +139,15 @@ module Copernicium
       branch = args.shift
       if branch.nil? # show all branches
         puts "Current: ".grn + Repos.current
-        puts "Branches: ".grn + Repos.branches.join(' ')
+        Repos.branches.each { |br| puts 'Branch: ' + br }
+        puts "Total: ".grn + Repos.branches.length.to_s
 
-      elsif branch == '-c' # try to create a new branch
+      elsif branch == '-c' # create a new branch
         branch = args.first # get from the user
         branch = get "new branch name" if branch.nil?
         create_branch branch
 
-      elsif branch == '-r' # rename the current branch
+      elsif branch == '-r' # rename branch
         newname = args.first # get if not specified
         newname = get "new name for current branch" if newname.nil?
         oldname = Repos.current
@@ -155,7 +156,7 @@ module Copernicium
         puts "Deleted branch '#{oldname}'".grn
         puts "Renamed branch '#{oldname}' to '#{newname}'".grn
 
-      elsif branch == '-d' # Delete the specified branch
+      elsif branch == '-d' # delete branch
         branch = args.first # If not specified, get
         branch = get "branch to delete" if branch.nil?
         if branch == Repos.current
