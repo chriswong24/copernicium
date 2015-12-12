@@ -1,7 +1,7 @@
 # user interface module - parse and execute commands
 # integrates all modules, central module
 
-VERSION = "0.2.2"
+VERSION = "0.2.3"
 
 include Copernicium::PushPull
 
@@ -167,7 +167,7 @@ module Copernicium
 
       elsif Repos.has_branch? branch # switch branch (branch <branch name>)
         Repos.update_branch branch
-        puts "Current: ".grn + Repos.current
+        puts 'Current: '.grn + Repos.current
         Workspace.checkout
 
       else # create it, switch to it
@@ -180,8 +180,8 @@ module Copernicium
     def clonecn(args)
       user = args.first
       host = args.last
-      user = get "username for push" if user.nil?
-      host = get "host path (<host:/dir/of/repo>)" if host.nil? || user == host
+      user = get 'username for push' if user.nil?
+      host = get 'host path (<host:/dir/of/repo>)' if host.nil? || user == host
       comm = UIComm.new(command: 'clone', repo: host, opts: user)
       PushPull.UICommandParser(comm)
       return comm
@@ -190,8 +190,8 @@ module Copernicium
     def push(args)
       user = args.first
       host = args.last
-      user = get "username for push" if user.nil?
-      host = get "host path (<host:/dir/of/repo>)" if host.nil? || user == host
+      user = get 'username for push' if user.nil?
+      host = get 'host path (<host:/dir/of/repo>)' if host.nil? || user == host
       comm = UIComm.new(command: 'push', repo: host, opts: user)
       PushPull.UICommandParser(comm)
       return comm
@@ -200,8 +200,8 @@ module Copernicium
     def pull(args)
       user = args.first
       host = args.last
-      user = get "username for push" if user.nil?
-      host = get "host path (<host:/dir/of/repo>)" if host.nil? || user == host
+      user = get 'username for push' if user.nil?
+      host = get 'host path (<host:/dir/of/repo>)' if host.nil? || user == host
       comm = UIComm.new(command: 'pull', repo: host, opts: user)
       PushPull.UICommandParser(comm)
       return comm
@@ -252,7 +252,7 @@ module Copernicium
 
       # perform the commit, with workspace
       ui = UIComm.new(command: 'commit', files: files, cmt_msg: message)
-      puts "New commit: ".grn + Workspace.commit(ui)
+      puts 'New commit: '.grn + Workspace.commit(ui)
       ui
     end
 
@@ -274,16 +274,16 @@ module Copernicium
         rev = (Repos.history rev).last
         conflicts = Workspace.merge(rev)
         unless conflicts.nil?
-          conflicts.each { |conflict| puts "Conflict: ".red + conflict }
+          conflicts.each { |conflict| puts 'Conflict: '.red + conflict }
         end
       else # branch not found
-        puts "Branch not found: ".red + rev
+        puts 'Branch not found: '.red + rev
       end
     end
 
     def update(args)
       if args.empty?
-        username = get "user to update to"
+        username = get 'user to update to'
       else
         username = args.first
       end
