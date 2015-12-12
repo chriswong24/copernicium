@@ -3,7 +3,7 @@
 
 module Copernicium
   class FileObj
-    attr_reader :path, :base, :history
+    attr_reader :path, :history
     def initialize(path, ids)
       @base =  File.dirname(path)
       @history = ids
@@ -16,6 +16,11 @@ module Copernicium
       else
         @path == rhs.path
       end
+    end
+
+    def base # fix for deployment
+      @base = File.dirname(@path)
+      @base
     end
 
     # returns most recent file id in the snapshot it was saved in
