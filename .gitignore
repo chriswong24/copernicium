@@ -7,3 +7,4 @@ comm_t*
 .cn
 workspace
 bin/thing
+byebug*
