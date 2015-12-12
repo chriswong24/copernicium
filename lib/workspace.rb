@@ -3,13 +3,11 @@
 
 module Copernicium
   class FileObj
-    attr_reader :path, :name, :history
+    attr_reader :path, :base, :history
     def initialize(path, ids)
+      @base =  File.dirname(path)
       @history = ids
       @path = path
-      @name = path
-      # todo - subout everything after the last /
-      # @path = File.dirname(path)
     end
 
     def ==(rhs)
@@ -126,8 +124,7 @@ module Copernicium
     def Workspace.checkout_file(file)
       idx = indexOf(file.path)
       idx.nil?? @@files << file : @@files[idx] = file
-      base = File.dirname(file)
-      Dir.mkdir base unless Dir.exist? base
+      Dir.mkdir file.base unless Dir.exist? file.base
       File.write(file.path, RevLog.get_file(file.last))
     end
 
@@ -141,8 +138,9 @@ module Copernicium
           Workspace.checkout_file file
         end
       else # just checkout given files
-        Repos.get_snapshot(comm.rev).files.select { |f|
-          comm.files.include? f.path }.each do |file|
+        Repos.get_snapshot(comm.rev).files.select do |f|
+          comm.files.include? f.path
+        end .each do |file|
           Workspace.checkout_file file
         end
       end

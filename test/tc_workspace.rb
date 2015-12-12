@@ -49,27 +49,26 @@ class CoperniciumWorkspaceTest < Minitest::Test
     end
 
     it 'can checkout a entire branch' do
-      drive "branch -c new"
-      drive "branch new"
+      drive 'branch new'
       File.write('1.txt', '1_1_1_1')
       File.write('2.txt', '2_2_2_2')
       Workspace.commit
       File.read('1.txt').must_equal '1_1_1_1'
       File.read('2.txt').must_equal '2_2_2_2'
-      drive "branch master"
+      drive 'branch master'
       Workspace.checkout
       File.read('1.txt').must_equal '1_2'
       File.read('2.txt').must_equal '2_1'
     end
 
     it 'can checkout a entire branch and switch files' do
-      drive "branch new"
+      drive 'branch new'
       File.write('1.txt', '1_1_1_1')
       File.write('2.txt', '2_2_2_2')
-      drive "commit -m new"
+      drive 'commit -m new'
       File.read('1.txt').must_equal '1_1_1_1'
       File.read('2.txt').must_equal '2_2_2_2'
-      drive "branch master"
+      drive 'branch master'
       File.read('1.txt').must_equal '1_2'
       File.read('2.txt').must_equal '2_1'
     end
@@ -116,15 +115,28 @@ class CoperniciumWorkspaceTest < Minitest::Test
     end
 
     it 'can create files while switching branches' do
-      drive "branch -c new"
-      drive "branch new"
+      drive 'branch new'
       File.write('3.txt', '3')
       Workspace.commit
       File.delete('3.txt')
-      drive "branch master"
+      drive 'branch master'
       File.exist?('3.txt').must_equal false
-      drive "branch new"
+      drive 'branch new'
       File.read('3.txt').must_equal '3'
+    end
+
+    it 'can create folders while switching branches' do
+      drive 'branch new'
+      Dir.mkdir('new')
+      File.write('new/3.txt', '3')
+      Workspace.commit
+      FileUtils.rm_rf('new')
+      drive 'branch master'
+      Dir.exist?('new').must_equal false
+      File.exist?('new/3.txt').must_equal false
+      drive 'branch new'
+      Dir.exist?('new').must_equal true
+      File.read('new/3.txt').must_equal '3'
     end
   end
 end
