@@ -162,7 +162,7 @@ than using indices.</p>
 
           
           <div class="method-source-code" id="checkout-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 130</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 132</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">checkout</span>(<span class="ruby-identifier">comm</span> = <span class="ruby-constant">UIComm</span>.<span class="ruby-identifier">new</span>)
   <span class="ruby-identifier">comm</span>.<span class="ruby-identifier">rev</span> = <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">current_head</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">comm</span>.<span class="ruby-identifier">rev</span>.<span class="ruby-identifier">nil?</span>
   <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">has_snapshots?</span> <span class="ruby-comment"># dont checkout</span>
@@ -172,8 +172,9 @@ than using indices.</p>
       <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">checkout_file</span> <span class="ruby-identifier">file</span>
     <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">else</span> <span class="ruby-comment"># just checkout given files</span>
-    <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">get_snapshot</span>(<span class="ruby-identifier">comm</span>.<span class="ruby-identifier">rev</span>).<span class="ruby-identifier">files</span>.<span class="ruby-identifier">select</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
-      <span class="ruby-identifier">comm</span>.<span class="ruby-identifier">files</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">path</span> }.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+    <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">get_snapshot</span>(<span class="ruby-identifier">comm</span>.<span class="ruby-identifier">rev</span>).<span class="ruby-identifier">files</span>.<span class="ruby-identifier">select</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">comm</span>.<span class="ruby-identifier">files</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">path</span>
+    <span class="ruby-keyword">end</span> .<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
       <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">checkout_file</span> <span class="ruby-identifier">file</span>
     <span class="ruby-keyword">end</span>
   <span class="ruby-keyword">end</span>
@@ -207,10 +208,11 @@ than using indices.</p>
 
           
           <div class="method-source-code" id="checkout_file-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 123</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 124</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">checkout_file</span>(<span class="ruby-identifier">file</span>)
   <span class="ruby-identifier">idx</span> = <span class="ruby-identifier">indexOf</span>(<span class="ruby-identifier">file</span>.<span class="ruby-identifier">path</span>)
   <span class="ruby-identifier">idx</span>.<span class="ruby-identifier">nil?</span><span class="ruby-operator">?</span> <span class="ruby-identifier">@@files</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">file</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">@@files</span>[<span class="ruby-identifier">idx</span>] = <span class="ruby-identifier">file</span>
+  <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">mkdir</span> <span class="ruby-identifier">file</span>.<span class="ruby-identifier">base</span> <span class="ruby-keyword">unless</span> <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">file</span>.<span class="ruby-identifier">base</span>
   <span class="ruby-constant">File</span>.<span class="ruby-identifier">write</span>(<span class="ruby-identifier">file</span>.<span class="ruby-identifier">path</span>, <span class="ruby-constant">RevLog</span>.<span class="ruby-identifier">get_file</span>(<span class="ruby-identifier">file</span>.<span class="ruby-identifier">last</span>))
 <span class="ruby-keyword">end</span></pre>
           </div>
@@ -242,7 +244,7 @@ than using indices.</p>
 
           
           <div class="method-source-code" id="clean-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 147</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 150</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">clean</span>(<span class="ruby-identifier">comm</span> = <span class="ruby-constant">UIComm</span>.<span class="ruby-identifier">new</span>)
   <span class="ruby-keyword">if</span> <span class="ruby-identifier">comm</span>.<span class="ruby-identifier">files</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-comment"># reset everything</span>
     <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">clear</span>
@@ -288,7 +290,7 @@ than using indices.</p>
 
           
           <div class="method-source-code" id="clear-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 117</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 118</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">clear</span>
   <span class="ruby-identifier">@@files</span>.<span class="ruby-identifier">each</span>{ <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">x</span>.<span class="ruby-identifier">path</span>) }
   <span class="ruby-identifier">@@files</span> = []
@@ -322,7 +324,7 @@ than using indices.</p>
 
           
           <div class="method-source-code" id="commit-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 181</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 184</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">commit</span>(<span class="ruby-identifier">comm</span> = <span class="ruby-constant">UIComm</span>.<span class="ruby-identifier">new</span>)
   <span class="ruby-keyword">if</span> <span class="ruby-identifier">comm</span>.<span class="ruby-identifier">files</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-comment"># commit everything</span>
     <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">status</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">st</span><span class="ruby-operator">|</span>
@@ -368,7 +370,7 @@ than using indices.</p>
 
           
           <div class="method-source-code" id="commit_file-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 164</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 167</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">commit_file</span>(<span class="ruby-identifier">x</span>)
   <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;Committing: &#39;</span>.<span class="ruby-identifier">grn</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">x</span>
   <span class="ruby-identifier">added</span>, <span class="ruby-identifier">edits</span>, <span class="ruby-identifier">remov</span> = <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">status</span>
@@ -381,7 +383,7 @@ than using indices.</p>
   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">remov</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">x</span>
     <span class="ruby-identifier">@@files</span>.<span class="ruby-identifier">delete_at</span>(<span class="ruby-identifier">indexOf</span> <span class="ruby-identifier">x</span>)
   <span class="ruby-keyword">else</span>
-    <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;Failed, no changes: &#39;</span>.<span class="ruby-identifier">yel</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">x</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;No changes: &#39;</span>.<span class="ruby-identifier">yel</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">x</span>
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
@@ -413,7 +415,7 @@ than using indices.</p>
 
           
           <div class="method-source-code" id="create_project-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 43</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 44</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">create_project</span>(<span class="ruby-identifier">location</span> = <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>, <span class="ruby-identifier">branch</span> = <span class="ruby-string">&#39;master&#39;</span>)
   <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">mkdir</span> <span class="ruby-identifier">location</span> <span class="ruby-keyword">unless</span> <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">location</span>
   <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">chdir</span> <span class="ruby-identifier">location</span>
@@ -468,7 +470,7 @@ than using indices.</p>
 
           
           <div class="method-source-code" id="indexOf-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 99</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 100</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">indexOf</span>(<span class="ruby-identifier">x</span>)
   <span class="ruby-identifier">@@files</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">f</span>, <span class="ruby-identifier">i</span><span class="ruby-operator">|</span>
     <span class="ruby-keyword">return</span> <span class="ruby-identifier">i</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">path</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">x</span>
@@ -506,7 +508,7 @@ workspace with result todo return any conflicting files</p>
 
           
           <div class="method-source-code" id="merge-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 202</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 205</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">id</span>)
   <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">merge_snapshot</span>(<span class="ruby-identifier">id</span>)
 <span class="ruby-keyword">end</span></pre>
@@ -539,7 +541,7 @@ workspace with result todo return any conflicting files</p>
 
           
           <div class="method-source-code" id="setup-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 29</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 30</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">setup</span>
   <span class="ruby-identifier">@@cwd</span> = <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>
   <span class="ruby-identifier">@@root</span> = (<span class="ruby-identifier">noroot?</span><span class="ruby-operator">?</span> <span class="ruby-identifier">@@cwd</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">getroot</span>)
@@ -581,7 +583,7 @@ workspace with result todo return any conflicting files</p>
 
           
           <div class="method-source-code" id="status-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 206</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 209</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">status</span>
   <span class="ruby-identifier">added</span> = []
   <span class="ruby-identifier">edits</span> = []
@@ -630,7 +632,7 @@ todo - include files and files that start with a dot (.)</p>
 
           
           <div class="method-source-code" id="working_files-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 108</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 109</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Workspace</span>.<span class="ruby-identifier">working_files</span>
   (<span class="ruby-constant">Dir</span>[ <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@root</span>, <span class="ruby-string">&#39;**&#39;</span>, <span class="ruby-string">&#39;*&#39;</span>) ].<span class="ruby-identifier">reject</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span>
     <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-identifier">p</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">p</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">@@copn</span>)
@@ -677,7 +679,7 @@ todo - include files and files that start with a dot (.)</p>
 
           
           <div class="method-source-code" id="getroot-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 73</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 74</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">getroot</span>
   <span class="ruby-identifier">cwd</span> = <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>
   <span class="ruby-identifier">max</span> = <span class="ruby-value">0</span>
@@ -726,7 +728,7 @@ todo - include files and files that start with a dot (.)</p>
 
           
           <div class="method-source-code" id="more_folders-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 76</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 77</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">more_folders</span>() <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span> <span class="ruby-operator">!=</span> <span class="ruby-string">&#39;/&#39;</span> <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -757,7 +759,7 @@ todo - include files and files that start with a dot (.)</p>
 
           
           <div class="method-source-code" id="noroot-3F-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 94</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 95</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">noroot?</span>() <span class="ruby-identifier">getroot</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -788,7 +790,7 @@ todo - include files and files that start with a dot (.)</p>
 
           
           <div class="method-source-code" id="root_found-source">
-            <pre><span class="ruby-comment"># File lib/workspace.rb, line 77</span>
+            <pre><span class="ruby-comment"># File lib/workspace.rb, line 78</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">root_found</span>() <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>, <span class="ruby-string">&#39;.cn&#39;</span>) <span class="ruby-keyword">end</span></pre>
           </div>
           

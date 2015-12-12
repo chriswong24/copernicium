@@ -98,11 +98,15 @@
     
     <li ><a href="#method-c-make_snapshot">::make_snapshot</a>
     
+    <li ><a href="#method-c-merge_history">::merge_history</a>
+    
     <li ><a href="#method-c-merge_snapshot">::merge_snapshot</a>
     
     <li ><a href="#method-c-setup">::setup</a>
     
     <li ><a href="#method-c-setup_tester">::setup_tester</a>
+    
+    <li ><a href="#method-c-sort_history">::sort_history</a>
     
     <li ><a href="#method-c-update">::update</a>
     
@@ -175,7 +179,7 @@
 
           
           <div class="method-source-code" id="delete_branch-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 261</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 271</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">delete_branch</span>(<span class="ruby-identifier">branch</span>)
   <span class="ruby-identifier">@@history</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">branch</span>)
   <span class="ruby-identifier">update_history</span>
@@ -209,7 +213,7 @@
 
           
           <div class="method-source-code" id="delete_snapshot-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 163</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 173</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">delete_snapshot</span>(<span class="ruby-identifier">id</span>)
   <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">@@branch</span>].<span class="ruby-identifier">delete_if</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">id</span> }
   <span class="ruby-constant">File</span>.<span class="ruby-identifier">delete</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@snap</span>, <span class="ruby-identifier">id</span>)
@@ -249,7 +253,7 @@ differences in between the files by calling RevLogs diffy.</p>
 
           
           <div class="method-source-code" id="diff_snapshots-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 172</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 182</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">diff_snapshots</span>(<span class="ruby-identifier">id1</span>, <span class="ruby-identifier">id2</span>)
   <span class="ruby-identifier">new_files</span> = []
   <span class="ruby-identifier">conflicts</span> = []
@@ -319,7 +323,7 @@ differences in between the files by calling RevLogs diffy.</p>
 
           
           <div class="method-source-code" id="diffset-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 214</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 224</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">diffset</span>(<span class="ruby-identifier">array1</span>, <span class="ruby-identifier">array2</span>)
   <span class="ruby-identifier">array1</span>.<span class="ruby-identifier">select</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-operator">!</span><span class="ruby-identifier">array2</span>.<span class="ruby-identifier">any?</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">y</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">y</span> } }
 <span class="ruby-keyword">end</span></pre>
@@ -353,7 +357,7 @@ This is different than the history branch which just contains ids</p>
 
           
           <div class="method-source-code" id="get_branch-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 254</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 264</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">get_branch</span>(<span class="ruby-identifier">branch</span>)
   <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">history</span>(<span class="ruby-identifier">branch</span>).<span class="ruby-identifier">inject</span>([]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hist</span>, <span class="ruby-identifier">snapid</span><span class="ruby-operator">|</span>
     <span class="ruby-identifier">hist</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">get_snapshot</span>(<span class="ruby-identifier">snapid</span>)
@@ -388,9 +392,9 @@ This is different than the history branch which just contains ids</p>
 
           
           <div class="method-source-code" id="get_snapshot-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 152</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 162</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">get_snapshot</span>(<span class="ruby-identifier">id</span>)
-  <span class="ruby-identifier">@@history</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">branch</span>, <span class="ruby-identifier">snapids</span><span class="ruby-operator">|</span>
+  <span class="ruby-identifier">@@history</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">_branch</span>, <span class="ruby-identifier">snapids</span><span class="ruby-operator">|</span>
     <span class="ruby-identifier">snapids</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">snapid</span><span class="ruby-operator">|</span>
       <span class="ruby-keyword">return</span> <span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load_file</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@snap</span>, <span class="ruby-identifier">id</span>)) <span class="ruby-keyword">if</span> <span class="ruby-identifier">snapid</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">id</span>
     <span class="ruby-keyword">end</span>
@@ -526,7 +530,7 @@ This is different than the history branch which just contains ids</p>
 
           
           <div class="method-source-code" id="history-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 108</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 118</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">history</span>(<span class="ruby-identifier">branch</span> = <span class="ruby-keyword">nil</span>)
   <span class="ruby-keyword">if</span> <span class="ruby-identifier">branch</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-comment"># return a list of unique all commits</span>
     (<span class="ruby-identifier">@@history</span>.<span class="ruby-identifier">inject</span>([]) { <span class="ruby-operator">|</span><span class="ruby-identifier">o</span>, <span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">last</span> }).<span class="ruby-identifier">uniq</span>
@@ -567,7 +571,7 @@ This is different than the history branch which just contains ids</p>
 
           
           <div class="method-source-code" id="make_branch-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 240</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 250</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">make_branch</span>(<span class="ruby-identifier">branch</span>)
   <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">branch</span>] = <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">@@branch</span>].<span class="ruby-identifier">inject</span>([]) { <span class="ruby-operator">|</span><span class="ruby-identifier">n</span>, <span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">n</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">o</span> }
   <span class="ruby-identifier">@@branch</span> = <span class="ruby-identifier">branch</span>
@@ -603,7 +607,7 @@ This is different than the history branch which just contains ids</p>
 
           
           <div class="method-source-code" id="make_snapshot-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 119</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 129</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">make_snapshot</span>(<span class="ruby-identifier">files</span> = [], <span class="ruby-identifier">msg</span> = <span class="ruby-string">&#39;nil&#39;</span>)
   <span class="ruby-identifier">snap</span> = <span class="ruby-constant">Snapshot</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">files</span>, <span class="ruby-identifier">msg</span>)
   <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">@@branch</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">snap</span>.<span class="ruby-identifier">id</span>
@@ -612,6 +616,39 @@ This is different than the history branch which just contains ids</p>
   <span class="ruby-identifier">update_snap</span> <span class="ruby-identifier">snap</span>
   <span class="ruby-identifier">update_history</span>
   <span class="ruby-identifier">snap</span>.<span class="ruby-identifier">id</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-c-merge_history" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">merge_history</span><span
+            class="method-args">(branch, hist)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="merge_history-source">
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 107</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">merge_history</span>(<span class="ruby-identifier">branch</span>, <span class="ruby-identifier">hist</span>)
+  <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">branch</span>] = <span class="ruby-identifier">sort_history</span>(<span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">branch</span>] <span class="ruby-operator">+</span> <span class="ruby-identifier">hist</span>).<span class="ruby-identifier">uniq</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -643,7 +680,7 @@ Check to make sure id is from a different branch</p>
 
           
           <div class="method-source-code" id="merge_snapshot-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 137</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 147</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">merge_snapshot</span>(<span class="ruby-identifier">id</span>)
   <span class="ruby-comment"># run diff to get conflicts</span>
   <span class="ruby-identifier">current</span> = <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">@@branch</span>].<span class="ruby-identifier">last</span>
@@ -756,6 +793,41 @@ Check to make sure id is from a different branch</p>
       </div>
 
     
+      <div id="method-c-sort_history" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">sort_history</span><span
+            class="method-args">(hist)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="sort_history-source">
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 111</span>
+<span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">sort_history</span>(<span class="ruby-identifier">hist</span>)
+  <span class="ruby-comment">#fails if there is no snapshot with the target id (a | b)</span>
+  <span class="ruby-comment">#hist.sort { |a, b| get_snapshot(a).date &lt;=&gt; get_snapshot(b).date }</span>
+  <span class="ruby-identifier">hist</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
       <div id="method-c-update" class="method-detail ">
         
         <div class="method-heading">
@@ -770,44 +842,57 @@ Check to make sure id is from a different branch</p>
         <div class="method-description">
           
           <p>FOR PUSHPULL UPDATE</p>
+<ul><li>
+<p>give a comm with user&#39;s history to merge</p>
+</li></ul>
           
           
 
           
           <div class="method-source-code" id="update-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 267</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 284</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">update</span>(<span class="ruby-identifier">comm</span> = <span class="ruby-constant">UIComm</span>.<span class="ruby-identifier">new</span>)
-  <span class="ruby-identifier">merge_name</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@copn</span>, <span class="ruby-string">&#39;merging_&#39;</span><span class="ruby-operator">+</span><span class="ruby-identifier">comm</span>.<span class="ruby-identifier">opts</span>)
-  <span class="ruby-identifier">status</span> = <span class="ruby-string">&quot;Remote is either up-to-date or ahead of local&quot;</span>
+  <span class="ruby-identifier">merge_name</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@copn</span>, <span class="ruby-string">&#39;merging_&#39;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">comm</span>.<span class="ruby-identifier">opts</span>)
 
-  <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">merge_name</span>)
-    <span class="ruby-identifier">merger</span> = <span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">merge_name</span>)
+  <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">merge_name</span>) <span class="ruby-comment"># merge history</span>
+    <span class="ruby-identifier">branches</span> = <span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">merge_name</span>)
+    <span class="ruby-identifier">statuses</span> = {}
 
-    <span class="ruby-comment"># merge @@history with merger hash</span>
-    <span class="ruby-identifier">merger</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">key</span>, <span class="ruby-identifier">val</span><span class="ruby-operator">|</span>
-      <span class="ruby-keyword">if</span> <span class="ruby-identifier">@@history</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">key</span>
-        <span class="ruby-identifier">val</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">snap</span>, <span class="ruby-identifier">index</span><span class="ruby-operator">|</span>
-          <span class="ruby-keyword">if</span> <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">key</span>][<span class="ruby-identifier">index</span>].<span class="ruby-identifier">nil?</span>
-            <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">key</span>] <span class="ruby-operator">+=</span> <span class="ruby-identifier">val</span>[<span class="ruby-identifier">index</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>]
-            <span class="ruby-identifier">status</span> = <span class="ruby-string">&quot;Updated remote successfully&quot;</span>
-          <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">key</span>][<span class="ruby-identifier">index</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">snap</span>
-            <span class="ruby-keyword">next</span>
-          <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">key</span>][<span class="ruby-identifier">index</span>] <span class="ruby-operator">!=</span> <span class="ruby-identifier">snap</span>
-            <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">key</span>] <span class="ruby-operator">+=</span> <span class="ruby-identifier">val</span>[<span class="ruby-identifier">index</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>]
-            <span class="ruby-identifier">status</span> = <span class="ruby-string">&quot;Merged remote history with local&quot;</span>
-          <span class="ruby-keyword">end</span>
-        <span class="ruby-keyword">end</span>
-      <span class="ruby-keyword">else</span>
-        <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">key</span>] = <span class="ruby-identifier">val</span>
+    <span class="ruby-comment"># merge @@history with remote hash</span>
+    <span class="ruby-identifier">branches</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">branch</span>, <span class="ruby-identifier">hist</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">statuses</span>[<span class="ruby-identifier">branch</span>] = <span class="ruby-string">&#39;is up-to-date with remote&#39;</span>
+      <span class="ruby-keyword">if</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">has_branch?</span> <span class="ruby-identifier">branch</span> <span class="ruby-comment"># update</span>
+        <span class="ruby-identifier">hist</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">snap</span>, <span class="ruby-identifier">i</span><span class="ruby-operator">|</span>
+
+          <span class="ruby-comment">#byebug</span>
+          <span class="ruby-comment"># merger hist length is longer than ours</span>
+          <span class="ruby-keyword">if</span> <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">branch</span>][<span class="ruby-identifier">i</span>].<span class="ruby-identifier">nil?</span>
+            <span class="ruby-identifier">statuses</span>[<span class="ruby-identifier">branch</span>] = <span class="ruby-string">&#39;updated successfully&#39;</span>
+            <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">merge_history</span> <span class="ruby-identifier">branch</span>, <span class="ruby-identifier">hist</span>
+            <span class="ruby-keyword">break</span>
+
+            <span class="ruby-comment"># merger hist diverged from our system</span>
+          <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">branch</span>][<span class="ruby-identifier">i</span>] <span class="ruby-operator">!=</span> <span class="ruby-identifier">snap</span>
+            <span class="ruby-identifier">statuses</span>[<span class="ruby-identifier">branch</span>] = <span class="ruby-string">&#39;merged history with local&#39;</span>
+            <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">merge_history</span> <span class="ruby-identifier">branch</span>, <span class="ruby-identifier">hist</span>
+            <span class="ruby-keyword">break</span>
+
+          <span class="ruby-keyword">end</span> <span class="ruby-comment"># else synchronized - no differences</span>
+        <span class="ruby-keyword">end</span> <span class="ruby-comment"># will exit cleanly if we are more up-to-date</span>
+      <span class="ruby-keyword">else</span> <span class="ruby-comment"># branch does not exist locally yet, copy</span>
+        <span class="ruby-identifier">statuses</span>[<span class="ruby-identifier">branch</span>] = <span class="ruby-string">&#39;created ok&#39;</span>
+        <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">branch</span>] = <span class="ruby-identifier">hist</span>
       <span class="ruby-keyword">end</span>
-    <span class="ruby-keyword">end</span>
+      <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Success: &quot;</span>.<span class="ruby-identifier">grn</span> <span class="ruby-operator">+</span> <span class="ruby-node">&quot;#{branch} &quot;</span>.<span class="ruby-identifier">yel</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">statuses</span>[<span class="ruby-identifier">branch</span>]
+    <span class="ruby-keyword">end</span> <span class="ruby-comment"># end branch iterations</span>
 
-    <span class="ruby-constant">File</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">merge_name</span>)
+    <span class="ruby-comment"># cleaning up...persist</span>
+    <span class="ruby-constant">File</span>.<span class="ruby-identifier">delete</span> <span class="ruby-identifier">merge_name</span>
     <span class="ruby-identifier">update_history</span>
-    <span class="ruby-identifier">puts</span> <span class="ruby-identifier">status</span>
   <span class="ruby-keyword">else</span>
-    <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;Error updating: &#39;</span>.<span class="ruby-identifier">red</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">merge_name</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39;doesnt exist.&#39;</span>
+    <span class="ruby-identifier">puts</span> <span class="ruby-string">&#39;Error updating: &#39;</span>.<span class="ruby-identifier">red</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">merge_name</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39; does not exist.&#39;</span>
   <span class="ruby-keyword">end</span>
+  <span class="ruby-identifier">statuses</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -838,7 +923,7 @@ Check to make sure id is from a different branch</p>
 
           
           <div class="method-source-code" id="update_branch-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 247</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 257</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">update_branch</span>(<span class="ruby-identifier">branch</span>)
   <span class="ruby-constant">File</span>.<span class="ruby-identifier">write</span>(<span class="ruby-identifier">@@head</span>, <span class="ruby-identifier">branch</span>)
   <span class="ruby-identifier">@@branch</span> = <span class="ruby-identifier">branch</span>
@@ -906,7 +991,7 @@ class instance to a string</p>
 
           
           <div class="method-source-code" id="update_snap-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 131</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 141</span>
 <span class="ruby-keyword">def</span> <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">update_snap</span>(<span class="ruby-identifier">snap</span>)
   <span class="ruby-constant">File</span>.<span class="ruby-identifier">write</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">@@snap</span>, <span class="ruby-identifier">snap</span>.<span class="ruby-identifier">id</span>), <span class="ruby-constant">YAML</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">snap</span>)
 <span class="ruby-keyword">end</span></pre>
@@ -947,7 +1032,7 @@ class instance to a string</p>
 
           
           <div class="method-source-code" id="branches-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 234</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 244</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">branches</span>() <span class="ruby-identifier">@@history</span>.<span class="ruby-identifier">keys</span> <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -980,7 +1065,7 @@ class instance to a string</p>
 
           
           <div class="method-source-code" id="current-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 222</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 232</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">current</span>() <span class="ruby-identifier">@@branch</span> <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -1011,7 +1096,7 @@ class instance to a string</p>
 
           
           <div class="method-source-code" id="current_files-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 231</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 241</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">current_files</span>() <span class="ruby-constant">Repos</span>.<span class="ruby-identifier">has_snapshots?</span><span class="ruby-operator">?</span> <span class="ruby-identifier">@@brsnaps</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">files</span> <span class="ruby-operator">:</span> [] <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -1042,7 +1127,7 @@ class instance to a string</p>
 
           
           <div class="method-source-code" id="current_head-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 225</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 235</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">current_head</span>() <span class="ruby-identifier">@@history</span>[<span class="ruby-identifier">@@branch</span>].<span class="ruby-identifier">last</span> <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -1073,7 +1158,7 @@ class instance to a string</p>
 
           
           <div class="method-source-code" id="current_snaps-source">
-            <pre><span class="ruby-comment"># File lib/repos.rb, line 228</span>
+            <pre><span class="ruby-comment"># File lib/repos.rb, line 238</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">current_snaps</span>() <span class="ruby-identifier">@@brsnaps</span> <span class="ruby-keyword">end</span></pre>
           </div>
           
