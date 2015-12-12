@@ -215,7 +215,7 @@ module Copernicium
         rev = get 'branch or commit id'
       else
         rev = args.shift
-        files = args
+        files = args unless args.empty?
       end
 
       # if 'head' keyword, grab the head

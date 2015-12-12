@@ -13,7 +13,7 @@ require_relative 'test_helper'
 include Copernicium::Driver
 
 class TestUI < Minitest::Test
-  describe "UIModule" do
+  describe 'Driver' do
     def drive(str)
       Driver.run str.split
     end
@@ -25,24 +25,24 @@ class TestUI < Minitest::Test
     end
 
     after 'testing the driver ui' do
-      FileUtils.rm_rf "testing" if Dir.exist? 'testing'
-      FileUtils.rm_rf ".cn" if Dir.exist? '.cn'
+      FileUtils.rm_rf 'testing' if Dir.exist? 'testing'
+      FileUtils.rm_rf '.cn' if Dir.exist? '.cn'
     end
 
-    it "supports 'init' command" do
-      Driver.run ["init"]
+    it 'supports init command' do
+      Driver.run ['init']
     end
 
-    it "supports 'status' command" do
-      Driver.run ["status"]
+    it 'supports status command' do
+      Driver.run ['status']
     end
 
-    it "supports 'history' command" do
-      Driver.run ["history"]
+    it 'supports history command' do
+      Driver.run ['history']
     end
 
-    it "supports 'branch' command" do
-      drive "branch"
+    it 'supports branch command' do
+      drive 'branch'
       drive 'branch -c newbranch'
       drive 'branch -r renamedbranch'
       drive 'branch -d renamedbranch'
@@ -54,38 +54,38 @@ class TestUI < Minitest::Test
       drive 'branch thirdbranch'
     end
 
-    it "supports 'clean' command" do
-      Driver.run ["clean"]
+    it 'supports clean command' do
+      Driver.run ['clean']
     end
 
-    it "supports 'commit' command" do
+    it 'supports commit command' do
       Driver.run %w{commit -m a commit message}
       Driver.run %w{commit -m a \strange commit $message}
     end
 
-    it "supports 'checkout' command" do
+    it 'supports checkout command' do
       drive 'checkout master'
       drive 'branch -c newbranch'
       drive 'checkout master'
     end
 
-    it "supports 'merge' command" do
+    it 'supports merge command' do
       Driver.run %w{commit -m a commit message}
       Driver.run %w{branch -c branch1}
       Driver.run %w{branch -c branch2}
       Driver.run %w{merge branch1}
     end
 
-    it "supports 'clone' command" do
-      Driver.run ["clone", @user, @host]
+    it 'supports clone command' do
+      Driver.run ['clone', @user, @host]
     end
 
-    it "supports 'pull' command" do
-       Driver.run ["pull", @user, @host]
+    it 'supports pull command' do
+      Driver.run ['pull', @user, @host]
     end
 
-    it "supports 'push' command" do
-      Driver.run ["push", @user, @host]
+    it 'supports push command' do
+      Driver.run ['push', @user, @host]
     end
   end
 end

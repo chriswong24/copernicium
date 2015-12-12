@@ -5,7 +5,7 @@ require_relative 'test_helper'
 include Copernicium::RevLog
 
 class TestCoperniciumRevLog < Minitest::Test
-  describe "RevLogModule" do
+  describe "RevLog" do
     before "manipulating the log, setup tester" do
       Copernicium::RevLog.setup_tester
     end

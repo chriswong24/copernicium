@@ -9,7 +9,7 @@ include Copernicium::Driver
 include Copernicium::PushPull
 
 class TestPushPullModule < Minitest::Test
-  describe 'Copernicium PushPull' do
+  describe 'PushPull' do
     before 'connecting to host, define constants' do
       @remotefile = '/u/jwarn10/testfile'
       @filename = 'testfile'

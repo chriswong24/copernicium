@@ -6,7 +6,7 @@ include Copernicium::Driver
 include Copernicium::Workspace
 
 class CoperniciumWorkspaceTest < Minitest::Test
-  describe 'WorkspaceModule' do
+  describe 'Workspace' do
     def drive(str) Driver.run str.split end
     before 'manipulating the workspace, make a cn repo' do
       Dir.mkdir('workspace')
