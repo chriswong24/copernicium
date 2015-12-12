@@ -160,7 +160,7 @@ module Copernicium
 
     # Find snapshot and return snapshot from id
     def Repos.get_snapshot(id)
-      @@history.each do |branch, snapids|
+      @@history.each do |_branch, snapids|
         snapids.each do |snapid|
           return YAML.load_file(File.join(@@snap, id)) if snapid == id
         end
