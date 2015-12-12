@@ -1,12 +1,15 @@
-# workspace module - linfeng and qiguang
-
+# workspace module
+# linfeng song, qiguang liu
 
 module Copernicium
   class FileObj
-    attr_reader :path, :history
+    attr_reader :path, :name, :history
     def initialize(path, ids)
       @history = ids
       @path = path
+      @name = path
+      # todo - subout everything after the last /
+      # @path = File.dirname(path)
     end
 
     def ==(rhs)
@@ -123,6 +126,8 @@ module Copernicium
     def Workspace.checkout_file(file)
       idx = indexOf(file.path)
       idx.nil?? @@files << file : @@files[idx] = file
+      base = File.dirname(file)
+      Dir.mkdir base unless Dir.exist? base
       File.write(file.path, RevLog.get_file(file.last))
     end
 
