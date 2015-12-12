@@ -104,6 +104,16 @@ module Copernicium
       File.write @@hist, YAML.dump(@@history) # write history
     end
 
+    def Repos.merge_history(branch, hist)
+      @@history[branch] = sort_history(@@history[branch] + hist).uniq
+    end
+
+    def Repos.sort_history(hist)
+      #fails if there is no snapshot with the target id (a | b)
+      #hist.sort { |a, b| get_snapshot(a).date <=> get_snapshot(b).date }
+      hist
+    end
+
     # Return array of snapshot IDs
     def Repos.history(branch = nil)
       if branch.nil? # return a list of unique all commits
@@ -268,51 +278,51 @@ module Copernicium
     # bc each snapshot in our repo is atomic, not diffed
     # snap here is the id of a specific commit id
     # todo - optionally sort these by timestamp, sync
-    def Repos.merge_history(branch, hist)
-      hist.each do |snap|
-        @@history[branch] << snap unless @@history[branch].include? snap
-      end
-    end
 
     # FOR PUSHPULL UPDATE
-    # - give a comm with username hist to merge
+    # - give a comm with user's history to merge
     def Repos.update(comm = UIComm.new)
       merge_name = File.join(@@copn, 'merging_' + comm.opts)
-      status = "Remote is either up-to-date or ahead of local"
 
-      if File.exist?(merge_name)
+      if File.exist?(merge_name) # merge history
         branches = YAML.load File.read(merge_name)
+        statuses = {}
 
         # merge @@history with remote hash
         branches.each do |branch, hist|
-          if Repos.has_branch? branch
+          statuses[branch] = 'is up-to-date with remote'
+          if Repos.has_branch? branch # update
             hist.each_with_index do |snap, i|
 
+              #byebug
               # merger hist length is longer than ours
               if @@history[branch][i].nil?
-                status = "Updated successfully"
+                statuses[branch] = 'updated successfully'
                 Repos.merge_history branch, hist
                 break
 
-              # merger hist diverged from our system
+                # merger hist diverged from our system
               elsif @@history[branch][i] != snap
-                status = "Merged remote history with local"
+                statuses[branch] = 'merged history with local'
                 Repos.merge_history branch, hist
                 break
-              end
+
+              end # else synchronized - no differences
             end # will exit cleanly if we are more up-to-date
           else # branch does not exist locally yet, copy
+            statuses[branch] = 'created ok'
             @@history[branch] = hist
           end
-        end
+          puts "Success: ".grn + "#{branch} ".yel + statuses[branch]
+        end # end branch iterations
 
-        puts 'Result: '.grn + status
-        File.delete(merge_name)
+        # cleaning up...persist
+        File.delete merge_name
         update_history
-        return status
       else
         puts 'Error updating: '.red + merge_name + ' does not exist.'
       end
+      statuses
     end # update
   end # Repos
 end # Copernicium
