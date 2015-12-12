@@ -139,7 +139,7 @@ module Copernicium
       branch = args.shift
       if branch.nil? # show all branches
         puts "Current: ".grn + Repos.current
-        Repos.branches.each { |br| puts 'Branch: ' + br }
+        Repos.branches.each { |br| puts 'Branch: '.yel + br }
         puts "Total: ".grn + Repos.branches.length.to_s
 
       elsif branch == '-c' # create a new branch
