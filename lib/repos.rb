@@ -35,7 +35,7 @@ module Copernicium
   class Snapshot
     attr_accessor :id, :files, :msg, :date
     # todo - doesnt support merging. consider adding parents field
-    def initialize(files = [], msg = 'null', date = nil)
+    def initialize(files = [], msg = "null", date = nil)
       @date = (date.nil?? DateTime.now : date)
       @files = files
       @msg = msg
@@ -54,10 +54,10 @@ module Copernicium
     # read in file of snapshot ids (.cn/history)
     # check the current branch (.cn/branch)
     def Repos.setup(root = Dir.pwd)
-      @@copn = File.join(root, '.cn')
-      @@snap = File.join(@@copn, 'snap')
-      @@head = File.join(@@copn, 'branch')
-      @@hist = File.join(@@copn, 'history')
+      @@copn = File.join(root, ".cn")
+      @@snap = File.join(@@copn, "snap")
+      @@head = File.join(@@copn, "branch")
+      @@hist = File.join(@@copn, "history")
 
       # read history from disk
       @@branch = File.read(@@head)
@@ -66,12 +66,12 @@ module Copernicium
     end
 
     # unit testing version - create folders for this code
-    def Repos.setup_tester(root = Dir.pwd, branch = 'master')
-      @@copn = File.join(root, '.cn')
-      @@snap = File.join(@@copn, 'snap')
-      @@revs = File.join(@@copn, 'revs')
-      @@head = File.join(@@copn, 'branch')
-      @@hist = File.join(@@copn, 'history')
+    def Repos.setup_tester(root = Dir.pwd, branch = "master")
+      @@copn = File.join(root, ".cn")
+      @@snap = File.join(@@copn, "snap")
+      @@revs = File.join(@@copn, "revs")
+      @@head = File.join(@@copn, "branch")
+      @@hist = File.join(@@copn, "history")
 
       # create folders for testing this module
       Dir.mkdir(@@copn) unless Dir.exist?(@@copn)
@@ -126,7 +126,7 @@ module Copernicium
     end
 
     # Create and return snapshot id
-    def Repos.make_snapshot(files = [], msg = 'nil')
+    def Repos.make_snapshot(files = [], msg = "nil")
       snap = Snapshot.new(files, msg)
       @@history[@@branch] << snap.id
 
@@ -280,9 +280,9 @@ module Copernicium
     # todo - optionally sort these by timestamp, sync
 
     # FOR PUSHPULL UPDATE
-    # - give a comm with user's history to merge
+    # - give a comm with user"s history to merge
     def Repos.update(comm = UIComm.new)
-      merge_name = File.join(@@copn, 'merging_' + comm.opts)
+      merge_name = File.join(@@copn, "merging_" + comm.opts)
 
       if File.exist?(merge_name) # merge history
         branches = YAML.load File.read(merge_name)
@@ -290,27 +290,27 @@ module Copernicium
 
         # merge @@history with remote hash
         branches.each do |branch, hist|
-          statuses[branch] = 'is up-to-date with remote'
+          statuses[branch] = "is up-to-date with remote"
           if Repos.has_branch? branch # update
             hist.each_with_index do |snap, i|
 
               #byebug
               # merger hist length is longer than ours
               if @@history[branch][i].nil?
-                statuses[branch] = 'updated successfully'
+                statuses[branch] = "updated successfully"
                 Repos.merge_history branch, hist
                 break
 
                 # merger hist diverged from our system
               elsif @@history[branch][i] != snap
-                statuses[branch] = 'merged history with local'
+                statuses[branch] = "merged history with local"
                 Repos.merge_history branch, hist
                 break
 
               end # else synchronized - no differences
             end # will exit cleanly if we are more up-to-date
           else # branch does not exist locally yet, copy
-            statuses[branch] = 'created ok'
+            statuses[branch] = "created ok"
             @@history[branch] = hist
           end
           puts "Success: ".grn + "#{branch} ".yel + statuses[branch]
@@ -320,7 +320,7 @@ module Copernicium
         File.delete merge_name
         update_history
       else
-        puts 'Error updating: '.red + merge_name + ' does not exist.'
+        puts "Error updating: ".red + merge_name + " does not exist."
       end
       statuses
     end # update
