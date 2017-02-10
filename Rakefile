@@ -29,6 +29,7 @@ end
 Rake::TestTask.new do |t|
   t.name = 'travis'
   t.verbose = true
+  t.warning = false
   t.test_files =
     FileList['test/tc_repos.rb', 'test/tc_revlog.rb', 'test/tc_ui.rb',
              'test/tc_workspace.rb', 'test/tc_integration']
