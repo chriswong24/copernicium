@@ -3,6 +3,10 @@ require 'rake/testtask'
 require 'rdoc/task'
 
 
+g='copernicium'
+v='0.3'
+
+
 # setup development environment with bundler
 task :setup do
   system 'gem install bundler'
@@ -25,9 +29,9 @@ end
 Rake::TestTask.new do |t|
   t.name = 'travis'
   t.verbose = true
-  t.test_files = FileList['test/tc_repos.rb', 'test/tc_revlog.rb',
-                          'test/tc_ui.rb', 'test/tc_workspace.rb',
-                          'test/tc_integration']
+  t.test_files =
+    FileList['test/tc_repos.rb', 'test/tc_revlog.rb', 'test/tc_ui.rb',
+             'test/tc_workspace.rb', 'test/tc_integration']
 end
 
 
@@ -79,3 +83,21 @@ RDoc::Task.new :rdoc do |rdoc|
   rdoc.options << "--all" # show private methods
 end
 
+
+# imported from makefile
+task :build do
+  sh "gem build #{g}.gemspec"
+  sh "gem install ./#{g}-#{v}.gem"
+end
+
+task :clean do
+  sh "rm -vf *.gem"
+end
+
+task :push => [:clean, :build] do
+  sh "gem push #{g}-#{v}.gem"
+end
+
+task :dev do
+  sh "filewatcher '**/*.rb' 'clear && yes | rake'"
+end
