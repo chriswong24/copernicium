@@ -2,5 +2,5 @@ language: ruby
 rvm: 2.2.3
 install:
   - bundle install --jobs=3 --retry=3
-  - make # build ruby gem locally
+  - rake build # make ruby gem locally
 script: yes | rake # run travis modules
